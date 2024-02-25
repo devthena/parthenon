@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+:root {
+  --black: #1d1e2c;
+  --dark-purple: #451b40;
+  --melon: #f3adad;
+  --plum: #8b4382;
+  --white: #f8f8ff;
+}
+
+body {
+  background-image: linear-gradient(var(--white), var(--melon));
+  background-repeat: no-repeat;
+  color: var(--black);
+  margin: 0;
+  font-family: 'Quicksand', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+footer {
+  font-size: 11px;
+  text-align: center;
+}
+
+svg {
+  fill: var(--dark-purple);
+  margin: 0 8px;
+  max-width: 20px;
+
+  &:hover {
+    fill: var(--plum);
+  }
+}

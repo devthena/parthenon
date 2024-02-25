@@ -1,0 +1,99 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+.container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 14px;
+  justify-content: center;
+
+  @media screen and (min-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media screen and (min-width: 992px) {
+    flex-direction: row;
+  }
+}
+
+.content {
+  text-align: center;
+}
+
+.hero {
+  max-width: 170px;
+
+  @media screen and (min-width: 768px) {
+    max-width: 270px;
+  }
+
+  @media screen and (min-width: 992px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 1200px) {
+    max-width: none;
+  }
+}
+
+.socials {
+  margin-top: 50px;
+}
+
+a {
+  color: var(--dark-purple);
+  font-weight: 700;
+
+  &:hover {
+    color: var(--plum);
+  }
+}
+
+button {
+  background: transparent;
+  border: 2px solid var(--dark-purple);
+  border-radius: 7px;
+  color: var(--dark-purple);
+  cursor: pointer;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 5px 10px;
+
+  &:hover {
+    border-color: var(--plum);
+    color: var(--plum);
+  }
+
+  @media screen and (min-width: 768px) {
+    font-size: 18px;
+  }
+}
+
+h1 {
+  color: var(--dark-purple);
+  font-size: 36px;
+
+  @media screen and (min-width: 768px) {
+    font-size: 62px;
+  }
+
+  @media screen and (min-width: 1200px) {
+    font-size: 72px;
+  }
+}
+
+h2 {
+  font-size: 20px;
+  margin: 15px 0;
+
+  @media screen and (min-width: 768px) {
+    font-size: 32px;
+  }
+}
