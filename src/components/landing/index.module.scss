@@ -1,0 +1,40 @@
+.container {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: 14px;
+  justify-content: center;
+
+  @media screen and (min-width: 768px) {
+    font-size: 18px;
+  }
+
+  @media screen and (min-width: 992px) {
+    flex-direction: row;
+  }
+}
+
+.content {
+  text-align: center;
+}
+
+.hero {
+  max-width: 170px;
+
+  @media screen and (min-width: 768px) {
+    max-width: 270px;
+  }
+
+  @media screen and (min-width: 992px) {
+    max-width: 320px;
+  }
+
+  @media screen and (min-width: 1200px) {
+    max-width: none;
+  }
+}
+
+.socials {
+  margin-top: 50px;
+}
