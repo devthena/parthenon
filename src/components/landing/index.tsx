@@ -33,7 +33,11 @@ const Landing = ({ setPage }: LandingProps) => {
           <h2>Software Engineer</h2>
           <p>
             Check out what I've worked on:{' '}
-            <button onClick={() => setPage(Pages.Projects)}>Projects</button>
+            <button
+              className={styles.projectsButton}
+              onClick={() => setPage(Pages.Projects)}>
+              Projects
+            </button>
           </p>
         </div>
         <div className={styles.socials}>

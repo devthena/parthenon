@@ -14,27 +14,6 @@ a {
   }
 }
 
-button {
-  background: transparent;
-  border: 2px solid var(--dark-purple);
-  border-radius: 7px;
-  color: var(--dark-purple);
-  cursor: pointer;
-  font-family: 'Quicksand', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 5px 10px;
-
-  &:hover {
-    border-color: var(--plum);
-    color: var(--plum);
-  }
-
-  @media screen and (min-width: 768px) {
-    font-size: 18px;
-  }
-}
-
 h1 {
   color: var(--dark-purple);
   font-size: 36px;
