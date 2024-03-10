@@ -4,34 +4,3 @@
   min-height: 100vh;
   min-height: -webkit-fill-available;
 }
-
-a {
-  color: var(--dark-purple);
-  font-weight: 700;
-
-  &:hover {
-    color: var(--plum);
-  }
-}
-
-h1 {
-  color: var(--dark-purple);
-  font-size: 36px;
-
-  @media screen and (min-width: 768px) {
-    font-size: 62px;
-  }
-
-  @media screen and (min-width: 1200px) {
-    font-size: 72px;
-  }
-}
-
-h2 {
-  font-size: 20px;
-  margin: 15px 0;
-
-  @media screen and (min-width: 768px) {
-    font-size: 32px;
-  }
-}

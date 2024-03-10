@@ -1,10 +1,17 @@
 header {
-  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  padding: 15px 30px;
 }
 
 .nav {
-  background: transparent;
   border: none;
+  color: var(--dark-purple);
   cursor: pointer;
   font-size: 22px;
+
+  &:disabled {
+    color: var(--plum);
+    cursor: default;
+  }
 }

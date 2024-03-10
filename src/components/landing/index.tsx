@@ -11,9 +11,9 @@ const Landing = ({ setPage }: LandingProps) => {
         <img alt="Athena" className={styles.hero} src="/athena.png" />
       </figure>
       <div className={styles.content}>
-        <h1>🌸 AthenaUS 🌸</h1>
+        <h1 className={styles.headline}>🌸 AthenaUS 🌸</h1>
         <div>
-          <h2>Twitch Affiliate</h2>
+          <h2 className={styles.subHeadline}>Twitch Affiliate</h2>
           <p>
             Join my community on{' '}
             <a
@@ -30,7 +30,7 @@ const Landing = ({ setPage }: LandingProps) => {
               Twitch
             </a>
           </p>
-          <h2>Software Engineer</h2>
+          <h2 className={styles.subHeadline}>Software Engineer</h2>
           <p>
             Check out what I've worked on:{' '}
             <button
