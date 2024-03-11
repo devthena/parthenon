@@ -16,7 +16,7 @@ export const ProjectData = [
   },
   {
     title: 'Wordle',
-    description: 'A word game based on the original NY Times Wordle',
+    description: 'The popular word-guessing game in React',
     type: 'web',
     repository: 'https://github.com/devthena/wordle',
     tech: ['React', 'TypeScript'],
