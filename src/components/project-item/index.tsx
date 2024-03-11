@@ -4,11 +4,11 @@ import styles from './index.module.scss';
 const ProjectItem = ({ item }: ProjectItemProps) => {
   return (
     <div className={styles.item}>
-      <h2>
+      <h2 className={styles.title}>
         {item.title}
         <sup className={styles.type}>{item.type}</sup>
       </h2>
-      <p>{item.description}</p>
+      <p className={styles.description}>{item.description}</p>
       <p className={styles.repository}>
         Github:{' '}
         <a href={item.repository} target="_blank" rel="noreferrer">
