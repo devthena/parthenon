@@ -1,15 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
+
+import Loading from "../components/loading";
 
 const Dashboard = () => {
   const { user, error, isLoading } = useUser();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
-  console.log(user);
+  if (!user) return redirect("/");
 
   return (
     <div>

@@ -14,8 +14,7 @@
 }
 
 body {
-  background-image: linear-gradient(var(--white), var(--melon));
-  background-repeat: no-repeat;
+  background-color: var(--white);
   color: var(--black);
   margin: 0;
   -webkit-font-smoothing: antialiased;
