@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { LoginMethod } from "../lib/enums";
-import { IUser } from "../lib/interfaces";
+import { LoginMethod } from "../lib/enums/auth";
+import { UserObject } from "../lib/types/db";
 
 export const useApi = () => {
-  const [data, setData] = useState<IUser | null>(null);
+  const [data, setData] = useState<UserObject | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 

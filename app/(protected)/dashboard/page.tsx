@@ -7,7 +7,7 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 
 import Loading from "../../components/loading";
 import { useApi } from "../../hooks";
-import { LoginMethod } from "../../lib/enums";
+import { LoginMethod } from "../../lib/enums/auth";
 
 const Dashboard = () => {
   const { data, apiError, fetchUser } = useApi();

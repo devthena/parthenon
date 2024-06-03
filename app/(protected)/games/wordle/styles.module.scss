@@ -1,0 +1,16 @@
+button.play {
+  background-color: var(--green);
+  border: 2px solid forestgreen;
+  border-radius: 30px;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 500;
+  height: 62px;
+  margin: 5px 0;
+  width: 235px;
+
+  &:hover {
+    background-color: var(--green-hover);
+  }
+}

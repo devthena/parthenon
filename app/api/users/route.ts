@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-import { LoginMethod } from "../../lib/enums";
+import { LoginMethod } from "../../lib/enums/auth";
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? "";
 const mongodbName = process.env.MONGODB_NAME;
