@@ -1,9 +1,9 @@
-export const enum GameStatus {
+export enum GameStatus {
   Overview,
   Start,
 }
 
-export const enum WordleStatus {
+export enum WordleStatus {
   Answered,
   Completed,
   InvalidWord,

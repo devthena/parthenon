@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { redirect } from "next/navigation";
-import { useState } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import Image from 'next/image';
+import { redirect } from 'next/navigation';
+import { useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
-import Loading from "../../components/loading";
-import { useApi } from "../../hooks";
-import { LoginMethod } from "../../lib/enums/auth";
+import Loading from '../../components/loading';
+import { useApi } from '../../hooks';
+import { ApiUrls } from '../../lib/constants/db';
+import { LoginMethod } from '../../lib/enums/auth';
 
 const Dashboard = () => {
-  const { data, apiError, fetchUser } = useApi();
+  const { apiError, isFetching, profile, fetchData } = useApi();
   const { user, error, isLoading } = useUser();
 
   const [isDataFetched, setIsDataFetched] = useState(false);
@@ -18,14 +19,14 @@ const Dashboard = () => {
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
-  if (!user || !user.sub) return redirect("/");
+  if (!user || !user.sub) return redirect('/');
 
-  const userSub = user.sub.split("|");
+  const userSub = user.sub.split('|');
   const userId = userSub[2];
   const loginMethod = userSub[1] as LoginMethod;
 
   if (!isDataFetched) {
-    fetchUser(userId, loginMethod);
+    fetchData(ApiUrls.users, userId, loginMethod);
     setIsDataFetched(true);
   }
 
@@ -42,12 +43,20 @@ const Dashboard = () => {
           <p>Email: {user.email}</p>
         </div>
       )}
-      {!data && <Loading />}
-      {data && (
+      {!profile && isFetching && <Loading />}
+      {!profile && !isFetching && (
         <div>
-          <p>Cash: {data.cash}</p>
-          <p>Bank: {data.bank}</p>
-          <p>Total: {data.cash + data.bank}</p>
+          <p>
+            Start earning points by participating in AthenaUS Twitch chat and
+            Discord server!
+          </p>
+        </div>
+      )}
+      {profile && (
+        <div>
+          <p>Cash: {profile.cash}</p>
+          <p>Bank: {profile.bank}</p>
+          <p>Total: {profile.cash + profile.bank}</p>
         </div>
       )}
       {apiError && (

@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
 import { LoginMethod } from '../../lib/enums/auth';
-import { UserObject } from '../../lib/types/db';
+import { StatsObject } from '../../lib/types/db';
 
-const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
+const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
 const mongodbURI = process.env.MONGODB_URI ?? '';
 
@@ -16,14 +16,14 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getUser = async (id: string, method: LoginMethod) => {
+const getStats = async (id: string, method: LoginMethod) => {
   await client.connect();
 
   const idField = method + '_id';
 
   const collection = await client
     .db(mongodbName)
-    .collection<UserObject>(mongodbCollection);
+    .collection<StatsObject>(mongodbCollection);
   const data = await collection.findOne({ [idField]: id });
 
   await client.close();
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   const { id, method } = await request.json();
 
   try {
-    responseData = await getUser(id, method);
+    responseData = await getStats(id, method);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
