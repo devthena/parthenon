@@ -1,9 +1,20 @@
-import { useState } from 'react';
-import { useApi } from './useApi';
+import { useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+
+import { ApiUrls } from '../lib/constants/db';
+import { LoginMethod } from '../lib/enums/auth';
 import { StatsWordleObject } from '../lib/types/db';
 
+import { useApi } from './useApi';
+import { RequestType } from '../lib/enums/db';
+
 export const useStats = () => {
-  // const { data, fetchApi, postApi } = useApi();
+  const { apiError, stats, fetchData, updateData } = useApi();
+  const { user } = useUser();
+
+  const userSub = user?.sub?.split('|');
+  const userId = userSub ? userSub[2] : null;
+  const loginMethod = userSub ? (userSub[1] as LoginMethod) : null;
 
   const [wordleStats, setWordleStats] = useState<StatsWordleObject>({
     currentStreak: 0,
@@ -13,16 +24,36 @@ export const useStats = () => {
     totalWon: 0,
   });
 
+  const getWordleStats = async () => {
+    if (userId && loginMethod) {
+      await fetchData(ApiUrls.stats, {
+        type: RequestType.Read,
+        payload: {
+          id: userId,
+          method: loginMethod,
+        },
+      });
+    }
+  };
+
   const saveStats = async (stats: StatsWordleObject) => {
-    console.log('saveStats', stats);
-    // await postApi(apiUrls.stats, {
-    //   type: authType,
-    //   [`${authType}_id`]: userId,
-    //   wordle: stats,
-    // });
+    await updateData(ApiUrls.stats, {
+      type: RequestType.Update,
+      payload: {
+        [`${loginMethod}_id`]: userId,
+        wordle: stats,
+      },
+    });
   };
 
   const updateWordleStats = (finalTurn: number) => {
+    /**
+     * @todo: fix the function below being called twice
+     *        without adding the isSaving condition
+     */
+
+    let isSaving = true;
+
     setWordleStats(prev => {
       const updatedUserStats = { ...prev };
       updatedUserStats.totalPlayed += 1;
@@ -39,12 +70,21 @@ export const useStats = () => {
         }
       }
 
-      saveStats(updatedUserStats);
+      if (isSaving) {
+        saveStats(updatedUserStats);
+        isSaving = false;
+      }
       return updatedUserStats;
     });
   };
 
+  useEffect(() => {
+    if (stats) setWordleStats(stats.wordle);
+  }, [stats]);
+
   return {
+    apiError,
+    getWordleStats,
     setWordleStats,
     updateWordleStats,
     wordleStats,

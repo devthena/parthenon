@@ -5,10 +5,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 import Loading from '../../../components/loading';
-import { useApi, useStats, useWordle } from '../../../hooks';
-
-import { ApiUrls } from '../../../lib/constants/db';
-import { LoginMethod } from '../../../lib/enums/auth';
+import { useStats, useWordle } from '../../../hooks';
 import { GameStatus, WordleStatus } from '../../../lib/enums/wordle';
 
 import { AnswerGrid, Keyboard, Notice, Stats } from './components';
@@ -16,8 +13,8 @@ import { AnswerGrid, Keyboard, Notice, Stats } from './components';
 import styles from './styles.module.scss';
 
 const Wordle = () => {
-  const { apiError, stats, fetchData } = useApi();
-  const { wordleStats, setWordleStats, updateWordleStats } = useStats();
+  const { apiError, wordleStats, getWordleStats, updateWordleStats } =
+    useStats();
   const { user, error, isLoading } = useUser();
 
   const [isDataFetched, setIsDataFetched] = useState(false);
@@ -36,10 +33,6 @@ const Wordle = () => {
   } = useWordle(null);
 
   useEffect(() => {
-    if (isDataFetched && stats) setWordleStats(stats.wordle);
-  }, [isDataFetched, stats, setWordleStats]);
-
-  useEffect(() => {
     if (
       !isGameOver &&
       (wordleStatus === WordleStatus.Answered ||
@@ -54,12 +47,7 @@ const Wordle = () => {
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
-
-  if (!user || !user.sub) return redirect('/');
-
-  const userSub = user.sub.split('|');
-  const userId = userSub[2];
-  const loginMethod = userSub[1] as LoginMethod;
+  if (!user) return redirect('/');
 
   if (!isDataFetched) {
     const keyUpHandler = (evt: KeyboardEvent) => {
@@ -68,7 +56,7 @@ const Wordle = () => {
 
     window.addEventListener('keyup', keyUpHandler, true);
 
-    fetchData(ApiUrls.stats, userId, loginMethod);
+    getWordleStats();
     setIsDataFetched(true);
   }
 
@@ -99,7 +87,7 @@ const Wordle = () => {
       )}
       {apiError && (
         <div>
-          <p>User Stats Fetch Error: {apiError}</p>
+          <p>Stats Fetch Error: {apiError}</p>
         </div>
       )}
     </div>

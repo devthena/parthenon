@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { LoginMethod } from '../lib/enums/auth';
-import { StatsObject, UserObject } from '../lib/types/db';
+import { StatsObject, StatsRequest, UserObject } from '../lib/types/db';
 import { ApiUrls } from '../lib/constants/db';
 
 export const useApi = () => {
@@ -8,8 +7,9 @@ export const useApi = () => {
   const [stats, setStats] = useState<StatsObject | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [apiSuccess, setApiSuccess] = useState<boolean>(false);
 
-  const fetchData = async (url: string, id: string, method: LoginMethod) => {
+  const fetchData = async (url: string, request: StatsRequest) => {
     setIsFetching(true);
 
     try {
@@ -18,7 +18,7 @@ export const useApi = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, method }),
+        body: JSON.stringify(request),
       });
 
       const response = await res.json();
@@ -37,5 +37,40 @@ export const useApi = () => {
     }
   };
 
-  return { apiError, isFetching, profile, stats, fetchData };
+  const updateData = async (url: string, request: StatsRequest) => {
+    setIsFetching(true);
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      });
+
+      const response = await res.json();
+
+      if (response.error) {
+        setApiError('useApi updateData Error:' + response.error);
+      } else if (response.data) {
+        setApiSuccess(true);
+      }
+
+      setIsFetching(false);
+    } catch (fetchError) {
+      setApiError(JSON.stringify(fetchError));
+      setIsFetching(false);
+    }
+  };
+
+  return {
+    apiError,
+    apiSuccess,
+    isFetching,
+    profile,
+    stats,
+    fetchData,
+    updateData,
+  };
 };

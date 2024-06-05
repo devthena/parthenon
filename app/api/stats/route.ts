@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { LoginMethod } from '../../lib/enums/auth';
-import { StatsObject } from '../../lib/types/db';
+import { RequestType } from '../../lib/enums/db';
+
+import {
+  StatsObject,
+  StatsReadPayload,
+  StatsUpdatePayload,
+} from '../../lib/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -16,15 +21,40 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getStats = async (id: string, method: LoginMethod) => {
+const getStats = async (req: StatsReadPayload) => {
   await client.connect();
 
-  const idField = method + '_id';
+  const idField = req.method + '_id';
 
   const collection = await client
     .db(mongodbName)
     .collection<StatsObject>(mongodbCollection);
-  const data = await collection.findOne({ [idField]: id });
+
+  const data = await collection.findOne({ [idField]: req.id });
+
+  await client.close();
+  return data;
+};
+
+const saveStats = async (req: StatsUpdatePayload) => {
+  await client.connect();
+
+  const idField = req.discord_id ? 'discord_id' : 'twitch_id';
+  const idValue = req.discord_id || req.twitch_id;
+
+  if (!idField) return null;
+
+  const collection = await client.db(mongodbName).collection(mongodbCollection);
+
+  const data = await collection.updateOne(
+    { [idField]: idValue },
+    {
+      $set: {
+        ...req,
+      },
+    },
+    { upsert: true }
+  );
 
   await client.close();
   return data;
@@ -34,10 +64,17 @@ export async function POST(request: NextRequest) {
   let responseData = null;
   let responseError = null;
 
-  const { id, method } = await request.json();
+  const { type, payload } = await request.json();
 
   try {
-    responseData = await getStats(id, method);
+    switch (type) {
+      case RequestType.Read:
+        responseData = await getStats(payload);
+        break;
+      case RequestType.Update:
+        responseData = await saveStats(payload);
+        break;
+    }
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
