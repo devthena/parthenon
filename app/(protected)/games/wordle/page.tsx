@@ -6,6 +6,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 import Loading from '../../../components/loading';
 import { useStats, useWordle } from '../../../hooks';
+import { BackIcon } from '../../../icons';
 import { GameStatus, WordleStatus } from '../../../lib/enums/wordle';
 
 import { AnswerGrid, Keyboard, Notice, Stats } from './components';
@@ -75,6 +76,17 @@ const Wordle = () => {
       )}
       {status === GameStatus.Start && (
         <div>
+          <button
+            className={styles.back}
+            onClick={() => setStatus(GameStatus.Overview)}>
+            <BackIcon />
+          </button>
+          <button
+            className={styles.backDesktop}
+            onClick={() => setStatus(GameStatus.Overview)}>
+            <BackIcon />
+            <span>BACK</span>
+          </button>
           <Notice word={word} status={wordleStatus} />
           <AnswerGrid
             colors={guessColors}
