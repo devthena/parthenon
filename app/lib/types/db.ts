@@ -15,6 +15,10 @@ export type StatsWordleObject = {
   totalWon: number;
 };
 
+export type StatsWordleProps = {
+  data: StatsWordleObject;
+};
+
 export type UserObject = {
   _id: ObjectId;
   user_id: string;

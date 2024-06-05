@@ -1,0 +1,80 @@
+.grid {
+  color: var(--black);
+  display: grid;
+  font-weight: 500;
+  grid-template-rows: repeat(6, 1fr);
+  grid-gap: 3px;
+  height: 300px;
+  margin: 0 auto 20px;
+  width: 250px;
+
+  @media screen and (min-width: 768px) {
+    grid-gap: 5px;
+    height: 375px;
+    margin: 0 auto 40px;
+    width: 320px;
+  }
+}
+
+.invalid {
+  animation: shake 0.25s;
+}
+
+.letter {
+  align-items: center;
+  border: 1px solid var(--grey-light);
+  display: inline-flex;
+  font-size: 26px;
+  justify-content: center;
+  text-transform: uppercase;
+  user-select: none;
+
+  @media screen and (min-width: 768px) {
+    font-size: 36px;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 3px;
+  width: 100%;
+
+  @media screen and (min-width: 768px) {
+    grid-gap: 5px;
+  }
+}
+
+.guessing {
+  border: 1px solid var(--grey-dark);
+}
+.green {
+  background-color: var(--green);
+  color: white;
+}
+.grey {
+  background-color: var(--grey);
+  color: white;
+}
+.yellow {
+  background-color: var(--yellow);
+  color: white;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(3px);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}

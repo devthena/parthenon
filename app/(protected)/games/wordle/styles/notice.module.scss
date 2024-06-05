@@ -1,0 +1,30 @@
+.answer {
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.container {
+  align-items: center;
+  display: flex;
+  height: 20px;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.note {
+  font-size: 14px;
+  margin: 0;
+}
+
+.noteFade {
+  animation: fadeOut ease 2s;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

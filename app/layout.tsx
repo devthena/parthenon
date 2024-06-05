@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-import { Figtree } from "next/font/google";
+import type { Metadata } from 'next';
+import { Figtree } from 'next/font/google';
 
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { UserProvider } from '@auth0/nextjs-auth0/client';
 
-import "./globals.scss";
-import styles from "./index.module.scss";
+import './globals.scss';
+import styles from './index.module.scss';
 
 export const metadata: Metadata = {
-  title: "Parthenon",
-  description: "Official website of AthenaUS",
+  title: 'Parthenon',
+  description: 'Official website of AthenaUS',
 };
 
-const figtree = Figtree({ subsets: ["latin"] });
+const figtree = Figtree({ subsets: ['latin'] });
 
 const RootLayout = ({
   children,
