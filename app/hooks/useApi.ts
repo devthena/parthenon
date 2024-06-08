@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { StatsObject, StatsRequest, UserObject } from '../lib/types/db';
+import {
+  FetchPayload,
+  PostPayload,
+  StatsObject,
+  UserObject,
+} from '../lib/types/api';
 import { ApiUrls } from '../lib/constants/db';
 
 export const useApi = () => {
@@ -9,18 +14,11 @@ export const useApi = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [apiSuccess, setApiSuccess] = useState<boolean>(false);
 
-  const fetchData = async (url: string, request: StatsRequest) => {
+  const fetchData = async (url: string, payload: FetchPayload) => {
     setIsFetching(true);
 
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
-
+      const res = await fetch(`${url}/${payload.method}/${payload.id}`);
       const response = await res.json();
 
       if (response.error) {
@@ -37,16 +35,16 @@ export const useApi = () => {
     }
   };
 
-  const updateData = async (url: string, request: StatsRequest) => {
+  const updateData = async (url: string, request: PostPayload) => {
     setIsFetching(true);
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch(`${url}/${request.method}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(request.payload),
       });
 
       const response = await res.json();

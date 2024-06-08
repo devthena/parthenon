@@ -26,7 +26,11 @@ const Dashboard = () => {
   const loginMethod = userSub[1] as LoginMethod;
 
   if (!isDataFetched) {
-    fetchData(ApiUrls.users, userId, loginMethod);
+    fetchData(ApiUrls.users, {
+      id: userId,
+      method: loginMethod,
+    });
+
     setIsDataFetched(true);
   }
 

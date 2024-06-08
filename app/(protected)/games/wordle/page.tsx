@@ -28,6 +28,7 @@ const Wordle = () => {
     handleKeyUp,
     keyColors,
     keyIds,
+    setWordleStatus,
     turn,
     word,
     wordleStatus,
@@ -78,12 +79,18 @@ const Wordle = () => {
         <div>
           <button
             className={styles.back}
-            onClick={() => setStatus(GameStatus.Overview)}>
+            onClick={() => {
+              setWordleStatus(WordleStatus.Restart);
+              setStatus(GameStatus.Overview);
+            }}>
             <BackIcon />
           </button>
           <button
             className={styles.backDesktop}
-            onClick={() => setStatus(GameStatus.Overview)}>
+            onClick={() => {
+              setWordleStatus(WordleStatus.Restart);
+              setStatus(GameStatus.Overview);
+            }}>
             <BackIcon />
             <span>BACK</span>
           </button>

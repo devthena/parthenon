@@ -191,6 +191,7 @@ export const useWordle = (answer: string | null) => {
     handleKeyUp,
     keyColors,
     keyIds,
+    setWordleStatus,
     turn: turn.current,
     word: word.current,
     wordleStatus,

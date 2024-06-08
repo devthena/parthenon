@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { LoginMethod } from '../../lib/enums/auth';
-import { UserObject } from '../../lib/types/db';
+import { FetchParams, UserObject } from '../../../../lib/types/api';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -16,28 +15,24 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getUser = async (id: string, method: LoginMethod) => {
+const getUser = async (id: string) => {
   await client.connect();
-
-  const idField = method + '_id';
 
   const collection = await client
     .db(mongodbName)
     .collection<UserObject>(mongodbCollection);
-  const data = await collection.findOne({ [idField]: id });
+  const data = await collection.findOne({ discord_id: id });
 
   await client.close();
   return data;
 };
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: FetchParams) {
   let responseData = null;
   let responseError = null;
 
-  const { id, method } = await request.json();
-
   try {
-    responseData = await getUser(id, method);
+    responseData = await getUser(params.id);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

@@ -1,6 +1,21 @@
 import { ObjectId } from 'mongodb';
 import { LoginMethod } from '../enums/auth';
-import { RequestType } from '../enums/db';
+
+export type FetchParams = {
+  params: {
+    id: string;
+  };
+};
+
+export type FetchPayload = {
+  id: string;
+  method: LoginMethod;
+};
+
+export type PostPayload = {
+  method: LoginMethod;
+  payload: StatsPayload;
+};
 
 export type StatsObject = {
   _id: ObjectId;
@@ -9,17 +24,7 @@ export type StatsObject = {
   wordle: StatsWordleObject;
 };
 
-export type StatsReadPayload = {
-  id: string;
-  method: LoginMethod;
-};
-
-export type StatsRequest = {
-  type: RequestType;
-  payload: StatsReadPayload | StatsUpdatePayload;
-};
-
-export type StatsUpdatePayload = {
+export type StatsPayload = {
   discord_id?: string;
   twitch_id?: string;
   wordle: StatsWordleObject;

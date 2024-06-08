@@ -4,7 +4,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
-import { StatsWordleProps } from '../../../../lib/types/db';
+import { StatsWordleProps } from '../../../../lib/types/api';
 import styles from '../styles/stats.module.scss';
 
 export const Stats = ({ data }: StatsWordleProps) => {
