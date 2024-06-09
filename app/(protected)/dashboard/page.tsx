@@ -63,6 +63,23 @@ const Dashboard = () => {
           <p>Total: {profile.cash + profile.bank}</p>
         </div>
       )}
+      {profile && profile.twitch_id && !profile.discord_id && (
+        <div>
+          <p>Link your Twitch and Discord accounts!</p>
+          <p>Copy the code below:</p>
+          <code>{profile.user_id}</code>
+          <p>
+            In the Discord server, use the /link command and enter the code.
+          </p>
+          <p>
+            The bot will give you a confirmation once both accounts are linked.
+          </p>
+          <p>
+            Note: Should you need to unlink your accounts, use /unlink in the
+            server.
+          </p>
+        </div>
+      )}
       {apiError && (
         <div>
           <p>User Data Fetch Error: {apiError}</p>
