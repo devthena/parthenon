@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { redirect } from "next/navigation";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { redirect } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
-import Loading from "./components/loading";
+import Loading from './components/loading';
 
 const Home = () => {
   const { user, error, isLoading } = useUser();
@@ -11,7 +11,7 @@ const Home = () => {
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
-  if (user) return redirect("/dashboard");
+  if (user) return redirect('/dashboard');
 
   return (
     <div>
