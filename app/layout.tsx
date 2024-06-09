@@ -22,7 +22,12 @@ const RootLayout = ({
     <html lang="en">
       <UserProvider>
         <body className={figtree.className}>
-          <main className={styles.main}>{children}</main>
+          <main className={styles.main}>
+            <div className={styles.content}>{children}</div>
+            <footer className={styles.footer}>
+              Made with ♡ by Athena | Build v0.1.0
+            </footer>
+          </main>
         </body>
       </UserProvider>
     </html>

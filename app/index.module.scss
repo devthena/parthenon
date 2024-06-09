@@ -3,4 +3,15 @@
   flex-direction: column;
   min-height: 100vh;
   min-height: -webkit-fill-available;
+  padding: 20px;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.footer {
+  font-size: 14px;
+  font-weight: 300;
+  text-align: center;
 }

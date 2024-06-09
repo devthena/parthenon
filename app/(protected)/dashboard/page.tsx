@@ -80,6 +80,13 @@ const Dashboard = () => {
           </p>
         </div>
       )}
+      {profile && profile.discord_id && profile.twitch_id && (
+        <div>
+          <h2>Accounts Linked!</h2>
+          <p>Discord: {profile.discord_username}</p>
+          <p>Twitch: {profile.twitch_username}</p>
+        </div>
+      )}
       {apiError && (
         <div>
           <p>User Data Fetch Error: {apiError}</p>
