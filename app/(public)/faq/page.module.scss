@@ -1,4 +1,4 @@
-.faqContainer {
+.faq {
   margin: 0 auto;
   max-width: 1060px;
 }
@@ -7,7 +7,7 @@
   font-size: 36px;
 }
 
-.faqBox {
+.questions {
   color: var(--dark-blue);
   margin-top: 36px;
   text-align: left;
@@ -16,6 +16,10 @@
     font-size: 28px;
     font-weight: 500;
     margin-top: 30px;
+  }
+
+  h2:first-child {
+    margin-top: 45px;
   }
 
   ol {
