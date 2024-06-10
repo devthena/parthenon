@@ -1,0 +1,26 @@
+.dashboard {
+  display: flex;
+}
+
+.bio {
+  h1 {
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 48px;
+  }
+}
+
+.avatar img {
+  border-radius: 100%;
+}
+
+.cash {
+  align-items: center;
+  display: flex;
+  font-size: 28px;
+  line-height: 32px;
+
+  span {
+    margin-right: 3px;
+  }
+}

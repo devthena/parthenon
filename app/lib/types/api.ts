@@ -53,5 +53,4 @@ export type UserObject = {
   cash: number;
   bank: number;
   stars: number;
-  power_ups: string[];
 };

@@ -7,6 +7,9 @@
 
 .avatar {
   background-color: var(--owl-blue-light);
+  border-radius: 24px;
+  display: flex;
+  justify-content: center;
   margin: 0 auto;
   width: 500px;
 }
@@ -39,4 +42,8 @@
   display: flex;
   justify-content: center;
   margin-top: 20px;
+
+  svg {
+    margin-right: 15px;
+  }
 }

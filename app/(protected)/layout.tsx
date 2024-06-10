@@ -2,6 +2,8 @@
 
 import { Header } from '../components';
 
+import styles from './layout.module.scss';
+
 const ProtectedLayout = ({
   children,
 }: Readonly<{
@@ -10,7 +12,7 @@ const ProtectedLayout = ({
   return (
     <>
       <Header isProtected={true} />
-      {children}
+      <div className={styles.container}>{children}</div>
     </>
   );
 };

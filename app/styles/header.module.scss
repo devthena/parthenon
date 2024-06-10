@@ -51,4 +51,10 @@
   color: var(--dark-blue);
   font-weight: 700;
   padding: 7px 28px 8px 29px;
+  transition: all 0.1s ease;
+
+  &:hover {
+    background-color: var(--dark-blue);
+    color: var(--white);
+  }
 }

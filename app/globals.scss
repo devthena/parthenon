@@ -40,21 +40,10 @@ a {
 
 button {
   background: transparent;
-  color: var(--dark-purple);
   font-family: 'Figtree', sans-serif;
 }
 
 code {
   font-family: 'Source Code Pro', monospace;
   font-optical-sizing: auto;
-}
-
-svg {
-  fill: var(--dark-purple);
-  margin: 0 8px;
-  max-width: 20px;
-
-  &:hover {
-    fill: var(--plum);
-  }
 }
