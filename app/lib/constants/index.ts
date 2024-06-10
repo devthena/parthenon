@@ -4,11 +4,11 @@ export const NavPaths = [
     value: '/',
     protected: false,
   },
-  {
-    label: 'Games',
-    value: '/games',
-    protected: true,
-  },
+  // {
+  //   label: 'Games',
+  //   value: '/games',
+  //   protected: true,
+  // },
   {
     label: 'Commands',
     value: '/commands',

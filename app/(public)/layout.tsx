@@ -12,13 +12,16 @@ const PublicLayout = ({
 }>) => {
   const { user, error, isLoading } = useUser();
 
-  if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
   return (
     <>
       <Header isProtected={!!user} />
-      <div className={styles.container}>{children}</div>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className={styles.container}>{children}</div>
+      )}
     </>
   );
 };
