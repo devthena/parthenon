@@ -1,9 +1,13 @@
 .header {
   display: flex;
+  height: 90px;
   justify-content: space-between;
 }
 
 .logo {
+  align-items: center;
+  display: flex;
+
   a {
     align-items: center;
     display: flex;

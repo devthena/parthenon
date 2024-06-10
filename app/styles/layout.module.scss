@@ -12,11 +12,13 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 17px;
 }
 
 .footer {
+  align-items: center;
+  display: flex;
   font-size: 14px;
   font-weight: 300;
-  padding: 17px;
+  height: 80px;
+  justify-content: center;
 }
