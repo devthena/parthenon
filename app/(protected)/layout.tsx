@@ -8,10 +8,10 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div>
+    <>
       <Header isProtected={true} />
       {children}
-    </div>
+    </>
   );
 };
 

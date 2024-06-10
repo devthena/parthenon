@@ -20,3 +20,10 @@ export const NavPaths = [
     protected: false,
   },
 ];
+
+export const SocialUrls = {
+  Github: 'https://github.com/devthena',
+  Instagram: 'https://instagram.com/theathenaus',
+  Twitch: 'https://twitch.tv/athenaus',
+  X: 'https://x.com/athenaus',
+};
