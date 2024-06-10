@@ -1,4 +1,6 @@
-import Link from 'next/link';
+'use client';
+
+import { Header } from '../components';
 
 const ProtectedLayout = ({
   children,
@@ -7,13 +9,7 @@ const ProtectedLayout = ({
 }>) => {
   return (
     <div>
-      <header>
-        <nav>
-          <Link href="/dashboard">Home</Link>
-          <Link href="/games">Games</Link>
-        </nav>
-        <a href="/api/auth/logout">Logout</a>
-      </header>
+      <Header isProtected={true} />
       {children}
     </div>
   );

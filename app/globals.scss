@@ -1,5 +1,6 @@
 :root {
   --black: #1d1d21;
+  --dark-blue: #01314a;
   --dark-purple: #451b40;
   --green: #6aaa64;
   --green-hover: rgba(106, 170, 100, 0.9);
@@ -8,6 +9,8 @@
   --grey-light: #cccccc;
   --grey-lighter: #e9e9ec;
   --melon: #f3adad;
+  --owl-blue: #93c7ff;
+  --owl-blue-light: rgba(147, 199, 255, 0.5);
   --plum: #8b4382;
   --silver: #bbbbbb;
   --white: #f8f8ff;
@@ -27,6 +30,10 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
 }
 
 button {

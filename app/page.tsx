@@ -3,7 +3,8 @@
 import { redirect } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import Loading from './components/loading';
+import { Header, Loading } from './components';
+import styles from './styles/page.module.scss';
 
 const Home = () => {
   const { user, error, isLoading } = useUser();
@@ -15,8 +16,12 @@ const Home = () => {
 
   return (
     <div>
-      <p>Hello World!</p>
-      <a href="/api/auth/login">Login</a>
+      <Header isProtected={false} />
+      <div className={styles.container}>
+        <div className={styles.social}>
+          <p>Connect with me!</p>
+        </div>
+      </div>
     </div>
   );
 };

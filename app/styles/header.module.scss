@@ -1,0 +1,50 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.logo {
+  a {
+    align-items: center;
+    display: flex;
+  }
+
+  h1 {
+    color: var(--dark-blue);
+    font-size: 28px;
+    margin-left: 3px;
+
+    & > span {
+      color: var(--owl-blue);
+    }
+  }
+}
+
+.links {
+  align-items: center;
+  display: flex;
+
+  & > a {
+    color: var(--black);
+    font-size: 20px;
+    line-height: 24px;
+    margin-left: 38px;
+  }
+
+  & > a:first-child {
+    margin-left: 0;
+  }
+}
+
+.selected {
+  text-decoration: underline;
+}
+
+.logButton {
+  background-color: var(--owl-blue-light);
+  border: 2px solid var(--dark-blue);
+  border-radius: 19.5rem;
+  color: var(--dark-blue);
+  font-weight: 700;
+  padding: 7px 28px 8px 29px;
+}

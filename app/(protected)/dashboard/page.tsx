@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import Loading from '../../components/loading';
+import { Loading } from '../../components';
 import { useApi } from '../../hooks';
 import { ApiUrls } from '../../lib/constants/db';
 import { LoginMethod } from '../../lib/enums/auth';

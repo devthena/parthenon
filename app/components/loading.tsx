@@ -1,7 +1,5 @@
-import styles from './styles.module.scss';
+import styles from '../styles/loading.module.scss';
 
-const Loading = () => {
+export const Loading = () => {
   return <div className={styles.dualRing}></div>;
 };
-
-export default Loading;

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import Loading from '../../../components/loading';
+import { Loading } from '../../../components/loading';
 import { useStats, useWordle } from '../../../hooks';
 import { BackIcon } from '../../../icons';
 import { GameStatus, WordleStatus } from '../../../lib/enums/wordle';

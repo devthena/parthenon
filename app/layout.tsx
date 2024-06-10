@@ -4,7 +4,7 @@ import { Figtree } from 'next/font/google';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 import './globals.scss';
-import styles from './index.module.scss';
+import styles from './styles/layout.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon',
@@ -20,6 +20,9 @@ const RootLayout = ({
 }>) => {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <UserProvider>
         <body className={figtree.className}>
           <main className={styles.main}>
