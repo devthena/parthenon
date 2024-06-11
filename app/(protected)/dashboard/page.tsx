@@ -12,9 +12,8 @@ import { CoinIcon } from '../../icons';
 import { ApiUrls } from '../../lib/constants/db';
 import { LoginMethod } from '../../lib/enums/auth';
 
-import { Register } from './components';
+import { AccountLinked, Instructions, Register } from './components';
 import styles from './page.module.scss';
-import { Instructions } from './components/instructions';
 
 const Dashboard = () => {
   const { apiError, isFetching, profile, fetchData } = useApi();
@@ -91,17 +90,16 @@ const Dashboard = () => {
             <Instructions code={profile.user_id} />
           )}
           {profile && profile.discord_id && profile.twitch_id && (
-            <div>
-              <h2>Accounts Linked!</h2>
-              <p>Discord: {profile.discord_username}</p>
-              <p>Twitch: {profile.twitch_username}</p>
-            </div>
+            <AccountLinked
+              discord={profile.discord_username ?? 'Discord'}
+              twitch={profile.twitch_username ?? 'Twitch'}
+            />
           )}
         </div>
       </div>
       {apiError && (
         <div>
-          <p>User Data Fetch Error: {apiError}</p>
+          <p>User Fetch Error: {apiError}</p>
         </div>
       )}
     </>
