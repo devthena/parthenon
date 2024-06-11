@@ -1,0 +1,67 @@
+.title {
+  font-size: 36px;
+}
+
+.boxes {
+  color: var(--dark-blue);
+  display: flex;
+  justify-content: center;
+  margin-top: 35px;
+}
+
+.box {
+  background-color: var(--discord-light);
+  border-color: var(--owl-blue-lightest);
+  border-width: 0 2px 2px 0;
+  border-style: solid;
+  border-radius: 20px;
+  box-shadow: 1px 4px 4px 0px var(--owl-blue-lighter);
+  padding: 30px;
+  width: 450px;
+
+  h2 {
+    align-items: center;
+    display: flex;
+    font-size: 34px;
+    justify-content: center;
+
+    span {
+      margin-right: 8px;
+    }
+  }
+}
+
+.box:first-child {
+  background-color: var(--twitch-light);
+  margin-right: 60px;
+}
+
+.list {
+  list-style-type: none;
+  text-align: left;
+
+  li {
+    margin-top: 20px;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24px;
+
+    span {
+      font-weight: 500;
+    }
+  }
+
+  p {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+
+  p:last-child {
+    font-weight: 400;
+    margin-top: 2px;
+  }
+}
