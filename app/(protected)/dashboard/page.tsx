@@ -7,11 +7,13 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Loading } from '../../components';
 import { useApi } from '../../hooks';
+import { CoinIcon } from '../../icons';
+
 import { ApiUrls } from '../../lib/constants/db';
 import { LoginMethod } from '../../lib/enums/auth';
 
+import { AccountLinked, Instructions, Register } from './components';
 import styles from './page.module.scss';
-import { CoinIcon } from '../../icons';
 
 const Dashboard = () => {
   const { apiError, isFetching, profile, fetchData } = useApi();
@@ -42,7 +44,7 @@ const Dashboard = () => {
       <div className={styles.dashboard}>
         <div className={styles.info}>
           {user && (
-            <div className={styles.bio}>
+            <>
               <h1>
                 Welcome,{' '}
                 {profile?.discord_name ||
@@ -51,67 +53,53 @@ const Dashboard = () => {
                   user.name}
                 !
               </h1>
-              {user.picture && (
-                <figure className={styles.avatar}>
-                  <Image
-                    alt="Avatar"
-                    height={200}
-                    src={user.picture}
-                    width={200}
-                  />
-                </figure>
-              )}
-            </div>
-          )}
-          {!profile && isFetching && <Loading />}
-          {profile && (
-            <div className={styles.balance}>
-              <p className={styles.cash}>
-                <span>Points: {profile.cash}</span>
-                <CoinIcon />
-              </p>
-            </div>
+              <div className={styles.bio}>
+                {user.picture && (
+                  <figure className={styles.avatar}>
+                    <Image
+                      alt="Avatar"
+                      height={200}
+                      src={user.picture}
+                      width={200}
+                    />
+                  </figure>
+                )}
+                <div className={styles.balance}>
+                  {!profile && isFetching && <Loading />}
+                  {!isFetching && (
+                    <div className={styles.item}>
+                      <p className={styles.label}>
+                        <span>POINTS</span>
+                        <span>{profile ? profile.cash : 0}</span>
+                      </p>
+                      <CoinIcon />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </div>
         <div className={styles.status}>
-          {!profile && !isFetching && (
-            <div>
-              <p>
-                Start earning points by participating in AthenaUS Twitch chat
-                and Discord server!
-              </p>
-            </div>
+          {!profile && isFetching && <Loading />}
+          {!profile && !isFetching && <Register />}
+          {profile && profile.discord_id && !profile.twitch_id && (
+            <Instructions />
           )}
           {profile && profile.twitch_id && !profile.discord_id && (
-            <div>
-              <p>Link your Twitch and Discord accounts!</p>
-              <p>Copy the code below:</p>
-              <code>{profile.user_id}</code>
-              <p>
-                In the Discord server, use the /link command and enter the code.
-              </p>
-              <p>
-                The bot will give you a confirmation once both accounts are
-                linked.
-              </p>
-              <p>
-                Note: Should you need to unlink your accounts, use /unlink in
-                the server.
-              </p>
-            </div>
+            <Instructions code={profile.user_id} />
           )}
           {profile && profile.discord_id && profile.twitch_id && (
-            <div>
-              <h2>Accounts Linked!</h2>
-              <p>Discord: {profile.discord_username}</p>
-              <p>Twitch: {profile.twitch_username}</p>
-            </div>
+            <AccountLinked
+              discord={profile.discord_username ?? 'Discord'}
+              twitch={profile.twitch_username ?? 'Twitch'}
+            />
           )}
         </div>
       </div>
       {apiError && (
         <div>
-          <p>User Data Fetch Error: {apiError}</p>
+          <p>User Fetch Error: {apiError}</p>
         </div>
       )}
     </>

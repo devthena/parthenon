@@ -19,6 +19,11 @@
   padding: 30px;
   width: 450px;
 
+  &:first-child {
+    background-color: var(--twitch-light);
+    margin-right: 60px;
+  }
+
   h2 {
     align-items: center;
     display: flex;
@@ -29,11 +34,6 @@
       margin-right: 8px;
     }
   }
-}
-
-.box:first-child {
-  background-color: var(--twitch-light);
-  margin-right: 60px;
 }
 
 .list {
@@ -51,6 +51,7 @@
 
     span {
       font-weight: 500;
+      margin-left: 5px;
     }
   }
 

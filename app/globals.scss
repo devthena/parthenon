@@ -2,6 +2,7 @@
 
 :root {
   --black: #1d1d21;
+  --black-lighter: rgba(29, 29, 33, 0.2);
   --dark-blue: #01314a;
   --dark-purple: #451b40;
   --discord-light: rgba(88, 101, 242, 0.2);
@@ -48,6 +49,9 @@ button {
 }
 
 code {
+  background-color: var(--owl-blue-light);
   font-family: 'Source Code Pro', monospace;
   font-optical-sizing: auto;
+  font-size: 18px;
+  font-weight: 600;
 }

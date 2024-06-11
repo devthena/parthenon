@@ -2,7 +2,10 @@
   display: flex;
 }
 
-.bio {
+.info {
+  flex-grow: 1;
+  text-align: left;
+
   h1 {
     font-size: 40px;
     font-weight: 500;
@@ -10,17 +13,49 @@
   }
 }
 
-.avatar img {
-  border-radius: 100%;
-}
-
-.cash {
+.bio {
   align-items: center;
   display: flex;
-  font-size: 28px;
-  line-height: 32px;
+  margin-top: 30px;
+}
 
-  span {
-    margin-right: 3px;
+.avatar img {
+  border-radius: 100%;
+  margin-left: 45px;
+}
+
+.balance {
+  margin-left: 30px;
+}
+
+.item {
+  align-items: center;
+  display: flex;
+}
+
+.label {
+  font-size: 18px;
+  margin-right: 4px;
+
+  & > span:last-child {
+    font-size: 28px;
+    margin-left: 7px;
+  }
+}
+
+.status {
+  border-left: 1px solid var(--black-lighter);
+  padding: 48px 45px;
+
+  h2 {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 38px;
+  }
+
+  h3 {
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 32px;
   }
 }

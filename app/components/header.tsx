@@ -12,7 +12,7 @@ export const Header = ({ isProtected }: { isProtected: boolean }) => {
     <header className={styles.header}>
       <div className={styles.logo}>
         <a href="/">
-          <Image alt="Little Owl" height={38} src="/owl.png" width={38} />
+          <Image alt="Little Owl" height={30} src="/owl.png" width={30} />
           <h1>
             LITTLEOWL<span>BOT</span>
           </h1>

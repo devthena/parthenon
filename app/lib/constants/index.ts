@@ -71,6 +71,7 @@ export const NavPaths = [
 ];
 
 export const SocialUrls = {
+  Discord: 'https://discord.gg/athenaus',
   Github: 'https://github.com/devthena',
   Instagram: 'https://instagram.com/theathenaus',
   Twitch: 'https://twitch.tv/athenaus',
