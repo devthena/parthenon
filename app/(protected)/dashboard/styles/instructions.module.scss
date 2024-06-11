@@ -1,0 +1,33 @@
+.copyText {
+  font-size: 24px;
+  margin-top: 12px;
+}
+
+.userCode {
+  background-color: var(--owl-blue-lighter);
+  display: inline-block;
+  line-height: 30px;
+  margin: 5px 0 20px;
+  padding: 3px 10px;
+}
+
+.steps {
+  margin-top: 12px;
+
+  .note {
+    font-size: 16px;
+
+    code {
+      font-size: 14px;
+    }
+  }
+
+  p {
+    font-size: 18px;
+    line-height: 30px;
+  }
+
+  code {
+    font-size: 16px;
+  }
+}

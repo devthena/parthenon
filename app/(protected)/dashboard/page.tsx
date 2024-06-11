@@ -14,6 +14,7 @@ import { LoginMethod } from '../../lib/enums/auth';
 
 import { Register } from './components';
 import styles from './page.module.scss';
+import { Instructions } from './components/instructions';
 
 const Dashboard = () => {
   const { apiError, isFetching, profile, fetchData } = useApi();
@@ -64,9 +65,9 @@ const Dashboard = () => {
                     />
                   </figure>
                 )}
-                {!profile && isFetching && <Loading />}
-                {!isFetching && (
-                  <div className={styles.balance}>
+                <div className={styles.balance}>
+                  {!profile && isFetching && <Loading />}
+                  {!isFetching && (
                     <div className={styles.item}>
                       <p className={styles.label}>
                         <span>POINTS</span>
@@ -74,8 +75,8 @@ const Dashboard = () => {
                       </p>
                       <CoinIcon />
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -83,23 +84,11 @@ const Dashboard = () => {
         <div className={styles.status}>
           {!profile && isFetching && <Loading />}
           {!profile && !isFetching && <Register />}
+          {profile && profile.discord_id && !profile.twitch_id && (
+            <Instructions />
+          )}
           {profile && profile.twitch_id && !profile.discord_id && (
-            <div>
-              <p>Link your Twitch and Discord accounts!</p>
-              <p>Copy the code below:</p>
-              <code>{profile.user_id}</code>
-              <p>
-                In the Discord server, use the /link command and enter the code.
-              </p>
-              <p>
-                The bot will give you a confirmation once both accounts are
-                linked.
-              </p>
-              <p>
-                Note: Should you need to unlink your accounts, use /unlink in
-                the server.
-              </p>
-            </div>
+            <Instructions code={profile.user_id} />
           )}
           {profile && profile.discord_id && profile.twitch_id && (
             <div>
