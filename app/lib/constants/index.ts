@@ -25,11 +25,12 @@ export const CommandsDiscord = [
     name: '/points',
     description: 'View your current balance',
   },
-  {
-    name: '/star',
-    sub: '<@member>',
-    description: 'Give a star to a user as a form of endorsement',
-  },
+  // @todo: Add back when star command is completed
+  // {
+  //   name: '/star',
+  //   sub: '<@member>',
+  //   description: 'Give a star to a user as a form of endorsement',
+  // },
 ];
 
 export const CommandsTwitch = [
@@ -51,6 +52,7 @@ export const NavPaths = [
     value: '/',
     protected: false,
   },
+  // @todo: Add back when Wordle is completed
   // {
   //   label: 'Games',
   //   value: '/games',
