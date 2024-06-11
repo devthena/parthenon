@@ -59,6 +59,7 @@ const Dashboard = () => {
                     <Image
                       alt="Avatar"
                       height={200}
+                      priority
                       src={user.picture}
                       width={200}
                     />

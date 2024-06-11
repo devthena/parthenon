@@ -1,0 +1,29 @@
+.title {
+  font-size: 36px;
+}
+
+.description {
+  font-size: 24px;
+  margin-top: 10px;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 285px 285px 285px 285px;
+  margin-top: 45px;
+}
+
+.gridItem {
+  align-items: flex-end;
+  border: 1px solid var(--green);
+  border-radius: 20px;
+  display: flex;
+  padding: 10px;
+
+  span {
+    color: var(--black);
+    font-size: 32px;
+    font-weight: 500;
+  }
+}
