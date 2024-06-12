@@ -39,20 +39,21 @@ const Dashboard = () => {
     setIsDataFetched(true);
   }
 
+  let displayName = '';
+
+  if (profile?.discord_name) displayName = `, ${profile?.discord_name}`;
+  else if (profile?.discord_username)
+    displayName = `, ${profile?.discord_username}`;
+  else if (profile?.twitch_username)
+    displayName = `, ${profile?.twitch_username}`;
+
   return (
     <>
       <div className={styles.dashboard}>
         <div className={styles.info}>
           {user && (
             <>
-              <h1>
-                Welcome,{' '}
-                {profile?.discord_name ||
-                  profile?.twitch_username ||
-                  user.nickname ||
-                  user.name}
-                !
-              </h1>
+              <h1>Welcome{displayName}!</h1>
               <div className={styles.bio}>
                 {user.picture && (
                   <figure className={styles.avatar}>
