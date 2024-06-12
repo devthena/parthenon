@@ -13,13 +13,23 @@ export const CommandsDiscord = [
     name: '/gamble',
     sub: '<value>',
     description: 'Play your points for a chance to double it',
-    note: 'Accepted Values: <positive integer> | half | all',
+    note: 'Accepted Values: <positive number> | half | all',
   },
   {
     name: '/give',
     sub: '<@member> <value>',
     description: 'Give your points to another user',
-    note: 'Accepted Value: <positive integer>',
+    note: 'Accepted Value: <positive number>',
+  },
+  {
+    name: '/help',
+    description: 'Displays the links for Commands and FAQ',
+  },
+  {
+    name: '/link',
+    sub: '<value>',
+    description: 'Merge your Discord and Twitch accounts',
+    note: 'Accepted Value: <code>',
   },
   {
     name: '/points',
@@ -31,14 +41,28 @@ export const CommandsDiscord = [
   //   sub: '<@member>',
   //   description: 'Give a star to a user as a form of endorsement',
   // },
+  {
+    name: '/unlink',
+    description: 'Separates your Discord and Twitch accounts',
+  },
 ];
 
 export const CommandsTwitch = [
   {
+    name: '!commands',
+    description: 'Displays the link for the list of all commands',
+  },
+  {
     name: '!gamble',
     sub: '<value>',
     description: 'Play your points for a chance to double it',
-    note: 'Accepted Values: <positive integer> | half | all',
+    note: 'Accepted Values: <positive number> | half | all',
+  },
+  {
+    name: '!give',
+    sub: '<@member> <value>',
+    description: 'Give your points to another user',
+    note: 'Accepted Value: <positive number>',
   },
   {
     name: '!points',

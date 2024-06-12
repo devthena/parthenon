@@ -20,7 +20,7 @@ const Commands = () => {
                   {command.sub && <span>{command.sub}</span>}
                 </h3>
                 <p>{command.description}</p>
-                {command.note && <p>{command.note}</p>}
+                {command.note && <p className={styles.note}>{command.note}</p>}
               </li>
             ))}
           </ul>
@@ -38,7 +38,7 @@ const Commands = () => {
                   {command.sub && <span>{command.sub}</span>}
                 </h3>
                 <p>{command.description}</p>
-                {command.note && <p>{command.note}</p>}
+                {command.note && <p className={styles.note}>{command.note}</p>}
               </li>
             ))}
           </ul>
