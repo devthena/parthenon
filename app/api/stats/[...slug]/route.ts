@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { FetchParams, StatsObject } from '../../../../lib/types/api';
+import { StatsObject } from '../../../lib/types/api';
+import { GameCode } from '../../../lib/enums/games';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -15,24 +16,38 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getStats = async (id: string) => {
+const getStats = async (code: string, id: string) => {
   await client.connect();
 
   const collection = await client
     .db(mongodbName)
     .collection<StatsObject>(mongodbCollection);
-  const data = await collection.findOne({ twitch_id: id });
+  const data = await collection.findOne({ user_id: id });
+
+  let statsData = null;
+
+  switch (code) {
+    case GameCode.Wordle:
+      statsData = {
+        user_id: data?.user_id,
+        wordle: data?.wordle,
+      };
+      break;
+  }
 
   await client.close();
-  return data;
+  return statsData;
 };
 
-export async function GET(request: NextRequest, { params }: FetchParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { slug: string[] } }
+) {
   let responseData = null;
   let responseError = null;
 
   try {
-    responseData = await getStats(params.id);
+    responseData = await getStats(params.slug[0], params.slug[1]);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

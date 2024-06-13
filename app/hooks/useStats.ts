@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { ApiUrls } from '../lib/constants/db';
-import { LoginMethod } from '../lib/enums/auth';
-import { StatsWordleObject } from '../lib/types/api';
+import { ApiUrl } from '../lib/enums/api';
+import { GameCode } from '../lib/enums/games';
+import { WordleObject } from '../lib/types/api';
 
 import { useApi } from './useApi';
 
@@ -11,7 +11,7 @@ export const useStats = () => {
   const { apiError, stats, fetchData, updateData } = useApi();
   const { user } = useUser();
 
-  const [wordleStats, setWordleStats] = useState<StatsWordleObject>({
+  const [wordleStats, setWordleStats] = useState<WordleObject>({
     currentStreak: 0,
     distribution: new Array(6).fill(0),
     maxStreak: 0,
@@ -25,25 +25,21 @@ export const useStats = () => {
 
   const userSub = user?.sub?.split('|');
   const userId = userSub ? userSub[2] : null;
-  const loginMethod = userSub ? (userSub[1] as LoginMethod) : null;
 
   const getWordleStats = async () => {
-    if (userId && loginMethod) {
-      await fetchData(ApiUrls.stats, {
+    if (userId) {
+      await fetchData(ApiUrl.Stats, {
         id: userId,
-        method: loginMethod,
+        code: GameCode.Wordle,
       });
     }
   };
 
-  const saveStats = async (stats: StatsWordleObject) => {
-    if (userId && loginMethod) {
-      await updateData(ApiUrls.stats, {
-        method: loginMethod,
-        payload: {
-          [`${loginMethod}_id`]: userId,
-          wordle: stats,
-        },
+  const saveStats = async (stats: WordleObject) => {
+    if (userId) {
+      await updateData(ApiUrl.Stats, {
+        user_id: userId,
+        wordle: stats,
       });
     }
   };

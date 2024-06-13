@@ -11,7 +11,7 @@ import { GameStatus, WordleStatus } from '../../../lib/enums/wordle';
 
 import { AnswerGrid, Keyboard, Notice, Stats } from './components';
 
-import styles from './styles.module.scss';
+import styles from './page.module.scss';
 
 const Wordle = () => {
   const { apiError, wordleStats, getWordleStats, updateWordleStats } =
@@ -63,8 +63,8 @@ const Wordle = () => {
   }
 
   return (
-    <div>
-      <h1>Wordle</h1>
+    <>
+      <h1>WORDLE</h1>
       {status === GameStatus.Overview && (
         <div>
           <button
@@ -109,7 +109,7 @@ const Wordle = () => {
           <p>Stats Fetch Error: {apiError}</p>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

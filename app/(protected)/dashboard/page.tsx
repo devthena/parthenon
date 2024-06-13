@@ -9,7 +9,7 @@ import { Loading } from '../../components';
 import { useApi } from '../../hooks';
 import { CoinIcon } from '../../icons';
 
-import { ApiUrls } from '../../lib/constants/db';
+import { ApiUrl } from '../../lib/enums/api';
 import { LoginMethod } from '../../lib/enums/auth';
 
 import { AccountLinked, Instructions, Register } from './components';
@@ -31,7 +31,7 @@ const Dashboard = () => {
   const loginMethod = userSub[1] as LoginMethod;
 
   if (!isDataFetched) {
-    fetchData(ApiUrls.users, {
+    fetchData(ApiUrl.Users, {
       id: userId,
       method: loginMethod,
     });

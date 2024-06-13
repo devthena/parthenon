@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import {
-  FetchPayload,
-  PostPayload,
-  StatsObject,
-  UserObject,
-} from '../lib/types/api';
-import { ApiUrls } from '../lib/constants/db';
+import { StatsObject, UserObject } from '../lib/types/api';
+import { ApiUrl } from '../lib/enums/api';
+import { LoginMethod } from '../lib/enums/auth';
+import { GameCode } from '../lib/enums/games';
 
 export const useApi = () => {
   const [profile, setProfile] = useState<UserObject | null>(null);
@@ -14,18 +11,29 @@ export const useApi = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [apiSuccess, setApiSuccess] = useState<boolean>(false);
 
-  const fetchData = async (url: string, payload: FetchPayload) => {
+  const fetchData = async (
+    url: ApiUrl,
+    payload: {
+      id: string;
+      method?: LoginMethod;
+      code?: GameCode;
+    }
+  ) => {
     setIsFetching(true);
 
+    const apiUrl = payload.method
+      ? `${url}/${payload.method}/${payload.id}`
+      : `${url}/${payload.code}/${payload.id}`;
+
     try {
-      const res = await fetch(`${url}/${payload.method}/${payload.id}`);
+      const res = await fetch(apiUrl);
       const response = await res.json();
 
       if (response.error) {
         setApiError('useApi fetchUser Error:' + response.error);
       } else if (response.data) {
-        if (url === ApiUrls.users) setProfile(response.data);
-        else if (url === ApiUrls.stats) setStats(response.data);
+        if (url === ApiUrl.Users) setProfile(response.data);
+        else if (url === ApiUrl.Stats) setStats(response.data);
       }
 
       setIsFetching(false);
@@ -35,16 +43,16 @@ export const useApi = () => {
     }
   };
 
-  const updateData = async (url: string, request: PostPayload) => {
+  const updateData = async (url: string, request: StatsObject | UserObject) => {
     setIsFetching(true);
 
     try {
-      const res = await fetch(`${url}/${request.method}`, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request.payload),
+        body: JSON.stringify(request),
       });
 
       const response = await res.json();
