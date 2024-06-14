@@ -1,88 +1,119 @@
-import { useEffect, useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useCallback, useEffect, useReducer } from 'react';
 
+import { initialStats } from '../lib/constants/stats';
 import { ApiUrl } from '../lib/enums/api';
+import { WordleObject } from '../lib/types/db';
 import { GameCode } from '../lib/enums/games';
-import { WordleObject } from '../lib/types/api';
 
 import { useApi } from './useApi';
 
-export const useStats = () => {
-  const { apiError, stats, fetchData, updateData } = useApi();
-  const { user } = useUser();
+interface StatsState {
+  stats: WordleObject | null;
+  statsLoading: boolean;
+  statsError: string | null;
+}
 
-  const [wordleStats, setWordleStats] = useState<WordleObject>({
-    currentStreak: 0,
-    distribution: new Array(6).fill(0),
-    maxStreak: 0,
-    totalPlayed: 0,
-    totalWon: 0,
-  });
+type StatsAction =
+  | { type: 'fetch' }
+  | { type: 'fetch_ok'; payload: WordleObject }
+  | { type: 'fetch_error'; error: string }
+  | { type: 'save' }
+  | { type: 'save_ok'; payload: WordleObject }
+  | { type: 'save_error'; error: string };
+
+const statsReducer = (state: StatsState, action: StatsAction): StatsState => {
+  switch (action.type) {
+    case 'fetch':
+    case 'save':
+      return {
+        ...state,
+        statsLoading: true,
+        statsError: null,
+      };
+    case 'fetch_ok':
+    case 'save_ok':
+      return {
+        ...state,
+        statsLoading: false,
+        stats: action.payload,
+        statsError: null,
+      };
+    case 'fetch_error':
+    case 'save_error':
+      return {
+        ...state,
+        statsLoading: false,
+        statsError: action.error,
+      };
+    default:
+      return {
+        ...state,
+        statsLoading: false,
+        statsError: 'Unhandled action type.',
+      };
+  }
+};
+
+const initialState: StatsState = {
+  stats: null,
+  statsLoading: false,
+  statsError: null,
+};
+
+export const useStats = (code: GameCode) => {
+  const { data, dataLoading, dataError, fetchData, saveData } = useApi();
+
+  const [state, dispatch] = useReducer(statsReducer, initialState);
+
+  const fetchStats = useCallback(
+    async (userId: string) => {
+      dispatch({ type: 'fetch' });
+
+      try {
+        await fetchData(`${ApiUrl.Stats}/${code}/${userId}`);
+      } catch (error) {
+        dispatch({ type: 'fetch_error', error: JSON.stringify(error) });
+        throw new Error('Hook Error: useStats (fetchStats)');
+      }
+    },
+    [code, fetchData]
+  );
+
+  const saveStats = useCallback(
+    async (userId: string) => {
+      if (!state.stats) return;
+      dispatch({ type: 'save' });
+
+      try {
+        await saveData(ApiUrl.Stats, {
+          user_id: userId,
+          code: code,
+          data: state.stats,
+        });
+
+        dispatch({ type: 'save_ok', payload: state.stats });
+      } catch (error) {
+        dispatch({ type: 'save_error', error: JSON.stringify(error) });
+        throw new Error('Hook Error: useStats (fetchStats)');
+      }
+    },
+    [code, state.stats, saveData]
+  );
 
   useEffect(() => {
-    if (stats) setWordleStats(stats.wordle);
-  }, [stats]);
+    if (dataLoading || state.stats) return;
+    if (dataError) return dispatch({ type: 'fetch_error', error: dataError });
 
-  const userSub = user?.sub?.split('|');
-  const userId = userSub ? userSub[2] : null;
-
-  const getWordleStats = async () => {
-    if (userId) {
-      await fetchData(ApiUrl.Stats, {
-        id: userId,
-        code: GameCode.Wordle,
-      });
+    if (data) {
+      dispatch({ type: 'fetch_ok', payload: data as WordleObject });
+    } else {
+      dispatch({ type: 'fetch_ok', payload: initialStats[code] });
     }
-  };
-
-  const saveStats = async (stats: WordleObject) => {
-    if (userId) {
-      await updateData(ApiUrl.Stats, {
-        user_id: userId,
-        wordle: stats,
-      });
-    }
-  };
-
-  const updateWordleStats = (finalTurn: number) => {
-    /**
-     * @todo: fix the function below being called twice
-     *        without adding the isSaving condition
-     */
-
-    let isSaving = true;
-
-    setWordleStats(prev => {
-      const updatedUserStats = { ...prev };
-
-      if (isSaving) {
-        updatedUserStats.totalPlayed += 1;
-
-        if (finalTurn > 6) {
-          updatedUserStats.currentStreak = 0;
-        } else {
-          updatedUserStats.currentStreak += 1;
-          updatedUserStats.distribution[finalTurn - 1] += 1;
-          updatedUserStats.totalWon += 1;
-
-          if (updatedUserStats.currentStreak > updatedUserStats.maxStreak) {
-            updatedUserStats.maxStreak += 1;
-          }
-        }
-
-        saveStats(updatedUserStats);
-        isSaving = false;
-      }
-
-      return updatedUserStats;
-    });
-  };
+  }, [code, data, dataError, dataLoading, state.stats]);
 
   return {
-    apiError,
-    getWordleStats,
-    setWordleStats,
-    updateWordleStats,
-    wordleStats,
+    ...state,
+    fetchStats,
+    saveStats,
   };
 };

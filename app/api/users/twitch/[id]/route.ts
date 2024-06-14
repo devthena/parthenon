@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { FetchParams, UserObject } from '../../../../lib/types/api';
+import { UserObject } from '../../../../lib/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -27,7 +27,14 @@ const getUser = async (id: string) => {
   return data;
 };
 
-export async function GET(request: NextRequest, { params }: FetchParams) {
+export async function GET(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: { id: string };
+  }
+) {
   let responseData = null;
   let responseError = null;
 

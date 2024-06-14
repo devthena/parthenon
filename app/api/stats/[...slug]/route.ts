@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { StatsObject } from '../../../lib/types/api';
+import { StatsObject } from '../../../lib/types/db';
 import { GameCode } from '../../../lib/enums/games';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
@@ -22,21 +22,13 @@ const getStats = async (code: string, id: string) => {
   const collection = await client
     .db(mongodbName)
     .collection<StatsObject>(mongodbCollection);
-  const data = await collection.findOne({ user_id: id });
-
-  let statsData = null;
-
-  switch (code) {
-    case GameCode.Wordle:
-      statsData = {
-        user_id: data?.user_id,
-        wordle: data?.wordle,
-      };
-      break;
-  }
+  const data = await collection.findOne({
+    user_id: id,
+    code: code as GameCode,
+  });
 
   await client.close();
-  return statsData;
+  return data;
 };
 
 export async function GET(

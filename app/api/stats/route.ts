@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-
-import { StatsObject, UserObject } from '../../lib/types/api';
+import { StatsObject } from '../../lib/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -15,14 +14,14 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const saveStats = async (req: StatsObject | UserObject) => {
+const saveStats = async (payload: StatsObject) => {
   await client.connect();
 
   const collection = await client.db(mongodbName).collection(mongodbCollection);
 
   const data = await collection.updateOne(
-    { user_id: req.user_id },
-    { $set: { ...req } },
+    { user_id: payload.user_id },
+    { $set: { ...payload } },
     { upsert: true }
   );
 

@@ -1,18 +1,14 @@
 import { ObjectId } from 'mongodb';
+import { GameCode } from '../enums/games';
 
-export type FetchParams = {
-  params: {
-    id: string;
-  };
-};
-
-export type StatsObject = {
+export interface StatsObject {
   _id?: ObjectId;
   user_id: string;
-  wordle: WordleObject;
-};
+  code: GameCode;
+  data: WordleObject;
+}
 
-export type UserObject = {
+export interface UserObject {
   _id: ObjectId;
   user_id: string;
   discord_id: string | null;
@@ -23,12 +19,12 @@ export type UserObject = {
   cash: number;
   bank: number;
   stars: number;
-};
+}
 
-export type WordleObject = {
+export interface WordleObject {
   currentStreak: number;
   distribution: number[];
   maxStreak: number;
   totalPlayed: number;
   totalWon: number;
-};
+}

@@ -12,13 +12,15 @@ import { GameStatus, WordleStatus } from '../../../lib/enums/wordle';
 import { AnswerGrid, Keyboard, Notice, Stats } from './components';
 
 import styles from './page.module.scss';
+import { GameCode } from '../../../lib/enums/games';
 
 const Wordle = () => {
-  const { apiError, wordleStats, getWordleStats, updateWordleStats } =
-    useStats();
   const { user, error, isLoading } = useUser();
+  const { stats, statsLoading, statsError, fetchStats } = useStats(
+    GameCode.Wordle
+  );
 
-  const [isDataFetched, setIsDataFetched] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [status, setStatus] = useState(GameStatus.Overview);
 
@@ -35,31 +37,30 @@ const Wordle = () => {
   } = useWordle(null);
 
   useEffect(() => {
-    if (
-      !isGameOver &&
-      (wordleStatus === WordleStatus.Answered ||
-        wordleStatus === WordleStatus.Completed)
-    ) {
+    if (!isGameOver && (WordleStatus.Answered || WordleStatus.Completed)) {
       setIsGameOver(true);
-      updateWordleStats(turn);
-    } else if (isGameOver && wordleStatus === WordleStatus.Restart) {
-      setIsGameOver(false);
+    } else {
+      if (wordleStatus === WordleStatus.Restart) setIsGameOver(false);
     }
-  }, [isGameOver, turn, updateWordleStats, wordleStatus]);
+  }, [isGameOver, turn, wordleStatus]);
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
   if (!user) return redirect('/');
 
-  if (!isDataFetched) {
+  if (!isInitialized) {
     const keyUpHandler = (evt: KeyboardEvent) => {
       handleKeyUp(evt.key);
     };
-
     window.addEventListener('keyup', keyUpHandler, true);
 
-    getWordleStats();
-    setIsDataFetched(true);
+    const userSub = user.sub?.split('|');
+    const userId = userSub ? userSub[2] : null;
+
+    if (!userId) return;
+
+    fetchStats(userId);
+    setIsInitialized(true);
   }
 
   return (
@@ -72,7 +73,9 @@ const Wordle = () => {
             onClick={() => setStatus(GameStatus.Start)}>
             PLAY
           </button>
-          <Stats data={wordleStats} />
+          {!stats && <Loading />}
+          {statsLoading && stats && <Stats data={stats} />}
+          {statsError && <p>Stats Fetch Error: {statsError}</p>}
         </div>
       )}
       {status === GameStatus.Start && (
@@ -102,11 +105,6 @@ const Wordle = () => {
             turn={turn}
           />
           <Keyboard colors={keyColors} keys={keyIds} onKeyUp={handleKeyUp} />
-        </div>
-      )}
-      {apiError && (
-        <div>
-          <p>Stats Fetch Error: {apiError}</p>
         </div>
       )}
     </>

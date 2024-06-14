@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Loading } from '../../components';
@@ -13,39 +13,37 @@ import { ApiUrl } from '../../lib/enums/api';
 import { LoginMethod } from '../../lib/enums/auth';
 
 import { AccountLinked, Instructions, Register } from './components';
+
 import styles from './page.module.scss';
 
 const Dashboard = () => {
-  const { apiError, isFetching, profile, fetchData } = useApi();
+  const { data, dataLoading, dataError, fetchData } = useApi();
   const { user, error, isLoading } = useUser();
 
-  const [isDataFetched, setIsDataFetched] = useState(false);
+  useEffect(() => {
+    if (!user || !user.sub) return;
+
+    const userSub = user.sub.split('|');
+    const userId = userSub[2];
+    const loginMethod = userSub[1] as LoginMethod;
+
+    const getUser = async () => {
+      await fetchData(`${ApiUrl.Users}/${loginMethod}/${userId}`);
+    };
+
+    getUser();
+  }, [user, fetchData]);
+
+  if (!user && !isLoading) return redirect('/');
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
 
-  if (!user || !user.sub) return redirect('/');
-
-  const userSub = user.sub.split('|');
-  const userId = userSub[2];
-  const loginMethod = userSub[1] as LoginMethod;
-
-  if (!isDataFetched) {
-    fetchData(ApiUrl.Users, {
-      id: userId,
-      method: loginMethod,
-    });
-
-    setIsDataFetched(true);
-  }
-
   let displayName = '';
 
-  if (profile?.discord_name) displayName = `, ${profile?.discord_name}`;
-  else if (profile?.discord_username)
-    displayName = `, ${profile?.discord_username}`;
-  else if (profile?.twitch_username)
-    displayName = `, ${profile?.twitch_username}`;
+  if (data?.discord_name) displayName = `, ${data?.discord_name}`;
+  else if (data?.discord_username) displayName = `, ${data?.discord_username}`;
+  else if (data?.twitch_username) displayName = `, ${data?.twitch_username}`;
 
   return (
     <>
@@ -67,12 +65,12 @@ const Dashboard = () => {
                   </figure>
                 )}
                 <div className={styles.balance}>
-                  {!profile && isFetching && <Loading />}
-                  {!isFetching && (
+                  {!data && dataLoading && <Loading />}
+                  {data && (
                     <div className={styles.item}>
                       <p className={styles.label}>
                         <span>POINTS</span>
-                        <span>{profile ? profile.cash : 0}</span>
+                        <span>{data ? data.cash : 0}</span>
                       </p>
                       <CoinIcon />
                     </div>
@@ -83,27 +81,21 @@ const Dashboard = () => {
           )}
         </div>
         <div className={styles.status}>
-          {!profile && isFetching && <Loading />}
-          {!profile && !isFetching && <Register />}
-          {profile && profile.discord_id && !profile.twitch_id && (
-            <Instructions />
+          {!data && dataLoading && <Loading />}
+          {!data && !dataLoading && <Register />}
+          {data && data.discord_id && !data.twitch_id && <Instructions />}
+          {data && data.twitch_id && !data.discord_id && (
+            <Instructions code={data.user_id} />
           )}
-          {profile && profile.twitch_id && !profile.discord_id && (
-            <Instructions code={profile.user_id} />
-          )}
-          {profile && profile.discord_id && profile.twitch_id && (
+          {data && data.discord_id && data.twitch_id && (
             <AccountLinked
-              discord={profile.discord_username ?? 'Discord'}
-              twitch={profile.twitch_username ?? 'Twitch'}
+              discord={data.discord_username ?? 'Discord'}
+              twitch={data.twitch_username ?? 'Twitch'}
             />
           )}
         </div>
       </div>
-      {apiError && (
-        <div>
-          <p>User Fetch Error: {apiError}</p>
-        </div>
-      )}
+      {dataError && <p>User Fetch Error: {dataError}</p>}
     </>
   );
 };
