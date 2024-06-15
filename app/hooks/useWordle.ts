@@ -6,6 +6,7 @@ import {
   WordLength,
   WordList,
 } from '../lib/constants/wordle';
+
 import { KeyStatus, WordleStatus } from '../lib/enums/wordle';
 import { Guess, WordleState } from '../lib/types/wordle';
 
@@ -93,10 +94,10 @@ const wordleReducer = (
           };
         }
       } else {
-        return initialState;
+        return { ...initialState, answer: generateAnswer() };
       }
     case 'reset':
-      return initialState;
+      return { ...initialState, answer: generateAnswer() };
     case 'resume':
       return {
         ...state,
@@ -116,8 +117,8 @@ const initialState: WordleState = {
   answer: generateAnswer(),
   currentGuess: '',
   guesses: [],
-  status: WordleStatus.Playing,
   keyResults: {},
+  status: WordleStatus.Playing,
 };
 
 export const useWordle = () => {

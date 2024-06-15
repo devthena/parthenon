@@ -21,6 +21,6 @@ export interface WordleState {
   answer: string;
   currentGuess: string;
   guesses: Guess[];
-  status: WordleStatus;
   keyResults: { [letter: string]: KeyStatus };
+  status: WordleStatus;
 }

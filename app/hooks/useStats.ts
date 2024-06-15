@@ -9,7 +9,8 @@ import { useApi } from './useApi';
 
 interface StatsState {
   stats: WordleObject | null;
-  statsLoading: boolean;
+  statsFetchLoading: boolean;
+  statsSaveLoading: boolean;
   statsError: string | null;
 }
 
@@ -18,37 +19,55 @@ type StatsAction =
   | { type: 'fetch_ok'; payload: WordleObject }
   | { type: 'fetch_error'; error: string }
   | { type: 'save' }
-  | { type: 'save_ok'; payload: WordleObject }
-  | { type: 'save_error'; error: string };
+  | { type: 'save_ok' }
+  | { type: 'save_error'; error: string }
+  | { type: 'update_stats'; payload: WordleObject };
 
 const statsReducer = (state: StatsState, action: StatsAction): StatsState => {
   switch (action.type) {
     case 'fetch':
+      return {
+        ...state,
+        statsFetchLoading: true,
+        statsError: null,
+      };
     case 'save':
       return {
         ...state,
-        statsLoading: true,
+        statsSaveLoading: true,
         statsError: null,
       };
     case 'fetch_ok':
+      return {
+        ...state,
+        statsFetchLoading: false,
+        stats: action.payload,
+        statsError: null,
+      };
     case 'save_ok':
       return {
         ...state,
-        statsLoading: false,
-        stats: action.payload,
+        statsSaveLoading: false,
         statsError: null,
       };
     case 'fetch_error':
     case 'save_error':
       return {
         ...state,
-        statsLoading: false,
+        statsFetchLoading: false,
+        statsSaveLoading: false,
         statsError: action.error,
+      };
+    case 'update_stats':
+      return {
+        ...state,
+        stats: action.payload,
       };
     default:
       return {
         ...state,
-        statsLoading: false,
+        statsFetchLoading: false,
+        statsSaveLoading: false,
         statsError: 'Unhandled action type.',
       };
   }
@@ -56,13 +75,13 @@ const statsReducer = (state: StatsState, action: StatsAction): StatsState => {
 
 const initialState: StatsState = {
   stats: null,
-  statsLoading: false,
+  statsFetchLoading: false,
+  statsSaveLoading: false,
   statsError: null,
 };
 
 export const useStats = (code: GameCode) => {
   const { data, dataLoading, dataError, fetchData, saveData } = useApi();
-
   const [state, dispatch] = useReducer(statsReducer, initialState);
 
   const fetchStats = useCallback(
@@ -91,7 +110,7 @@ export const useStats = (code: GameCode) => {
           data: state.stats,
         });
 
-        dispatch({ type: 'save_ok', payload: state.stats });
+        dispatch({ type: 'save_ok' });
       } catch (error) {
         dispatch({ type: 'save_error', error: JSON.stringify(error) });
         throw new Error('Hook Error: useStats (fetchStats)');
@@ -100,20 +119,36 @@ export const useStats = (code: GameCode) => {
     [code, state.stats, saveData]
   );
 
+  const updateStats = useCallback((stats: WordleObject) => {
+    dispatch({ type: 'update_stats', payload: stats });
+  }, []);
+
   useEffect(() => {
-    if (!dataLoading || state.stats) return;
+    if (dataLoading) return;
     if (dataError) return dispatch({ type: 'fetch_error', error: dataError });
 
-    if (data) {
-      dispatch({ type: 'fetch_ok', payload: data as WordleObject });
-    } else {
-      dispatch({ type: 'fetch_ok', payload: initialStats[code] });
+    if (state.statsFetchLoading) {
+      if (data) {
+        dispatch({ type: 'fetch_ok', payload: data.data });
+      } else {
+        dispatch({ type: 'fetch_ok', payload: initialStats[code] });
+      }
+    } else if (state.statsSaveLoading) {
+      dispatch({ type: 'save_ok' });
     }
-  }, [code, data, dataError, dataLoading, state.stats]);
+  }, [
+    code,
+    data,
+    dataError,
+    dataLoading,
+    state.statsFetchLoading,
+    state.statsSaveLoading,
+  ]);
 
   return {
     ...state,
     fetchStats,
     saveStats,
+    updateStats,
   };
 };

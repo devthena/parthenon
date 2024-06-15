@@ -19,9 +19,15 @@ import { Guess } from '../../../lib/types/wordle';
 
 const Wordle = () => {
   const { user, error, isLoading } = useUser();
-  const { stats, statsLoading, statsError, fetchStats } = useStats(
-    GameCode.Wordle
-  );
+
+  const {
+    stats,
+    statsFetchLoading,
+    statsError,
+    fetchStats,
+    saveStats,
+    updateStats,
+  } = useStats(GameCode.Wordle);
 
   const {
     answer,
@@ -50,6 +56,11 @@ const Wordle = () => {
     [onEnter, onDelete, onKey]
   );
 
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isStatsUpdated, setIsStatsUpdated] = useState(false);
+  const [isStatsSaved, setIsStatsSaved] = useState(false);
+  const [page, setPage] = useState(GameStatus.Overview);
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => {
@@ -57,26 +68,62 @@ const Wordle = () => {
     };
   }, []);
 
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [page, setPage] = useState(GameStatus.Overview);
+  useEffect(() => {
+    if (!stats || isStatsUpdated) return;
+
+    if (status === WordleStatus.Answered) {
+      setIsStatsUpdated(true);
+
+      const newDistribution = [...stats.distribution];
+      newDistribution[guesses.length - 1] += 1;
+
+      updateStats({
+        currentStreak: stats.currentStreak + 1,
+        distribution: newDistribution,
+        maxStreak: Math.max(stats.maxStreak, stats.currentStreak + 1),
+        totalPlayed: stats.totalPlayed + 1,
+        totalWon: stats.totalWon + 1,
+      });
+    } else if (status === WordleStatus.Completed) {
+      setIsStatsUpdated(true);
+
+      updateStats({
+        currentStreak: 0,
+        distribution: [...stats.distribution],
+        maxStreak: stats.maxStreak,
+        totalPlayed: stats.totalPlayed + 1,
+        totalWon: stats.totalWon,
+      });
+    }
+  }, [guesses.length, isStatsUpdated, stats, status, updateStats]);
+
+  useEffect(() => {
+    if (status === WordleStatus.Playing && isStatsSaved && isStatsUpdated) {
+      setIsStatsUpdated(false);
+      setIsStatsSaved(false);
+    }
+  }, [status, isStatsSaved, isStatsUpdated]);
+
+  const userSub = user?.sub?.split('|');
+  const userId = userSub ? userSub[2] : null;
+
+  useEffect(() => {
+    if (!userId || !isStatsUpdated || isStatsSaved) return;
+    saveStats(userId);
+    setIsStatsSaved(true);
+  }, [userId, isStatsSaved, isStatsUpdated, saveStats]);
 
   if (isLoading) return <Loading />;
   if (error) return <div>{error.message}</div>;
   if (!user) return redirect('/');
 
   if (!isInitialized) {
-    const userSub = user.sub?.split('|');
-    const userId = userSub ? userSub[2] : null;
-
     if (!userId) return;
-
     fetchStats(userId);
     setIsInitialized(true);
   }
 
   const initialGuessResult = Array(WordLength).fill(KeyStatus.Default);
-  const isGameover =
-    status === WordleStatus.Answered || status === WordleStatus.Completed;
 
   // + 1 to take into account the current guess
   const fillLength = MaxAttempts - (guesses.length + 1);
@@ -88,12 +135,15 @@ const Wordle = () => {
         })
       : [];
 
-  const currentGuessArray: Guess[] = [
-    {
-      word: currentGuess,
-      result: initialGuessResult,
-    },
-  ];
+  const currentGuessArray: Guess[] =
+    guesses.length < MaxAttempts
+      ? [
+          {
+            word: currentGuess,
+            result: initialGuessResult,
+          },
+        ]
+      : [];
 
   const guessesArray: Guess[] = [
     ...guesses,
@@ -111,8 +161,8 @@ const Wordle = () => {
             onClick={() => setPage(GameStatus.Playing)}>
             PLAY
           </button>
-          {(!stats || statsLoading) && <Loading />}
-          {!statsLoading && stats && <Stats data={stats} />}
+          {(!stats || statsFetchLoading) && <Loading />}
+          {!statsFetchLoading && stats && <Stats data={stats} />}
           {statsError && <p>Stats Fetch Error: {statsError}</p>}
         </div>
       )}
