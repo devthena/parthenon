@@ -1,43 +1,42 @@
+import { WordLength } from '../../../../lib/constants/wordle';
 import { WordleStatus } from '../../../../lib/enums/wordle';
-import { AnswerGridProps } from '../../../../lib/types/wordle';
+import { Guess } from '../../../../lib/types/wordle';
 
 import styles from '../styles/grid.module.scss';
 
-export const AnswerGrid = ({
-  colors,
-  guesses,
-  status,
-  turn,
-}: AnswerGridProps) => {
+interface GridProps {
+  currentTurn: number;
+  guesses: Guess[];
+  status: WordleStatus;
+}
+
+export const AnswerGrid = ({ currentTurn, guesses, status }: GridProps) => {
   return (
     <div className={styles.grid}>
-      {Object.values(guesses).map((guess, i) => {
-        const colorArray = Object.values(colors)[i];
-        const lastTurn = turn - 1;
+      {guesses.map((guess, index) => {
+        const guessArray = guess.word.split('');
+        const wordArray = Array(WordLength)
+          .fill('')
+          .map((_l, i) => (guessArray[i] !== undefined ? guessArray[i] : ''));
 
-        let styleNamesRow = styles.row;
-
-        if (
-          lastTurn === i &&
-          (status === WordleStatus.InvalidTurn ||
+        const rowClass =
+          index === currentTurn &&
+          (status === WordleStatus.InvalidGuess ||
             status === WordleStatus.InvalidWord)
-        ) {
-          styleNamesRow = `${styles.row} ${styles.invalid}`;
-        }
+            ? styles.row + ' ' + styles.invalid
+            : styles.row;
 
         return (
-          <div className={styleNamesRow} key={i}>
-            {guess.map((letter, j) => {
-              let styleNames = styles.letter;
-
-              if (colorArray[j].length > 0) {
-                styleNames = `${styles.letter} ${styles[colorArray[j]]}`;
-              } else if (letter.length > 0) {
-                styleNames = `${styles.letter} ${styles.guessing}`;
-              }
+          <div key={index} className={rowClass}>
+            {wordArray.map((letter: string, i: number) => {
+              const resultClass = styles.letter + ' ' + styles[guess.result[i]];
+              const styleClass =
+                index === currentTurn && letter !== ''
+                  ? resultClass + ' ' + styles.guessing
+                  : resultClass;
 
               return (
-                <div className={styleNames} key={j}>
+                <div key={i} className={styleClass}>
                   {letter}
                 </div>
               );

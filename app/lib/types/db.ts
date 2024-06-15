@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { GameCode } from '../enums/games';
+import { WordleObject } from './wordle';
 
 export interface StatsObject {
   _id?: ObjectId;
@@ -19,12 +20,4 @@ export interface UserObject {
   cash: number;
   bank: number;
   stars: number;
-}
-
-export interface WordleObject {
-  currentStreak: number;
-  distribution: number[];
-  maxStreak: number;
-  totalPlayed: number;
-  totalWon: number;
 }

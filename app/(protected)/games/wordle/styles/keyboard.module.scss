@@ -25,6 +25,10 @@
     text-transform: capitalize;
     width: 34.5px;
 
+    &:hover {
+      background-color: var(--grey-light);
+    }
+
     @media screen and (min-width: 768px) {
       font-size: 18px;
       height: 46px;
@@ -65,15 +69,17 @@ button.enter {
   }
 }
 
-button.green {
-  background-color: var(--green);
-  color: white;
-}
-button.grey {
+button.absent {
   background-color: var(--grey);
   color: white;
 }
-button.yellow {
+
+button.correct {
+  background-color: var(--green);
+  color: white;
+}
+
+button.present {
   background-color: var(--yellow);
   color: white;
 }

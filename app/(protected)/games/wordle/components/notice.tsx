@@ -1,9 +1,27 @@
 import { WordleStatus } from '../../../../lib/enums/wordle';
-import { NoticeProps } from '../../../../lib/types/wordle';
 
 import styles from '../styles/notice.module.scss';
 
-export const Notice = ({ word, status }: NoticeProps) => {
+interface NoticeProps {
+  answer: string;
+  currentGuess: string;
+  status: WordleStatus;
+  onResume: () => void;
+}
+
+export const Notice = ({
+  answer,
+  currentGuess,
+  status,
+  onResume,
+}: NoticeProps) => {
+  if (
+    status === WordleStatus.InvalidGuess ||
+    status === WordleStatus.InvalidWord
+  ) {
+    setTimeout(onResume, 2250);
+  }
+
   return (
     <div className={styles.container}>
       {status === WordleStatus.Answered && (
@@ -11,17 +29,21 @@ export const Notice = ({ word, status }: NoticeProps) => {
       )}
       {status === WordleStatus.Completed && (
         <p className={styles.note}>
-          Answer: <span className={styles.answer}>{word}</span>. Press ENTER to
-          play again.
+          Answer: <span className={styles.answer}>{answer}</span>. Press ENTER
+          to play again.
         </p>
       )}
-      {status === WordleStatus.InvalidTurn && (
+      {status === WordleStatus.InvalidGuess && (
         <p className={`${styles.note} ${styles.noteFade}`}>
-          Not enough letters
+          <span className={styles.answer}>{currentGuess}</span> does not have
+          enough letters.
         </p>
       )}
       {status === WordleStatus.InvalidWord && (
-        <p className={`${styles.note} ${styles.noteFade}`}>Not in word list</p>
+        <p className={`${styles.note} ${styles.noteFade}`}>
+          <span className={styles.answer}>{currentGuess}</span> is not in the
+          dictionary.
+        </p>
       )}
     </div>
   );

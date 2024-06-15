@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer } from 'react';
 
 import { initialStats } from '../lib/constants/stats';
 import { ApiUrl } from '../lib/enums/api';
-import { WordleObject } from '../lib/types/db';
+import { WordleObject } from '../lib/types/wordle';
 import { GameCode } from '../lib/enums/games';
 
 import { useApi } from './useApi';
@@ -101,7 +101,7 @@ export const useStats = (code: GameCode) => {
   );
 
   useEffect(() => {
-    if (dataLoading || state.stats) return;
+    if (!dataLoading || state.stats) return;
     if (dataError) return dispatch({ type: 'fetch_error', error: dataError });
 
     if (data) {

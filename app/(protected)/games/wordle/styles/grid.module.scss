@@ -16,10 +16,6 @@
   }
 }
 
-.invalid {
-  animation: shake 0.25s;
-}
-
 .letter {
   align-items: center;
   border: 1px solid var(--grey-light);
@@ -48,17 +44,29 @@
 .guessing {
   border: 1px solid var(--grey-dark);
 }
-.green {
-  background-color: var(--green);
-  color: white;
-}
-.grey {
+
+.absent {
   background-color: var(--grey);
   color: white;
 }
-.yellow {
+
+.correct {
+  background-color: var(--green);
+  color: white;
+}
+
+.default {
+  background-color: var(--white);
+  color: var(--black);
+}
+
+.present {
   background-color: var(--yellow);
   color: white;
+}
+
+.invalid {
+  animation: shake 0.25s;
 }
 
 @keyframes shake {

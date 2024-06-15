@@ -1,33 +1,49 @@
 import { BackspaceIcon } from '../../../../icons';
-import { KeyboardProps, KeyTileProps } from '../../../../lib/types/wordle';
+import { keyIds } from '../../../../lib/constants/wordle';
+import { KeyStatus } from '../../../../lib/enums/wordle';
 
 import styles from '../styles/keyboard.module.scss';
 
-export const Keyboard = ({ colors, keys, onKeyUp }: KeyboardProps) => {
-  const KeyTile = ({ id }: KeyTileProps) => {
-    const isBackspace = id === 'Backspace';
-    const isEnter = id === 'Enter';
+interface KeyboardProps {
+  keyResults: { [letter: string]: KeyStatus };
+  onDelete: () => void;
+  onEnter: () => void;
+  onKey: (key: string) => void;
+}
 
-    let styleNames;
+export const Keyboard = ({
+  keyResults,
+  onDelete,
+  onEnter,
+  onKey,
+}: KeyboardProps) => {
+  const renderKey = (letter: string) => {
+    const isBackspace = letter === 'Backspace';
+    const keyResult = keyResults[letter] || 'none';
 
-    if (colors[id]) styleNames = styles[colors[id]];
-    else if (isBackspace) styleNames = styles.backspace;
-    else if (isEnter) styleNames = styles.enter;
+    const styleClass = isBackspace
+      ? `${styles.backspace} ${styles[keyResult]}`
+      : styles[keyResult];
 
     return (
-      <button className={styleNames} onClick={() => onKeyUp(id)}>
-        {isBackspace ? <BackspaceIcon /> : id}
+      <button
+        key={letter}
+        className={styleClass}
+        onClick={() => {
+          if (isBackspace) onDelete();
+          else if (letter === 'Enter') onEnter();
+          else onKey(letter);
+        }}>
+        {isBackspace ? <BackspaceIcon /> : letter}
       </button>
     );
   };
 
   return (
     <div className={styles.container}>
-      {keys.map((row, i) => (
+      {keyIds.map((row, i) => (
         <div className={styles.row} key={i}>
-          {row.map(id => (
-            <KeyTile id={id} key={id} />
-          ))}
+          {row.map(id => renderKey(id))}
         </div>
       ))}
     </div>
