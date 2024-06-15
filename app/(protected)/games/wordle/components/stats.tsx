@@ -4,10 +4,11 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
-import { StatsWordleProps } from '../../../../lib/types/api';
+import { WordleObject } from '../../../../lib/types/wordle';
+
 import styles from '../styles/stats.module.scss';
 
-export const Stats = ({ data }: StatsWordleProps) => {
+export const Stats = ({ data }: { data: WordleObject }) => {
   const winPercentage = !data?.totalPlayed
     ? 'N/A'
     : Math.round((data.totalWon / data.totalPlayed) * 100) + '%';
@@ -15,7 +16,6 @@ export const Stats = ({ data }: StatsWordleProps) => {
   return (
     <div className={styles.container}>
       <div className={styles.stats}>
-        <h3>Solo Stats</h3>
         <p>Win Percentage: {winPercentage}</p>
         <p>Max Streak: {data.maxStreak}</p>
         <p>Current Streak: {data.currentStreak}</p>

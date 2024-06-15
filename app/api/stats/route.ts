@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-
-import { FetchParams, StatsObject } from '../../../../lib/types/api';
+import { StatsObject } from '../../lib/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -15,24 +14,29 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getStats = async (id: string) => {
+const saveStats = async (payload: StatsObject) => {
   await client.connect();
 
-  const collection = await client
-    .db(mongodbName)
-    .collection<StatsObject>(mongodbCollection);
-  const data = await collection.findOne({ twitch_id: id });
+  const collection = await client.db(mongodbName).collection(mongodbCollection);
+
+  const data = await collection.updateOne(
+    { user_id: payload.user_id },
+    { $set: { ...payload } },
+    { upsert: true }
+  );
 
   await client.close();
   return data;
 };
 
-export async function GET(request: NextRequest, { params }: FetchParams) {
+export async function POST(request: NextRequest) {
   let responseData = null;
   let responseError = null;
 
+  const payload = await request.json();
+
   try {
-    responseData = await getStats(params.id);
+    responseData = await saveStats(payload);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

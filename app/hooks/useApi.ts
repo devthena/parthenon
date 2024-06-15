@@ -1,74 +1,73 @@
-import { useState } from 'react';
-import {
-  FetchPayload,
-  PostPayload,
-  StatsObject,
-  UserObject,
-} from '../lib/types/api';
-import { ApiUrls } from '../lib/constants/db';
+import { useCallback, useState } from 'react';
+import { StatsObject, UserObject } from '../lib/types/db';
+import { ApiUrl } from '../lib/enums/api';
+
+interface ApiState {
+  data: { [key: string]: any } | null;
+  dataLoading: boolean;
+  dataError: string | null;
+}
+
+const initialState = {
+  data: null,
+  dataLoading: false,
+  dataError: null,
+};
 
 export const useApi = () => {
-  const [profile, setProfile] = useState<UserObject | null>(null);
-  const [stats, setStats] = useState<StatsObject | null>(null);
-  const [isFetching, setIsFetching] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const [apiSuccess, setApiSuccess] = useState<boolean>(false);
+  const [apiData, setApiData] = useState<ApiState>(initialState);
 
-  const fetchData = async (url: string, payload: FetchPayload) => {
-    setIsFetching(true);
+  const fetchData = useCallback(async (url: string) => {
+    setApiData(prev => ({ ...prev, dataLoading: true, dataError: null }));
 
     try {
-      const res = await fetch(`${url}/${payload.method}/${payload.id}`);
+      const res = await fetch(url);
       const response = await res.json();
 
-      if (response.error) {
-        setApiError('useApi fetchUser Error:' + response.error);
-      } else if (response.data) {
-        if (url === ApiUrls.users) setProfile(response.data);
-        else if (url === ApiUrls.stats) setStats(response.data);
-      }
+      if (!res.ok) throw new Error('Hook Error: useApi (fetchData)');
 
-      setIsFetching(false);
-    } catch (fetchError) {
-      setApiError(JSON.stringify(fetchError));
-      setIsFetching(false);
-    }
-  };
-
-  const updateData = async (url: string, request: PostPayload) => {
-    setIsFetching(true);
-
-    try {
-      const res = await fetch(`${url}/${request.method}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request.payload),
+      setApiData({
+        data: response.data,
+        dataLoading: false,
+        dataError: response.error,
       });
-
-      const response = await res.json();
-
-      if (response.error) {
-        setApiError('useApi updateData Error:' + response.error);
-      } else if (response.data) {
-        setApiSuccess(true);
-      }
-
-      setIsFetching(false);
-    } catch (fetchError) {
-      setApiError(JSON.stringify(fetchError));
-      setIsFetching(false);
+    } catch (error) {
+      throw new Error('Hook Error: useApi (fetchData)');
     }
-  };
+  }, []);
+
+  const saveData = useCallback(
+    async (url: ApiUrl, payload: StatsObject | UserObject) => {
+      setApiData(prev => ({ ...prev, dataLoading: true, dataError: null }));
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const response = await res.json();
+
+        if (!res.ok) throw new Error('Hook Error: useApi (saveData)');
+
+        setApiData({
+          data: response.data,
+          dataLoading: false,
+          dataError: response.error,
+        });
+      } catch (error) {
+        throw new Error('Hook Error: useApi (saveData)');
+      }
+    },
+    []
+  );
 
   return {
-    apiError,
-    apiSuccess,
-    isFetching,
-    profile,
-    stats,
+    ...apiData,
     fetchData,
-    updateData,
+    saveData,
   };
 };

@@ -1,31 +1,26 @@
-import { WordleStatus } from '../enums/wordle';
+import { KeyStatus, WordleStatus } from '../enums/wordle';
 
-export type AnswerGridProps = {
-  colors: GuessesObject;
-  guesses: GuessesObject;
-  status: WordleStatus;
-  turn: number;
-};
-
-export type ColorObject = {
-  [key: string]: string;
-};
+export interface Guess {
+  word: string;
+  result: Array<KeyStatus>;
+}
 
 export type GuessesObject = {
   [key: number]: string[];
 };
 
-export type KeyboardProps = {
-  colors: ColorObject;
-  keys: string[][];
-  onKeyUp: Function;
-};
+export interface WordleObject {
+  currentStreak: number;
+  distribution: number[];
+  maxStreak: number;
+  totalPlayed: number;
+  totalWon: number;
+}
 
-export type KeyTileProps = {
-  id: string;
-};
-
-export type NoticeProps = {
-  word: string;
+export interface WordleState {
+  answer: string;
+  currentGuess: string;
+  guesses: Guess[];
+  keyResults: { [letter: string]: KeyStatus };
   status: WordleStatus;
-};
+}
