@@ -153,57 +153,62 @@ const Wordle = () => {
 
   return (
     <>
-      <h1>WORDLE</h1>
-      {page === GameStatus.Overview && (
-        <div>
-          <button
-            className={styles.play}
-            onClick={() => setPage(GameStatus.Playing)}>
-            PLAY
-          </button>
-          {(!stats || statsFetchLoading) && <Loading />}
-          {!statsFetchLoading && stats && <Stats data={stats} />}
-          {statsError && <p>Stats Fetch Error: {statsError}</p>}
-        </div>
-      )}
-      {page === GameStatus.Playing && (
-        <div>
-          <button
-            className={styles.back}
-            onClick={() => {
-              onReset();
-              setPage(GameStatus.Overview);
-            }}>
-            <BackIcon />
-          </button>
-          <button
-            className={styles.backDesktop}
-            onClick={() => {
-              onReset();
-              setPage(GameStatus.Overview);
-            }}>
-            <BackIcon />
-            <span>BACK</span>
-          </button>
-          <Notice
-            answer={answer}
-            currentGuess={currentGuess}
-            status={status}
-            onResume={onResume}
-          />
-          <AnswerGrid
-            currentTurn={guesses.length}
-            guesses={guessesArray}
-            status={status}
-          />
-          <Keyboard
-            keyResults={keyResults}
-            onDelete={onDelete}
-            onEnter={onEnter}
-            onKey={onKey}
-          />
-        </div>
-      )}
+      <div className={styles.wordle}>
+        <h1 className={styles.title}>WORDLE</h1>
+        {page === GameStatus.Overview && (
+          <div className={styles.overview}>
+            <button
+              className={styles.play}
+              onClick={() => setPage(GameStatus.Playing)}>
+              PLAY
+            </button>
+            <div className={styles.statsContainer}>
+              {(!stats || statsFetchLoading) && <Loading />}
+              {!statsFetchLoading && stats && <Stats data={stats} />}
+              {statsError && <p>Stats Fetch Error: {statsError}</p>}
+            </div>
+          </div>
+        )}
+        {page === GameStatus.Playing && (
+          <div className={styles.playing}>
+            <button
+              className={styles.back}
+              onClick={() => {
+                onReset();
+                setPage(GameStatus.Overview);
+              }}>
+              <BackIcon />
+            </button>
+            <button
+              className={styles.backDesktop}
+              onClick={() => {
+                onReset();
+                setPage(GameStatus.Overview);
+              }}>
+              <BackIcon />
+              <span>QUIT</span>
+            </button>
+            <Notice
+              answer={answer}
+              currentGuess={currentGuess}
+              status={status}
+              onResume={onResume}
+            />
+            <AnswerGrid
+              currentTurn={guesses.length}
+              guesses={guessesArray}
+              status={status}
+            />
+            <Keyboard
+              keyResults={keyResults}
+              onDelete={onDelete}
+              onEnter={onEnter}
+              onKey={onKey}
+            />
+          </div>
+        )}
+      </div>
+      {statsError && <p>User Stats Error: {statsError}</p>}
     </>
   );
 };

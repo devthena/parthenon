@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Source+Code+Pro:wght@400..700&display=swap');
 
 :root {
   --black: #1d1d21;
@@ -34,6 +34,7 @@ body {
   background-color: var(--white);
   color: var(--black);
   font-family: 'Figtree', sans-serif;
+  font-optical-sizing: auto;
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,6 +47,7 @@ a {
 button {
   background: transparent;
   font-family: 'Figtree', sans-serif;
+  font-optical-sizing: auto;
 }
 
 code {

@@ -19,10 +19,14 @@ export const Keyboard = ({
 }: KeyboardProps) => {
   const renderKey = (letter: string) => {
     const isBackspace = letter === 'Backspace';
+    const isEnter = letter === 'Enter';
+
     const keyResult = keyResults[letter] || 'none';
 
     const styleClass = isBackspace
       ? `${styles.backspace} ${styles[keyResult]}`
+      : isEnter
+      ? `${styles.enter} ${styles[keyResult]}`
       : styles[keyResult];
 
     return (
@@ -31,7 +35,7 @@ export const Keyboard = ({
         className={styleClass}
         onClick={() => {
           if (isBackspace) onDelete();
-          else if (letter === 'Enter') onEnter();
+          else if (isEnter) onEnter();
           else onKey(letter);
         }}>
         {isBackspace ? <BackspaceIcon /> : letter}

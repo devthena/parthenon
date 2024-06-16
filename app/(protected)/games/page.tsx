@@ -26,15 +26,6 @@ const Games = () => {
         <Link className={styles.gridItem} href="/games/wordle">
           <span>Wordle</span>
         </Link>
-        <Link className={styles.gridItem} href="/games/wordle">
-          <span>Wordle</span>
-        </Link>
-        <Link className={styles.gridItem} href="/games/wordle">
-          <span>Wordle</span>
-        </Link>
-        <Link className={styles.gridItem} href="/games/wordle">
-          <span>Wordle</span>
-        </Link>
       </div>
     </div>
   );

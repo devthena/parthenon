@@ -16,9 +16,10 @@
 
 .gridItem {
   align-items: flex-end;
-  border: 1px solid var(--green);
+  border: 2px solid var(--green);
   border-radius: 20px;
   display: flex;
+  height: 100px;
   padding: 10px;
 
   span {
