@@ -1,8 +1,8 @@
 'use client';
 
-import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+
+import { useParthenonState } from '../../../context';
 
 import { Loading } from '../../../components/loading';
 import { useStats, useWordle } from '../../../hooks';
@@ -11,14 +11,15 @@ import { BackIcon } from '../../../icons';
 import { MaxAttempts, WordLength } from '../../../lib/constants/wordle';
 import { GameCode } from '../../../lib/enums/games';
 import { GameStatus, KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
+import { Guess } from '../../../lib/types/wordle';
 
 import { AnswerGrid, Keyboard, Notice, Stats } from './components';
 
 import styles from './page.module.scss';
-import { Guess } from '../../../lib/types/wordle';
 
 const Wordle = () => {
-  const { user, error, isLoading } = useUser();
+  const { state } = useParthenonState();
+  const { user } = state;
 
   const {
     stats,
@@ -104,22 +105,16 @@ const Wordle = () => {
     }
   }, [status, isStatsSaved, isStatsUpdated]);
 
-  const userSub = user?.sub?.split('|');
-  const userId = userSub ? userSub[2] : null;
-
   useEffect(() => {
-    if (!userId || !isStatsUpdated || isStatsSaved) return;
-    saveStats(userId);
-    setIsStatsSaved(true);
-  }, [userId, isStatsSaved, isStatsUpdated, saveStats]);
+    if (!user || !user.user_id || !isStatsUpdated || isStatsSaved) return;
 
-  if (isLoading) return <Loading />;
-  if (error) return <div>{error.message}</div>;
-  if (!user) return redirect('/');
+    saveStats(user.user_id);
+    setIsStatsSaved(true);
+  }, [user, isStatsSaved, isStatsUpdated, saveStats]);
 
   if (!isInitialized) {
-    if (!userId) return;
-    fetchStats(userId);
+    if (!user) return;
+    fetchStats(user.user_id);
     setIsInitialized(true);
   }
 
