@@ -23,7 +23,7 @@ export const CommandsDiscord = [
   },
   {
     name: '/help',
-    description: 'Displays the links for Commands and FAQ',
+    description: 'Display the links for Commands and FAQ',
   },
   {
     name: '/link',
@@ -43,7 +43,7 @@ export const CommandsDiscord = [
   // },
   {
     name: '/unlink',
-    description: 'Separates your Discord and Twitch accounts',
+    description: 'Separate your Discord and Twitch accounts',
   },
 ];
 

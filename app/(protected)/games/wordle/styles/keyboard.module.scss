@@ -25,8 +25,8 @@
     text-transform: capitalize;
     width: 34.5px;
 
-    &:hover {
-      background-color: var(--grey-light);
+    &:disabled {
+      cursor: default;
     }
 
     @media screen and (min-width: 768px) {
@@ -43,7 +43,7 @@
 }
 
 button.backspace {
-  padding-top: 8px;
+  padding-top: 5px;
   width: 42px;
 
   @media screen and (min-width: 768px) {

@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { Figtree } from 'next/font/google';
-
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 import './globals.scss';
@@ -10,8 +8,6 @@ export const metadata: Metadata = {
   title: 'Parthenon',
   description: 'Official website of AthenaUS',
 };
-
-const figtree = Figtree({ subsets: ['latin'] });
 
 const RootLayout = ({
   children,
@@ -24,11 +20,11 @@ const RootLayout = ({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <UserProvider>
-        <body className={figtree.className}>
+        <body>
           <main className={styles.main}>
             <div className={styles.content}>{children}</div>
             <footer className={styles.footer}>
-              Made with ♡ by Athena | Build v0.4.0
+              Made with ♡ by Athena | Build v0.4.2
             </footer>
           </main>
         </body>

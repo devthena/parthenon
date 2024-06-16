@@ -1,3 +1,20 @@
+.title {
+  font-size: 36px;
+}
+
+.overview {
+  margin-top: 35px;
+}
+
+.playing {
+  margin: 0 auto;
+  max-width: 575px;
+}
+
+.statsContainer {
+  margin-top: 35px;
+}
+
 button.back {
   background: transparent;
   border: 1px solid var(--black);
@@ -35,6 +52,8 @@ button.backDesktop {
 
   @media screen and (min-width: 768px) {
     display: flex;
+    margin-top: 25px;
+    position: absolute;
   }
 }
 
@@ -47,7 +66,6 @@ button.play {
   font-size: 24px;
   font-weight: 500;
   height: 62px;
-  margin: 5px 0;
   width: 235px;
 
   &:hover {
