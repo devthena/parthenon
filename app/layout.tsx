@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+
 import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { ParthenonProvider } from './context';
 
 import './globals.scss';
 import styles from './styles/layout.module.scss';
@@ -19,16 +21,18 @@ const RootLayout = ({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <UserProvider>
-        <body>
-          <main className={styles.main}>
-            <div className={styles.content}>{children}</div>
-            <footer className={styles.footer}>
-              Made with ♡ by Athena | Build v0.4.2
-            </footer>
-          </main>
-        </body>
-      </UserProvider>
+      <body>
+        <UserProvider>
+          <ParthenonProvider>
+            <main className={styles.main}>
+              <div className={styles.content}>{children}</div>
+              <footer className={styles.footer}>
+                Made with ♡ by Athena | Build v0.5.0
+              </footer>
+            </main>
+          </ParthenonProvider>
+        </UserProvider>
+      </body>
     </html>
   );
 };

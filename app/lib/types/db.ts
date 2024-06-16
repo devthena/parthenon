@@ -10,7 +10,7 @@ export interface StatsObject {
 }
 
 export interface UserObject {
-  _id: ObjectId;
+  _id?: ObjectId;
   user_id: string;
   discord_id: string | null;
   discord_username: string | null;
