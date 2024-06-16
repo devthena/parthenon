@@ -17,6 +17,33 @@ type WordleAction =
   | { type: 'reset' }
   | { type: 'resume' };
 
+const getLetterResult = (guess: string[], answer: string): KeyStatus[] => {
+  const result: KeyStatus[] = Array(guess.length).fill(KeyStatus.Absent);
+  const answerArray = answer.split('');
+  const guessArray = [...guess];
+
+  // first pass: check for correct letters
+  for (let i = 0; i < guessArray.length; i++) {
+    if (guessArray[i] === answerArray[i]) {
+      result[i] = KeyStatus.Correct;
+      answerArray[i] = '';
+      guessArray[i] = '';
+    }
+  }
+
+  // second pass: check for present letters
+  for (let i = 0; i < guessArray.length; i++) {
+    if (guessArray[i] !== '' && answerArray.includes(guessArray[i])) {
+      const letterIndex = answerArray.indexOf(guessArray[i]);
+
+      result[i] = KeyStatus.Present;
+      answerArray[letterIndex] = '';
+    }
+  }
+
+  return result;
+};
+
 const wordleReducer = (
   state: WordleState,
   action: WordleAction
@@ -54,13 +81,10 @@ const wordleReducer = (
             };
           }
 
-          const result: Guess['result'] = state.currentGuess
-            .split('')
-            .map((l, i) => {
-              if (l === state.answer[i]) return KeyStatus.Correct;
-              if (state.answer.includes(l)) return KeyStatus.Present;
-              return KeyStatus.Absent;
-            });
+          const result = getLetterResult(
+            state.currentGuess.split(''),
+            state.answer
+          );
 
           const newGuess: Guess = { word: state.currentGuess, result };
           const newGuesses = [...state.guesses, newGuess];
