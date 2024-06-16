@@ -6,12 +6,14 @@ interface ApiState {
   data: { [key: string]: any } | null;
   dataLoading: boolean;
   dataError: string | null;
+  dataProcessed: boolean;
 }
 
 const initialState = {
   data: null,
-  dataLoading: false,
   dataError: null,
+  dataLoading: false,
+  dataProcessed: false,
 };
 
 export const useApi = () => {
@@ -28,8 +30,9 @@ export const useApi = () => {
 
       setApiData({
         data: response.data,
+        dataError: null,
         dataLoading: false,
-        dataError: response.error,
+        dataProcessed: true,
       });
     } catch (error) {
       throw new Error('Hook Error: useApi (fetchData)');
@@ -55,8 +58,9 @@ export const useApi = () => {
 
         setApiData({
           data: response.data,
+          dataError: null,
           dataLoading: false,
-          dataError: response.error,
+          dataProcessed: true,
         });
       } catch (error) {
         throw new Error('Hook Error: useApi (saveData)');
