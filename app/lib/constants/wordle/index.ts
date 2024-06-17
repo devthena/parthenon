@@ -9,3 +9,5 @@ export const keyIds = [
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
   ['Enter', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'Backspace'],
 ];
+
+export const WordleRewards = [10000, 1000, 500, 250, 100, 50];

@@ -18,8 +18,7 @@ import { AnswerGrid, Keyboard, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const { state } = useParthenonState();
-  const { user } = state;
+  const { user, onUpdateUser, saveUser } = useParthenonState();
 
   const {
     stats,
@@ -34,8 +33,9 @@ const Wordle = () => {
     answer,
     currentGuess,
     guesses,
-    status,
     keyResults,
+    reward,
+    status,
     onDelete,
     onEnter,
     onKey,
@@ -85,6 +85,13 @@ const Wordle = () => {
         totalPlayed: stats.totalPlayed + 1,
         totalWon: stats.totalWon + 1,
       });
+
+      if (user && reward) {
+        onUpdateUser({
+          ...user,
+          cash: user.cash + reward,
+        });
+      }
     } else if (status === WordleStatus.Completed) {
       setIsStatsUpdated(true);
 
@@ -96,7 +103,16 @@ const Wordle = () => {
         totalWon: stats.totalWon,
       });
     }
-  }, [guesses.length, isStatsUpdated, stats, status, updateStats]);
+  }, [
+    guesses.length,
+    isStatsUpdated,
+    reward,
+    stats,
+    status,
+    user,
+    onUpdateUser,
+    updateStats,
+  ]);
 
   useEffect(() => {
     if (status === WordleStatus.Playing && isStatsSaved && isStatsUpdated) {
@@ -108,9 +124,16 @@ const Wordle = () => {
   useEffect(() => {
     if (!user || !user.user_id || !isStatsUpdated || isStatsSaved) return;
 
+    if (status !== WordleStatus.Answered && status !== WordleStatus.Completed) {
+      return;
+    }
+
     saveStats(user.user_id);
     setIsStatsSaved(true);
-  }, [user, isStatsSaved, isStatsUpdated, saveStats]);
+
+    // user is updated only when the Wordle is answered
+    if (status === WordleStatus.Answered) saveUser();
+  }, [user, isStatsSaved, isStatsUpdated, status, saveStats, saveUser]);
 
   if (!isInitialized) {
     if (!user) return;
@@ -187,6 +210,7 @@ const Wordle = () => {
               answer={answer}
               currentGuess={currentGuess}
               status={status}
+              reward={reward}
               onResume={onResume}
             />
             <AnswerGrid

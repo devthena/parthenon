@@ -5,6 +5,7 @@ import {
   MaxAttempts,
   WordLength,
   WordList,
+  WordleRewards,
 } from '../lib/constants/wordle';
 
 import { KeyStatus, WordleStatus } from '../lib/enums/wordle';
@@ -96,6 +97,11 @@ const wordleReducer = (
               ? WordleStatus.Completed
               : WordleStatus.Playing;
 
+          const newReward =
+            newStatus === WordleStatus.Answered
+              ? WordleRewards[newGuesses.length - 1]
+              : null;
+
           const newKeyResults = { ...state.keyResults };
 
           state.currentGuess.split('').forEach((l, i) => {
@@ -108,8 +114,9 @@ const wordleReducer = (
             ...state,
             currentGuess: '',
             guesses: newGuesses,
-            status: newStatus,
             keyResults: newKeyResults,
+            reward: newReward,
+            status: newStatus,
           };
         } else {
           return {
@@ -142,6 +149,7 @@ const initialState: WordleState = {
   currentGuess: '',
   guesses: [],
   keyResults: {},
+  reward: null,
   status: WordleStatus.Playing,
 };
 
