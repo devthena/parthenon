@@ -21,12 +21,12 @@ const ProtectedLayout = ({
 }>) => {
   const { data, dataError, dataProcessed, fetchData } = useApi();
   const { user, isLoading, error } = useUser();
-  const { dispatch } = useParthenonState();
+  const { onSetLoading, onSetUser } = useParthenonState();
 
   useEffect(() => {
     if (!user || !user.sub) return;
 
-    dispatch({ type: 'set_loading' });
+    onSetLoading();
 
     const userSub = user.sub.split('|');
     const userId = userSub[2];
@@ -37,17 +37,17 @@ const ProtectedLayout = ({
     };
 
     getUser();
-  }, [user, dispatch, fetchData]);
+  }, [user, fetchData, onSetLoading]);
 
   useEffect(() => {
     if (!dataProcessed) return;
 
     if (data) {
-      dispatch({ type: 'set_user', payload: data as UserObject });
+      onSetUser(data as UserObject);
     } else {
-      dispatch({ type: 'set_user', payload: null });
+      onSetUser(null);
     }
-  }, [data, dataProcessed, dispatch]);
+  }, [data, dataProcessed, onSetUser]);
 
   if (!user && !isLoading) return redirect('/');
 

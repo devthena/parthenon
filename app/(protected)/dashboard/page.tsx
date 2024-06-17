@@ -13,8 +13,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Dashboard = () => {
   const { user: userAuth0 } = useUser();
-  const { state } = useParthenonState();
-  const { isFetched, user } = state;
+  const { isFetched, user } = useParthenonState();
 
   let displayName = '';
 

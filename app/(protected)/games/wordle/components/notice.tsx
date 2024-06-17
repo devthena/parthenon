@@ -1,3 +1,4 @@
+import { CoinIcon } from '../../../../icons';
 import { WordleStatus } from '../../../../lib/enums/wordle';
 
 import styles from '../styles/notice.module.scss';
@@ -6,6 +7,7 @@ interface NoticeProps {
   answer: string;
   currentGuess: string;
   status: WordleStatus;
+  reward: number | null;
   onResume: () => void;
 }
 
@@ -13,6 +15,7 @@ export const Notice = ({
   answer,
   currentGuess,
   status,
+  reward,
   onResume,
 }: NoticeProps) => {
   if (
@@ -25,7 +28,18 @@ export const Notice = ({
   return (
     <div className={styles.container}>
       {status === WordleStatus.Answered && (
-        <p className={styles.note}>Good job! Press ENTER to play again.</p>
+        <p className={styles.note}>
+          Congrats!{' '}
+          {reward && (
+            <>
+              Reward: <span>{reward}</span>
+              <span className={styles.coin}>
+                <CoinIcon />
+              </span>
+            </>
+          )}{' '}
+          Press ENTER to play again.
+        </p>
       )}
       {status === WordleStatus.Completed && (
         <p className={styles.note}>
