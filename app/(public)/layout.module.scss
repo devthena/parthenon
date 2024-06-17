@@ -3,4 +3,12 @@
   flex-direction: column;
   flex-grow: 1;
   padding: 45px 0 0;
+
+  h1 {
+    font-size: 26px;
+
+    @media screen and (min-width: 480px) {
+      font-size: 36px;
+    }
+  }
 }

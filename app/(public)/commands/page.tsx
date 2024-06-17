@@ -5,7 +5,7 @@ import styles from './page.module.scss';
 const Commands = () => {
   return (
     <div className={styles.commands}>
-      <h1 className={styles.title}>COMMANDS</h1>
+      <h1>COMMANDS</h1>
       <div className={styles.boxes}>
         <div className={styles.box}>
           <h2>

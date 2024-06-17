@@ -1,4 +1,4 @@
-import { KeyStatus, WordleStatus } from '../enums/wordle';
+import { KeyStatus, ModalContent, WordleStatus } from '../enums/wordle';
 
 export interface Guess {
   word: string;
@@ -22,6 +22,8 @@ export interface WordleState {
   currentGuess: string;
   guesses: Guess[];
   keyResults: { [letter: string]: KeyStatus };
+  modalContent: ModalContent;
+  modalDisplay: boolean;
   reward: number | null;
   status: WordleStatus;
 }

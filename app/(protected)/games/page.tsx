@@ -6,7 +6,7 @@ import styles from './page.module.scss';
 const Games = () => {
   return (
     <div className={styles.games}>
-      <h1 className={styles.title}>GAMES</h1>
+      <h1>GAMES</h1>
       <p className={styles.description}>
         Tired of gambling all and losing? Erase your debts (and more) here!
       </p>

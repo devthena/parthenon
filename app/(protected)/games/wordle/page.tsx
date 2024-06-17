@@ -6,14 +6,14 @@ import { useParthenonState } from '../../../context';
 
 import { Loading } from '../../../components/loading';
 import { useStats, useWordle } from '../../../hooks';
-import { BackIcon } from '../../../icons';
+import { BackIcon, RulesIcon, StatsIcon } from '../../../icons';
 
 import { MaxAttempts, WordLength } from '../../../lib/constants/wordle';
 import { GameCode } from '../../../lib/enums/games';
 import { GameStatus, KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
 import { Guess } from '../../../lib/types/wordle';
 
-import { AnswerGrid, Keyboard, Notice, Stats } from './components';
+import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 
 import styles from './page.module.scss';
 
@@ -34,11 +34,16 @@ const Wordle = () => {
     currentGuess,
     guesses,
     keyResults,
+    modalContent,
+    modalDisplay,
     reward,
     status,
     onDelete,
     onEnter,
     onKey,
+    onModalClose,
+    onModalRules,
+    onModalStats,
     onReset,
     onResume,
   } = useWordle();
@@ -170,65 +175,103 @@ const Wordle = () => {
   ];
 
   return (
-    <>
-      <div className={styles.wordle}>
-        <h1 className={styles.title}>WORDLE</h1>
-        {page === GameStatus.Overview && (
-          <div className={styles.overview}>
-            <button
-              className={styles.play}
-              onClick={() => setPage(GameStatus.Playing)}>
-              PLAY
-            </button>
-            <div className={styles.statsContainer}>
-              {(!stats || statsFetchLoading) && <Loading />}
-              {!statsFetchLoading && stats && <Stats data={stats} />}
-              {statsError && <p>Stats Fetch Error: {statsError}</p>}
-            </div>
-          </div>
-        )}
-        {page === GameStatus.Playing && (
-          <div className={styles.playing}>
-            <button
-              className={styles.back}
-              onClick={() => {
-                onReset();
-                setPage(GameStatus.Overview);
-              }}>
-              <BackIcon />
-            </button>
-            <button
-              className={styles.backDesktop}
-              onClick={() => {
-                onReset();
-                setPage(GameStatus.Overview);
-              }}>
-              <BackIcon />
-              <span>QUIT</span>
-            </button>
-            <Notice
-              answer={answer}
-              currentGuess={currentGuess}
-              status={status}
-              reward={reward}
-              onResume={onResume}
-            />
-            <AnswerGrid
-              currentTurn={guesses.length}
-              guesses={guessesArray}
-              status={status}
-            />
-            <Keyboard
-              keyResults={keyResults}
-              onDelete={onDelete}
-              onEnter={onEnter}
-              onKey={onKey}
-            />
-          </div>
-        )}
+    <div className={styles.wordle}>
+      {modalDisplay && (
+        <Modal
+          content={modalContent}
+          stats={stats}
+          onModalClose={onModalClose}
+        />
+      )}
+      <div className={styles.header}>
+        <div className={styles.leftButtons}>
+          {page !== GameStatus.Overview && (
+            <>
+              <button
+                className={styles.back}
+                onClick={() => {
+                  onReset();
+                  setPage(GameStatus.Overview);
+                }}>
+                <BackIcon />
+              </button>
+              <button
+                className={styles.backDesktop}
+                onClick={() => {
+                  onReset();
+                  setPage(GameStatus.Overview);
+                }}>
+                <BackIcon />
+                <span>QUIT</span>
+              </button>
+            </>
+          )}
+        </div>
+        <h1>WORDLE</h1>
+        <div className={styles.rightButtons}>
+          {page === GameStatus.Overview && (
+            <>
+              <button
+                className={styles.rulesOverview}
+                onClick={() => onModalRules()}>
+                <RulesIcon />
+              </button>
+              <button
+                className={styles.rulesDesktop}
+                onClick={() => onModalRules()}>
+                RULES
+              </button>
+            </>
+          )}
+          {page !== GameStatus.Overview && (
+            <>
+              <button className={styles.rules} onClick={() => onModalRules()}>
+                <RulesIcon />
+              </button>
+              <button className={styles.stats} onClick={() => onModalStats()}>
+                <StatsIcon />
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      {statsError && <p>User Stats Error: {statsError}</p>}
-    </>
+      {page === GameStatus.Overview && (
+        <div className={styles.overview}>
+          <button
+            className={styles.play}
+            onClick={() => setPage(GameStatus.Playing)}>
+            PLAY
+          </button>
+          <div className={styles.statsContainer}>
+            {(!stats || statsFetchLoading) && <Loading />}
+            {!statsFetchLoading && stats && <Stats data={stats} />}
+            {statsError && <p>Stats Fetch Error: {statsError}</p>}
+          </div>
+        </div>
+      )}
+      {page === GameStatus.Playing && (
+        <div className={styles.playing}>
+          <Notice
+            answer={answer}
+            currentGuess={currentGuess}
+            status={status}
+            reward={reward}
+            onResume={onResume}
+          />
+          <AnswerGrid
+            currentTurn={guesses.length}
+            guesses={guessesArray}
+            status={status}
+          />
+          <Keyboard
+            keyResults={keyResults}
+            onDelete={onDelete}
+            onEnter={onEnter}
+            onKey={onKey}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 
