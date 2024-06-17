@@ -8,17 +8,24 @@ import {
   WordleRewards,
 } from '../lib/constants/wordle';
 
-import { KeyStatus, WordleStatus } from '../lib/enums/wordle';
+import { KeyStatus, ModalContent, WordleStatus } from '../lib/enums/wordle';
 import { Guess, WordleState } from '../lib/types/wordle';
 
 type WordleAction =
   | { type: 'delete' }
   | { type: 'enter' }
   | { type: 'key'; letter: string }
+  | { type: 'modal_close' }
+  | { type: 'modal_rules' }
+  | { type: 'modal_stats' }
   | { type: 'reset' }
   | { type: 'resume' };
 
-const getLetterResult = (guess: string[], answer: string): KeyStatus[] => {
+const getLetterResult = (
+  guess: string[],
+  answer: string,
+  keyResults: { [key: string]: string }
+): KeyStatus[] => {
   const result: KeyStatus[] = Array(guess.length).fill(KeyStatus.Absent);
   const answerArray = answer.split('');
   const guessArray = [...guess];
@@ -27,8 +34,11 @@ const getLetterResult = (guess: string[], answer: string): KeyStatus[] => {
   for (let i = 0; i < guessArray.length; i++) {
     if (guessArray[i] === answerArray[i]) {
       result[i] = KeyStatus.Correct;
+      keyResults[guessArray[i]] = KeyStatus.Correct;
       answerArray[i] = '';
       guessArray[i] = '';
+    } else {
+      keyResults[guessArray[i]] = KeyStatus.Absent;
     }
   }
 
@@ -38,6 +48,7 @@ const getLetterResult = (guess: string[], answer: string): KeyStatus[] => {
       const letterIndex = answerArray.indexOf(guessArray[i]);
 
       result[i] = KeyStatus.Present;
+      keyResults[guessArray[i]] = KeyStatus.Present;
       answerArray[letterIndex] = '';
     }
   }
@@ -82,9 +93,12 @@ const wordleReducer = (
             };
           }
 
+          const newKeyResults = { ...state.keyResults };
+
           const result = getLetterResult(
             state.currentGuess.split(''),
-            state.answer
+            state.answer,
+            newKeyResults
           );
 
           const newGuess: Guess = { word: state.currentGuess, result };
@@ -101,14 +115,6 @@ const wordleReducer = (
             newStatus === WordleStatus.Answered
               ? WordleRewards[newGuesses.length - 1]
               : null;
-
-          const newKeyResults = { ...state.keyResults };
-
-          state.currentGuess.split('').forEach((l, i) => {
-            const keyResult = result[i];
-            if (newKeyResults[l] !== KeyStatus.Correct)
-              newKeyResults[l] = keyResult;
-          });
 
           return {
             ...state,
@@ -127,6 +133,23 @@ const wordleReducer = (
       } else {
         return { ...initialState, answer: generateAnswer() };
       }
+    case 'modal_close':
+      return {
+        ...state,
+        modalDisplay: false,
+      };
+    case 'modal_rules':
+      return {
+        ...state,
+        modalContent: ModalContent.Rules,
+        modalDisplay: true,
+      };
+    case 'modal_stats':
+      return {
+        ...state,
+        modalContent: ModalContent.Stats,
+        modalDisplay: true,
+      };
     case 'reset':
       return { ...initialState, answer: generateAnswer() };
     case 'resume':
@@ -149,6 +172,8 @@ const initialState: WordleState = {
   currentGuess: '',
   guesses: [],
   keyResults: {},
+  modalContent: ModalContent.Rules,
+  modalDisplay: false,
   reward: null,
   status: WordleStatus.Playing,
 };
@@ -168,6 +193,18 @@ export const useWordle = () => {
     dispatch({ type: 'key', letter: letter });
   }, []);
 
+  const onModalClose = useCallback(() => {
+    dispatch({ type: 'modal_close' });
+  }, []);
+
+  const onModalRules = useCallback(() => {
+    dispatch({ type: 'modal_rules' });
+  }, []);
+
+  const onModalStats = useCallback(() => {
+    dispatch({ type: 'modal_stats' });
+  }, []);
+
   const onReset = useCallback(() => {
     dispatch({ type: 'reset' });
   }, []);
@@ -181,6 +218,9 @@ export const useWordle = () => {
     onDelete,
     onEnter,
     onKey,
+    onModalClose,
+    onModalRules,
+    onModalStats,
     onReset,
     onResume,
   };

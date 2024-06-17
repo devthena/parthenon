@@ -16,6 +16,7 @@ export const Stats = ({ data }: { data: WordleObject }) => {
   return (
     <div className={styles.container}>
       <div className={styles.stats}>
+        <h3>STATS</h3>
         <p>Win Percentage: {winPercentage}</p>
         <p>Max Streak: {data.maxStreak}</p>
         <p>Current Streak: {data.currentStreak}</p>

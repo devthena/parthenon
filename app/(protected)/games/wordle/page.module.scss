@@ -1,5 +1,38 @@
-.title {
-  font-size: 36px;
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 700px;
+  padding: 0 20px;
+
+  h1 {
+    flex-grow: 1;
+  }
+
+  button {
+    background-color: var(--white);
+    border: 1px solid var(--black);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+.leftButtons,
+.rightButtons {
+  width: 80px;
+}
+
+.leftButtons {
+  text-align: left;
+}
+
+.rightButtons {
+  text-align: right;
+
+  button:last-child {
+    margin-left: 8px;
+  }
 }
 
 .overview {
@@ -16,9 +49,6 @@
 }
 
 button.back {
-  background: transparent;
-  border: 1px solid var(--black);
-  border-radius: 5px;
   margin-right: 15px;
   padding: 2px 5px 0 2px;
 
@@ -28,19 +58,15 @@ button.back {
     width: 20px;
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 480px) {
     display: none;
   }
 }
 
 button.backDesktop {
   align-items: center;
-  background: transparent;
-  border: 1px solid var(--black);
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   display: none;
   padding: 3px 11px 3px 3px;
 
@@ -50,18 +76,44 @@ button.backDesktop {
     width: 20px;
   }
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 480px) {
     display: flex;
-    margin-top: 28px;
-    position: absolute;
+  }
+}
+
+button.rules,
+button.rulesOverview,
+button.stats {
+  padding: 2px 5px 0;
+
+  & > svg {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+button.rulesOverview {
+  @media screen and (min-width: 480px) {
+    display: none;
+  }
+}
+
+button.rulesDesktop {
+  display: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 3px 11px;
+
+  @media screen and (min-width: 480px) {
+    display: inline-block;
   }
 }
 
 button.play {
   background-color: var(--green);
-  border: 2px solid forestgreen;
+  border: 2px solid var(--green-dark);
   border-radius: 30px;
-  color: white;
+  color: var(--white);
   cursor: pointer;
   font-size: 24px;
   font-weight: 500;

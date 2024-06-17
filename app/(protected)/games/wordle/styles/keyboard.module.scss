@@ -8,7 +8,7 @@
   justify-content: center;
   padding: 0 0 5px;
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 480px) {
     padding: 2px 0;
   }
 
@@ -29,7 +29,7 @@
       cursor: default;
     }
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 480px) {
       font-size: 18px;
       height: 46px;
       margin-right: 4px;
@@ -46,7 +46,7 @@ button.backspace {
   padding-top: 5px;
   width: 42px;
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 480px) {
     width: 60px;
   }
 
@@ -54,7 +54,7 @@ button.backspace {
     height: 20px;
     width: 20px;
 
-    @media screen and (min-width: 768px) {
+    @media screen and (min-width: 480px) {
       height: 24px;
       width: 24px;
     }
@@ -64,22 +64,22 @@ button.backspace {
 button.enter {
   width: 64px;
 
-  @media screen and (min-width: 768px) {
+  @media screen and (min-width: 480px) {
     width: 82px;
   }
 }
 
 button.absent {
   background-color: var(--grey);
-  color: white;
+  color: var(--white);
 }
 
 button.correct {
   background-color: var(--green);
-  color: white;
+  color: var(--white);
 }
 
 button.present {
   background-color: var(--yellow);
-  color: white;
+  color: var(--white);
 }

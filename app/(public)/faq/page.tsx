@@ -3,7 +3,7 @@ import styles from './page.module.scss';
 const FAQ = () => {
   return (
     <div className={styles.faq}>
-      <h1 className={styles.title}>FREQUENTLY ASKED QUESTIONS</h1>
+      <h1>FREQUENTLY ASKED QUESTIONS</h1>
       <div className={styles.questions}>
         <h2>Can I add the bot to my Twitch channel / Discord server?</h2>
         <p>

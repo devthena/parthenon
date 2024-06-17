@@ -10,6 +10,11 @@ export enum KeyStatus {
   Present = 'present', // exists but in the wrong position
 }
 
+export enum ModalContent {
+  Rules,
+  Stats,
+}
+
 export enum WordleStatus {
   Answered, // answered the wordle correctly
   Completed, // reached maximum number of guesses
