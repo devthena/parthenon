@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { DiscordIcon, TwitchIcon } from '../../../icons';
+import { DiscordIcon, TwitchIcon } from '../../../images/icons';
 import styles from '../styles/linked.module.scss';
 
 export const AccountLinked = ({

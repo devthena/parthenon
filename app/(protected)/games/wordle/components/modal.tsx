@@ -1,5 +1,5 @@
 import { useWordle } from '../../../../hooks';
-import { CloseIcon } from '../../../../icons';
+import { CloseIcon } from '../../../../images/icons';
 
 import { ModalContent } from '../../../../lib/enums/wordle';
 import { WordleObject } from '../../../../lib/types/wordle';

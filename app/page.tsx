@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading } from './components';
-import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from './icons';
+import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from './images/icons';
 import { SocialUrls } from './lib/constants';
 
 import styles from './styles/page.module.scss';

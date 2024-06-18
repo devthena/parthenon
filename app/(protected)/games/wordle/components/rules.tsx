@@ -13,7 +13,7 @@ export const Rules = () => {
             correct spot
           </li>
           <li>
-            <span className={styles.yellow}>YELLOW</span> is for letters the
+            <span className={styles.yellow}>YELLOW</span> is for letters in the
             wrong spot
           </li>
           <li>

@@ -1,4 +1,4 @@
-import { BackspaceIcon } from '../../../../icons';
+import { BackspaceIcon } from '../../../../images/icons';
 import { KeyList } from '../../../../lib/constants/wordle';
 import { KeyStatus } from '../../../../lib/enums/wordle';
 
