@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-
 import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Analytics } from '@vercel/analytics/react';
+
 import { ParthenonProvider } from './context';
 
 import './globals.scss';
@@ -32,6 +33,7 @@ const RootLayout = ({
             </main>
           </ParthenonProvider>
         </UserProvider>
+        <Analytics />
       </body>
     </html>
   );
