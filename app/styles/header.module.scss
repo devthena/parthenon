@@ -60,7 +60,7 @@
 }
 
 .modal {
-  height: 500px;
+  height: calc(100% - 50px);
   left: 0;
   overflow: hidden;
   position: absolute;
