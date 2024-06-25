@@ -4,10 +4,11 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { Header, Loading } from './components';
+import { Header, Loading, Login } from './components';
 import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from './images/icons';
 import { SocialUrls } from './lib/constants';
 
+import avatar from './images/avatar.png';
 import styles from './styles/page.module.scss';
 
 const Home = () => {
@@ -26,14 +27,19 @@ const Home = () => {
           <figure className={styles.avatar}>
             <Image
               alt="Athena Avatar"
+              className={styles.avatarImg}
               height={300}
-              src="/avatar.png"
+              priority
+              src={avatar}
               width={300}
             />
           </figure>
           <div className={styles.description}>
             <h1>Welcome to the Parthenon!</h1>
-            <p>The official website for the AthenaUS community.</p>
+            <p>The official website of the AthenaUS community</p>
+          </div>
+          <div className={styles.login}>
+            <Login />
           </div>
           <div className={styles.social}>
             <p>Connect with me!</p>
