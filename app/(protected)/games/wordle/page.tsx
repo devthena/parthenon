@@ -6,7 +6,7 @@ import { useParthenonState } from '../../../context';
 
 import { Loading } from '../../../components/loading';
 import { useStats, useWordle } from '../../../hooks';
-import { BackIcon, RulesIcon, StatsIcon } from '../../../icons';
+import { BackIcon, RulesIcon, StatsIcon } from '../../../images/icons';
 
 import { MaxAttempts, WordLength } from '../../../lib/constants/wordle';
 import { GameCode } from '../../../lib/enums/games';

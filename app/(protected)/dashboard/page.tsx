@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { useParthenonState } from '../../context';
 import { Loading } from '../../components';
-import { CoinIcon } from '../../icons';
+import { CoinIcon } from '../../images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
 

@@ -1,7 +1,13 @@
 .header {
+  background-color: var(--white);
   display: flex;
-  height: 90px;
-  justify-content: space-between;
+  height: 50px;
+  justify-content: center;
+
+  @media screen and (min-width: 480px) {
+    height: 90px;
+    justify-content: space-between;
+  }
 }
 
 .logo {
@@ -15,28 +21,106 @@
 
   h1 {
     color: var(--dark-blue);
-    font-size: 24px;
+    font-size: 16px;
     margin-left: 4px;
 
     & > span {
       color: var(--owl-blue);
     }
+
+    @media screen and (min-width: 480px) {
+      font-size: 24px;
+    }
   }
 }
 
-.links {
+.logoImg {
+  height: 18px;
+  width: 18px;
+
+  @media screen and (min-width: 480px) {
+    height: 30px;
+    width: 30px;
+  }
+}
+
+.menu {
+  position: absolute;
+  top: 17px;
+  left: 17px;
+
+  button {
+    border: none;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 480px) {
+    display: none;
+  }
+}
+
+.modal {
+  height: 500px;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 50px;
+  width: 100%;
+  z-index: -1;
+}
+
+.modalContent {
+  align-items: center;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  transform: translate(0, -100%);
+  transition-timing-function: ease-in;
+  transition: 0.25s;
+}
+
+.modalLinks {
   align-items: center;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   & > a {
     color: var(--black);
     font-size: 18px;
+    font-weight: 500;
     line-height: 24px;
-    margin-left: 30px;
+    margin-bottom: 30px;
   }
+}
 
-  & > a:first-child {
-    margin-left: 0;
+.open {
+  .modalContent {
+    transition: 0.25s;
+    transition-timing-function: ease-out;
+    transform: translate(0, 0%);
+  }
+}
+
+.links {
+  display: none;
+
+  @media screen and (min-width: 480px) {
+    align-items: center;
+    display: flex;
+
+    & > a {
+      color: var(--black);
+      font-size: 18px;
+      line-height: 24px;
+      margin-left: 30px;
+    }
+
+    & > a:first-child {
+      margin-left: 0;
+    }
   }
 }
 
@@ -57,4 +141,8 @@
     background-color: var(--dark-blue);
     color: var(--white);
   }
+}
+
+.zIndexAdd {
+  z-index: 1;
 }

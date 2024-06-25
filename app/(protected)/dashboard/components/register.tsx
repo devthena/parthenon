@@ -1,4 +1,4 @@
-import { DiscordIcon, TwitchIcon } from '../../../icons';
+import { DiscordIcon, TwitchIcon } from '../../../images/icons';
 import { SocialUrls } from '../../../lib/constants';
 
 import styles from '../styles/register.module.scss';
