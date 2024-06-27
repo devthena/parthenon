@@ -1,7 +1,7 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { Header, Loading } from '../components';
+import { usePathname } from 'next/navigation';
+import { Header } from '../components';
 
 import styles from './layout.module.scss';
 
@@ -10,18 +10,12 @@ const PublicLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { user, error, isLoading } = useUser();
-
-  if (error) return <div>{error.message}</div>;
+  const pathname = usePathname();
 
   return (
     <>
-      <Header isProtected={!!user} />
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <div className={styles.container}>{children}</div>
-      )}
+      <Header pathname={pathname} />
+      <div className={styles.container}>{children}</div>
     </>
   );
 };

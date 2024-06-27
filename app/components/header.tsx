@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 import { MenuCloseIcon, MenuIcon } from '../images/icons';
 import { Login } from './login';
@@ -10,8 +9,7 @@ import { NavPaths } from '../lib/constants';
 
 import styles from '../styles/header.module.scss';
 
-export const Header = ({ isProtected }: { isProtected: boolean }) => {
-  const pathname = usePathname();
+export const Header = ({ pathname }: { pathname: string }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zIndex, setZIndex] = useState(false);
 
@@ -34,17 +32,21 @@ export const Header = ({ isProtected }: { isProtected: boolean }) => {
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
 
+  const isProtected = NavPaths.some(
+    nav => nav.value === pathname && nav.protected
+  );
+
   return (
     <>
       <header className={styles.header}>
         <div className={styles.logo}>
           <div className={styles.menu}>
             {isModalOpen ? (
-              <button onClick={() => handleModalClose()}>
+              <button onClick={handleModalClose}>
                 <MenuCloseIcon />
               </button>
             ) : (
-              <button onClick={() => handleModalOpen()}>
+              <button onClick={handleModalOpen}>
                 <MenuIcon />
               </button>
             )}
@@ -101,7 +103,8 @@ export const Header = ({ isProtected }: { isProtected: boolean }) => {
                       pathValue === pathname ? styles.selected : undefined
                     }
                     href={pathValue}
-                    key={path.label}>
+                    key={path.label}
+                    onClick={handleModalClose}>
                     {path.label}
                   </Link>
                 )

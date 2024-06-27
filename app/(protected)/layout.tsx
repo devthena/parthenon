@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { redirect } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading } from '../components';
@@ -19,6 +19,7 @@ const ProtectedLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const pathname = usePathname();
   const { data, dataError, dataProcessed, fetchData } = useApi();
   const { user, isLoading, error } = useUser();
   const { onSetLoading, onSetUser } = useParthenonState();
@@ -57,11 +58,12 @@ const ProtectedLayout = ({
         <Loading />
       </div>
     );
+
   if (error) return <div>{error.message}</div>;
 
   return (
     <>
-      <Header isProtected={true} />
+      <Header pathname={pathname} />
       <div className={styles.container}>{children}</div>
       {dataError && <p>Hook Error (useApi): {dataError}</p>}
     </>

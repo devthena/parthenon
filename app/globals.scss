@@ -55,6 +55,10 @@ code {
   background-color: var(--owl-blue-light);
   font-family: 'Source Code Pro', monospace;
   font-optical-sizing: auto;
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 600;
+
+  @media screen and (min-width: 480px) {
+    font-size: 18px;
+  }
 }
