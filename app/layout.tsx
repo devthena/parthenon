@@ -28,7 +28,7 @@ const RootLayout = ({
             <main className={styles.main}>
               <div className={styles.content}>{children}</div>
               <footer className={styles.footer}>
-                Made with ♡ by Athena | Build v0.8.1
+                Made with ♡ by Athena | Build v0.8.2
               </footer>
             </main>
           </ParthenonProvider>
