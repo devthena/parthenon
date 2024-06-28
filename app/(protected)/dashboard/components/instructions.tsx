@@ -23,10 +23,10 @@ export const Instructions = ({ code }: { code?: string }) => {
         <>
           <h2>Link your Twitch account!</h2>
           <div className={styles.steps}>
-            <p>Logout from this website and login via Twitch.</p>
+            <p>Login on this website via Twitch.</p>
             <p>
-              You will get a code to submit using <code>/link</code> in the
-              server.
+              You will be provided a code to submit using <code>/link</code> in
+              the server.
             </p>
           </div>
         </>
