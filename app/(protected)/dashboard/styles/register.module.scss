@@ -1,6 +1,13 @@
 .buttons {
+  align-items: center;
   display: flex;
-  margin-top: 48px;
+  flex-direction: column;
+  margin-top: 15px;
+
+  @media screen and (min-width: 480px) {
+    flex-direction: row;
+    margin-top: 48px;
+  }
 }
 
 .button {
@@ -8,17 +15,32 @@
   background-color: var(--discord-lighter);
   border-radius: 16px;
   display: flex;
-  padding: 25px;
+  width: 170px;
+  padding: 15px;
+
+  @media screen and (min-width: 480px) {
+    width: auto;
+    padding: 25px;
+  }
 
   &:first-child {
     background-color: var(--twitch-lighter);
-    margin-right: 48px;
+    margin-bottom: 10px;
+
+    @media screen and (min-width: 480px) {
+      margin: 0 48px 0 0;
+    }
   }
 
   span {
     color: var(--dark-blue);
-    font-size: 26px;
+    font-size: 16px;
     font-weight: 600;
-    margin-left: 8px;
+    margin-left: 5px;
+
+    @media screen and (min-width: 480px) {
+      font-size: 26px;
+      margin-left: 8px;
+    }
   }
 }
