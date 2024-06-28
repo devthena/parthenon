@@ -1,35 +1,126 @@
+.toggle {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  @media screen and (min-width: 480px) {
+    display: none;
+  }
+
+  .switch {
+    margin: 0 10px;
+  }
+
+  svg {
+    height: 25px;
+    width: 25px;
+
+    path {
+      fill: var(--black);
+    }
+  }
+
+  input[type='checkbox'] {
+    height: 0;
+    width: 0;
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+    width: 40px;
+    height: 25px;
+    background: var(--discord-light);
+    display: block;
+    border-radius: 15px;
+    position: relative;
+  }
+
+  label:after {
+    content: '';
+    position: absolute;
+    top: 3.5px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    background: var(--white);
+    border-radius: 100%;
+    transition: 0.3s;
+  }
+
+  input:checked + label {
+    background: var(--twitch-light);
+  }
+
+  input:checked + label:after {
+    left: calc(100% - 4px);
+    transform: translateX(-100%);
+  }
+}
+
 .boxes {
   color: var(--dark-blue);
   display: flex;
   justify-content: center;
-  margin-top: 35px;
+  margin: 20px 0;
+
+  @media screen and (min-width: 480px) {
+    margin: 35px 0 0;
+  }
 }
 
 .box {
-  background-color: var(--discord-light);
+  background-color: var(--twitch-lighter);
   border-color: var(--owl-blue-lightest);
   border-width: 0 2px 2px 0;
   border-style: solid;
   border-radius: 20px;
   box-shadow: 1px 4px 4px 0px var(--owl-blue-lighter);
-  padding: 30px;
+  display: none;
+  padding: 20px;
   width: 450px;
 
+  @media screen and (min-width: 480px) {
+    display: block;
+    padding: 30px;
+  }
+
   &:first-child {
-    background-color: var(--twitch-light);
-    margin-right: 60px;
+    background-color: var(--discord-lighter);
+    margin-right: 0;
+
+    @media screen and (min-width: 480px) {
+      margin-right: 60px;
+    }
   }
 
   h2 {
     align-items: center;
     display: flex;
-    font-size: 34px;
+    font-size: 20px;
     justify-content: center;
 
-    span {
-      margin-right: 8px;
+    @media screen and (min-width: 480px) {
+      font-size: 34px;
+
+      span {
+        margin-right: 8px;
+      }
+    }
+
+    svg {
+      display: none;
+
+      @media screen and (min-width: 480px) {
+        display: block;
+      }
     }
   }
+}
+
+.mobile {
+  display: block;
 }
 
 .list {
@@ -37,13 +128,21 @@
   text-align: left;
 
   li {
-    margin-top: 20px;
+    margin-top: 12px;
+
+    @media screen and (min-width: 480px) {
+      margin-top: 20px;
+    }
   }
 
   h3 {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 24px;
+
+    @media screen and (min-width: 480px) {
+      font-size: 20px;
+    }
 
     span {
       font-weight: 500;
@@ -54,7 +153,11 @@
   p {
     font-size: 14px;
     font-weight: 500;
-    margin-top: 5px;
+    margin-top: 6px;
+
+    @media screen and (min-width: 480px) {
+      margin-top: 8px;
+    }
   }
 
   .note {
