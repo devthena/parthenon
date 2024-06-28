@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { redirect, usePathname } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading, Login } from './components';
@@ -12,7 +12,6 @@ import avatar from './images/avatar.png';
 import styles from './styles/page.module.scss';
 
 const Home = () => {
-  const pathname = usePathname();
   const { user, error, isLoading } = useUser();
 
   if (error) return <div>{error.message}</div>;
@@ -20,7 +19,7 @@ const Home = () => {
 
   return (
     <>
-      <Header pathname={pathname} />
+      <Header hasAuth={!!user} />
       {isLoading ? (
         <Loading />
       ) : (
