@@ -4,7 +4,7 @@
 
 .button {
   align-items: center;
-  background-color: var(--discord-light);
+  background-color: var(--discord-lighter);
   border-radius: 16px;
   display: flex;
   margin: 0 15px;
@@ -12,7 +12,7 @@
   padding: 20px 25px;
 
   &:first-child {
-    background-color: var(--twitch-light);
+    background-color: var(--twitch-lighter);
     margin-bottom: 20px;
   }
 

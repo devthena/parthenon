@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import { Header } from '../components';
 
 import styles from './layout.module.scss';
@@ -10,11 +10,11 @@ const PublicLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const pathname = usePathname();
+  const { user } = useUser();
 
   return (
     <>
-      <Header pathname={pathname} />
+      <Header hasAuth={!!user} />
       <div className={styles.container}>{children}</div>
     </>
   );

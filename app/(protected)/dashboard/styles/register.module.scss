@@ -5,13 +5,13 @@
 
 .button {
   align-items: center;
-  background-color: var(--discord-light);
+  background-color: var(--discord-lighter);
   border-radius: 16px;
   display: flex;
   padding: 25px;
 
   &:first-child {
-    background-color: var(--twitch-light);
+    background-color: var(--twitch-lighter);
     margin-right: 48px;
   }
 

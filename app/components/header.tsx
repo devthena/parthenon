@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { MenuCloseIcon, MenuIcon } from '../images/icons';
 import { Login } from './login';
@@ -9,7 +10,8 @@ import { NavPaths } from '../lib/constants';
 
 import styles from '../styles/header.module.scss';
 
-export const Header = ({ pathname }: { pathname: string }) => {
+export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
+  const pathname = usePathname();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zIndex, setZIndex] = useState(false);
 
@@ -31,10 +33,6 @@ export const Header = ({ pathname }: { pathname: string }) => {
     : zIndex
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
-
-  const isProtected = NavPaths.some(
-    nav => nav.value === pathname && nav.protected
-  );
 
   return (
     <>
@@ -67,9 +65,9 @@ export const Header = ({ pathname }: { pathname: string }) => {
         <nav className={styles.links}>
           {NavPaths.map(path => {
             const pathValue =
-              path.value === '/' && isProtected ? '/dashboard' : path.value;
+              path.value === '/' && hasAuth ? '/dashboard' : path.value;
             return (
-              (isProtected || !path.protected) && (
+              (hasAuth || !path.protected) && (
                 <Link
                   className={
                     pathValue === pathname ? styles.selected : undefined
@@ -81,7 +79,7 @@ export const Header = ({ pathname }: { pathname: string }) => {
               )
             );
           })}
-          {isProtected ? (
+          {hasAuth ? (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>
@@ -95,9 +93,9 @@ export const Header = ({ pathname }: { pathname: string }) => {
           <div className={styles.modalLinks}>
             {NavPaths.map(path => {
               const pathValue =
-                path.value === '/' && isProtected ? '/dashboard' : path.value;
+                path.value === '/' && hasAuth ? '/dashboard' : path.value;
               return (
-                (isProtected || !path.protected) && (
+                (hasAuth || !path.protected) && (
                   <Link
                     className={
                       pathValue === pathname ? styles.selected : undefined
@@ -111,7 +109,7 @@ export const Header = ({ pathname }: { pathname: string }) => {
               );
             })}
           </div>
-          {isProtected && (
+          {hasAuth && (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>
