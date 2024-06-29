@@ -4,7 +4,7 @@ import { WordleObject } from './wordle';
 
 export interface StatsObject {
   _id?: ObjectId;
-  user_id: string;
+  discord_id: string;
   code: GameCode;
   data: WordleObject;
 }
@@ -18,6 +18,7 @@ export interface UserObject {
   twitch_id: string | null;
   twitch_username: string | null;
   cash: number;
-  bank: number;
-  stars: number;
+  gamble_wins?: number;
+  gamble_losses?: number;
+  times_given?: number;
 }

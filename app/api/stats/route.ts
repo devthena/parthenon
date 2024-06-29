@@ -20,7 +20,7 @@ const saveStats = async (payload: StatsObject) => {
   const collection = await client.db(mongodbName).collection(mongodbCollection);
 
   const data = await collection.updateOne(
-    { user_id: payload.user_id },
+    { discord_id: payload.discord_id },
     { $set: { ...payload } },
     { upsert: true }
   );
