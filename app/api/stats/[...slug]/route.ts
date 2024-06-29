@@ -23,7 +23,7 @@ const getStats = async (code: string, id: string) => {
     .db(mongodbName)
     .collection<StatsObject>(mongodbCollection);
   const data = await collection.findOne({
-    user_id: id,
+    discord_id: id,
     code: code as GameCode,
   });
 

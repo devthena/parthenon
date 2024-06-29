@@ -127,13 +127,13 @@ const Wordle = () => {
   }, [status, isStatsSaved, isStatsUpdated]);
 
   useEffect(() => {
-    if (!user || !user.user_id || !isStatsUpdated || isStatsSaved) return;
+    if (!user || !user.discord_id || !isStatsUpdated || isStatsSaved) return;
 
     if (status !== WordleStatus.Answered && status !== WordleStatus.Completed) {
       return;
     }
 
-    saveStats(user.user_id);
+    saveStats(user.discord_id);
     setIsStatsSaved(true);
 
     // user is updated only when the Wordle is answered
@@ -141,8 +141,8 @@ const Wordle = () => {
   }, [user, isStatsSaved, isStatsUpdated, status, saveStats, saveUser]);
 
   if (!isInitialized) {
-    if (!user) return;
-    fetchStats(user.user_id);
+    if (!user || !user.discord_id) return;
+    fetchStats(user.discord_id);
     setIsInitialized(true);
   }
 

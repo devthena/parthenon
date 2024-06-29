@@ -85,11 +85,11 @@ export const useStats = (code: GameCode) => {
   const [state, dispatch] = useReducer(statsReducer, initialState);
 
   const fetchStats = useCallback(
-    async (userId: string) => {
+    async (discordId: string) => {
       dispatch({ type: 'fetch' });
 
       try {
-        await fetchData(`${ApiUrl.Stats}/${code}/${userId}`);
+        await fetchData(`${ApiUrl.Stats}/${code}/${discordId}`);
       } catch (error) {
         dispatch({ type: 'fetch_error', error: JSON.stringify(error) });
         throw new Error('Hook Error: useStats (fetchStats)');
@@ -99,13 +99,13 @@ export const useStats = (code: GameCode) => {
   );
 
   const saveStats = useCallback(
-    async (userId: string) => {
+    async (discordId: string) => {
       if (!state.stats) return;
       dispatch({ type: 'save' });
 
       try {
         await saveData(ApiUrl.Stats, {
-          user_id: userId,
+          discord_id: discordId,
           code: code,
           data: state.stats,
         });
