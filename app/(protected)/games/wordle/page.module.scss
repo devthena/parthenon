@@ -1,3 +1,5 @@
+@import 'variables';
+
 .header {
   align-items: center;
   display: flex;
@@ -58,7 +60,7 @@ button.back {
     width: 20px;
   }
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     display: none;
   }
 }
@@ -76,7 +78,7 @@ button.backDesktop {
     width: 20px;
   }
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     display: flex;
   }
 }
@@ -93,7 +95,7 @@ button.stats {
 }
 
 button.rulesOverview {
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     display: none;
   }
 }
@@ -104,7 +106,7 @@ button.rulesDesktop {
   font-weight: 600;
   padding: 3px 11px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     display: inline-block;
   }
 }

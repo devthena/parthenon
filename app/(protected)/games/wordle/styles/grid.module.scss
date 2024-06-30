@@ -1,3 +1,5 @@
+@import 'variables';
+
 .grid {
   color: var(--black);
   display: grid;
@@ -8,7 +10,7 @@
   margin: 0 auto 20px;
   width: 275px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     grid-gap: 5px;
     height: 375px;
     margin: 0 auto 40px;
@@ -25,7 +27,7 @@
   text-transform: uppercase;
   user-select: none;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     font-size: 36px;
   }
 }
@@ -36,7 +38,7 @@
   grid-gap: 3px;
   width: 100%;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     grid-gap: 5px;
   }
 }

@@ -1,17 +1,19 @@
+@import 'variables';
+
 .container {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   padding: 25px 0 0;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     padding-top: 45px;
   }
 
   h1 {
     font-size: 22px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 36px;
     }
   }

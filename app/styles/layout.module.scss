@@ -1,14 +1,16 @@
+@import 'variables';
+
 .main {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
   max-width: 1200px;
-  min-height: 100vh;
   min-height: -webkit-fill-available;
+  min-height: 100vh;
   padding: 0 17px;
   text-align: center;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     padding: 0 40px;
   }
 }
@@ -27,7 +29,7 @@
   height: 30px;
   justify-content: center;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     font-size: 14px;
     height: 80px;
   }
