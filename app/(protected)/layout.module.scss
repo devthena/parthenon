@@ -1,3 +1,5 @@
+@import '../styles/variables';
+
 .container {
   display: flex;
   flex-direction: column;
@@ -5,14 +7,14 @@
   justify-content: space-between;
   padding: 25px 0 0;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     padding-top: 45px;
   }
 
   h1 {
     font-size: 26px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 36px;
     }
   }

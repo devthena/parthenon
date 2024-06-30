@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Source+Code+Pro:wght@400..700&display=swap');
+@import 'styles/variables';
 
 :root {
   --black: #1d1d21;
@@ -60,7 +61,7 @@ code {
   font-size: 12px;
   font-weight: 600;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     font-size: 18px;
   }
 }

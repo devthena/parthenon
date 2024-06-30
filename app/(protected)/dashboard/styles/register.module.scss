@@ -1,10 +1,12 @@
+@import '../../../styles/variables';
+
 .buttons {
   align-items: center;
   display: flex;
   flex-direction: column;
   margin-top: 15px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     flex-direction: row;
     margin-top: 48px;
   }
@@ -18,7 +20,7 @@
   width: 170px;
   padding: 15px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     width: auto;
     padding: 25px;
   }
@@ -27,7 +29,7 @@
     background-color: var(--twitch-lighter);
     margin-bottom: 10px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       margin: 0 48px 0 0;
     }
   }
@@ -38,7 +40,7 @@
     font-weight: 600;
     margin-left: 5px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 26px;
       margin-left: 8px;
     }

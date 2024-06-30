@@ -1,10 +1,12 @@
+@import 'variables';
+
 .container {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   padding-top: 35px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     padding-top: 0;
     justify-content: center;
   }
@@ -19,7 +21,7 @@
   max-width: 300px;
   width: 100%;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     max-width: 500px;
   }
 }
@@ -28,7 +30,7 @@
   height: 135px;
   width: 138px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     height: 300px;
     width: 300px;
   }
@@ -42,7 +44,7 @@
     font-weight: 500;
     line-height: 24px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 30px;
       line-height: 36px;
     }
@@ -51,7 +53,7 @@
     font-size: 14px;
     margin-top: 8px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 22px;
     }
   }
@@ -62,7 +64,7 @@
   justify-content: center;
   margin: 50px 0 14px;
 
-  @media screen and (min-width: 480px) {
+  @media screen and (min-width: $tablet-width) {
     display: none;
   }
 }
@@ -74,7 +76,7 @@
     font-size: 20px;
     line-height: 24px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       font-size: 30px;
       line-height: 36px;
     }
@@ -99,7 +101,7 @@
     height: 20px;
     width: 20px;
 
-    @media screen and (min-width: 480px) {
+    @media screen and (min-width: $tablet-width) {
       height: 32px;
       width: 32px;
     }
