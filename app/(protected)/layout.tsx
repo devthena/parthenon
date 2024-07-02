@@ -10,7 +10,7 @@ import { useApi } from '../hooks';
 
 import { ApiUrl } from '../lib/enums/api';
 import { LoginMethod } from '../lib/enums/auth';
-import { UserObject } from '../lib/types/db';
+import { DataObject, UserObject } from '../lib/types/db';
 
 import styles from './layout.module.scss';
 
@@ -21,7 +21,7 @@ const ProtectedLayout = ({
 }>) => {
   const { data, dataError, dataProcessed, fetchData } = useApi();
   const { user, isLoading, error } = useUser();
-  const { onSetLoading, onSetUser } = useParthenonState();
+  const { onSetLoading, onSetData } = useParthenonState();
 
   useEffect(() => {
     if (!user || !user.sub) return;
@@ -43,11 +43,11 @@ const ProtectedLayout = ({
     if (!dataProcessed) return;
 
     if (data) {
-      onSetUser(data as UserObject);
+      onSetData(data as DataObject);
     } else {
-      onSetUser(null);
+      onSetData(null);
     }
-  }, [data, dataProcessed, onSetUser]);
+  }, [data, dataProcessed, onSetData]);
 
   if (!user && !isLoading) return redirect('/');
 

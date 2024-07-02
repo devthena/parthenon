@@ -10,23 +10,25 @@ import {
 } from 'react';
 
 import { ApiUrl } from './lib/enums/api';
-import { UserObject } from './lib/types/db';
+import { DataObject, StarObject, UserObject } from './lib/types/db';
 import { useApi } from './hooks';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
+  stars: StarObject | null;
   user: UserObject | null;
 }
 
 type ParthenonAction =
   | { type: 'set_loading' }
-  | { type: 'set_user'; payload: UserObject | null }
+  | { type: 'set_data'; payload: DataObject | null }
   | { type: 'update_user'; payload: UserObject | null };
 
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
+  stars: null,
   user: null,
 };
 
@@ -39,17 +41,18 @@ const reducer = (
   action: ParthenonAction
 ): ParthenonState => {
   switch (action.type) {
-    case 'set_loading':
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case 'set_user':
+    case 'set_data':
       return {
         ...state,
         isLoading: false,
         isFetched: true,
-        user: action.payload,
+        user: action.payload?.user ?? null,
+        stars: action.payload?.stars ?? null,
+      };
+    case 'set_loading':
+      return {
+        ...state,
+        isLoading: true,
       };
     case 'update_user':
       return {
@@ -86,9 +89,9 @@ const useParthenonState = () => {
     dispatch({ type: 'set_loading' });
   }, [dispatch]);
 
-  const onSetUser = useCallback(
-    (user: UserObject | null) => {
-      dispatch({ type: 'set_user', payload: user });
+  const onSetData = useCallback(
+    (data: DataObject | null) => {
+      dispatch({ type: 'set_data', payload: data });
     },
     [dispatch]
   );
@@ -115,7 +118,7 @@ const useParthenonState = () => {
   return {
     ...state,
     onSetLoading,
-    onSetUser,
+    onSetData,
     onUpdateUser,
     saveUser,
   };

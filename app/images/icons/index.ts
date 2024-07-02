@@ -10,4 +10,5 @@ export * from './social-github';
 export * from './social-instagram';
 export * from './social-twitch';
 export * from './social-x';
+export * from './star';
 export * from './stats';
