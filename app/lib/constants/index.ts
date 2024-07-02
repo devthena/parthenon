@@ -26,6 +26,10 @@ export const CommandsDiscord = [
     description: 'Display the links for Commands and FAQ',
   },
   {
+    name: '/leaderboard',
+    description: 'Display the top five users with the most coins',
+  },
+  {
     name: '/link',
     sub: '<value>',
     description: 'Merge your Discord and Twitch accounts',
@@ -35,12 +39,11 @@ export const CommandsDiscord = [
     name: '/points',
     description: 'View your current balance',
   },
-  // @todo: Add back when star command is completed
-  // {
-  //   name: '/star',
-  //   sub: '<@member>',
-  //   description: 'Give a star to a user as a form of endorsement',
-  // },
+  {
+    name: '/star',
+    sub: '<@member>',
+    description: 'Give a star to a user as a form of endorsement',
+  },
   {
     name: '/unlink',
     description: 'Separate your Discord and Twitch accounts',
