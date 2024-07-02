@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { useParthenonState } from '../../context';
 import { Loading } from '../../components';
-import { CoinIcon } from '../../images/icons';
+import { CoinIcon, StarIcon } from '../../images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
 
@@ -13,7 +13,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Dashboard = () => {
   const { user: userAuth0 } = useUser();
-  const { isFetched, user } = useParthenonState();
+  const { isFetched, stars, user } = useParthenonState();
 
   let displayName = '';
 
@@ -70,6 +70,13 @@ const Dashboard = () => {
                 <span>{user ? user.cash : 0}</span>
               </p>
               <CoinIcon />
+            </div>
+            <div className={styles.item}>
+              <p className={styles.label}>
+                <span>STARS</span>
+                <span>{stars ? stars.stars : 0}</span>
+              </p>
+              <StarIcon />
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { UserObject } from '../../../../lib/types/db';
+import { DataObject, UserObject } from '../../../../lib/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
 const mongodbName = process.env.MONGODB_NAME;
@@ -35,11 +35,13 @@ export async function GET(
     params: { id: string };
   }
 ) {
-  let responseData = null;
+  let responseData: DataObject = {
+    user: null,
+  };
   let responseError = null;
 
   try {
-    responseData = await getUser(params.id);
+    responseData.user = await getUser(params.id);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
