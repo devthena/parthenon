@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useParthenonState } from '../../../context';
-
-import { Loading } from '../../../components/loading';
+import { Loading } from '../../../components';
 import { useStats, useWordle } from '../../../hooks';
 import { BackIcon, RulesIcon, StatsIcon } from '../../../images/icons';
 
@@ -14,7 +13,6 @@ import { GameStatus, KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
 import { Guess } from '../../../lib/types/wordle';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
-
 import styles from './page.module.scss';
 
 const Wordle = () => {

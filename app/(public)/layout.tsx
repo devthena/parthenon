@@ -2,7 +2,6 @@
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { Header } from '../components';
-
 import styles from './layout.module.scss';
 
 const PublicLayout = ({

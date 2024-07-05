@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { redirect } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading } from '../components';
 import { useParthenonState } from '../context';
@@ -10,7 +9,7 @@ import { useApi } from '../hooks';
 
 import { ApiUrl } from '../lib/enums/api';
 import { LoginMethod } from '../lib/enums/auth';
-import { DataObject, UserObject } from '../lib/types/db';
+import { DataObject } from '../lib/types/db';
 
 import styles from './layout.module.scss';
 
@@ -49,8 +48,6 @@ const ProtectedLayout = ({
     }
   }, [data, dataProcessed, onSetData]);
 
-  if (!user && !isLoading) return redirect('/');
-
   if (isLoading)
     return (
       <div className={styles.loading}>
@@ -69,4 +66,4 @@ const ProtectedLayout = ({
   );
 };
 
-export default ProtectedLayout;
+export default withPageAuthRequired(ProtectedLayout);

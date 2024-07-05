@@ -1,6 +1,5 @@
 import { CoinIcon } from '../../../../images/icons';
 import { WordleStatus } from '../../../../lib/enums/wordle';
-
 import styles from '../styles/notice.module.scss';
 
 interface NoticeProps {

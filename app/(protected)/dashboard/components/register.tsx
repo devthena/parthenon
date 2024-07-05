@@ -1,6 +1,5 @@
 import { DiscordIcon, TwitchIcon } from '../../../images/icons';
 import { SocialUrls } from '../../../lib/constants';
-
 import styles from '../styles/register.module.scss';
 
 export const Register = () => {
