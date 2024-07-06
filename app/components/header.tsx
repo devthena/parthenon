@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { useParthenonState } from '../context';
 import { MenuCloseIcon, MenuIcon } from '../images/icons';
 import { Login } from './login';
 import { NavPaths } from '../lib/constants';
@@ -11,7 +12,9 @@ import { NavPaths } from '../lib/constants';
 import styles from '../styles/header.module.scss';
 
 export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
+  const { user } = useParthenonState();
   const pathname = usePathname();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zIndex, setZIndex] = useState(false);
 
@@ -66,14 +69,18 @@ export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
           {NavPaths.map(path => {
             const pathValue =
               path.value === '/' && hasAuth ? '/dashboard' : path.value;
+            const isRestricted = path.value === '/games' && !user?.discord_id;
+            const initialClass =
+              path.label === 'Home' ? styles.home : undefined;
+            const styleClass =
+              pathValue === pathname
+                ? `${styles.selected} ${initialClass}`
+                : initialClass;
+
             return (
-              (hasAuth || !path.protected) && (
-                <Link
-                  className={
-                    pathValue === pathname ? styles.selected : undefined
-                  }
-                  href={pathValue}
-                  key={path.label}>
+              (hasAuth || !path.protected) &&
+              !isRestricted && (
+                <Link className={styleClass} href={pathValue} key={path.label}>
                   {path.label}
                 </Link>
               )
@@ -94,8 +101,12 @@ export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
             {NavPaths.map(path => {
               const pathValue =
                 path.value === '/' && hasAuth ? '/dashboard' : path.value;
+
+              const isRestricted = path.value === '/games' && !user?.discord_id;
+
               return (
-                (hasAuth || !path.protected) && (
+                (hasAuth || !path.protected) &&
+                !isRestricted && (
                   <Link
                     className={
                       pathValue === pathname ? styles.selected : undefined

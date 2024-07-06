@@ -1,5 +1,6 @@
 'use client';
 
+import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useParthenonState } from '../../../context';
@@ -17,6 +18,7 @@ import styles from './page.module.scss';
 
 const Wordle = () => {
   const { user, onUpdateUser, saveUser } = useParthenonState();
+  if (!user?.discord_id) redirect('/dashboard');
 
   const {
     stats,

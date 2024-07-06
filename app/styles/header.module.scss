@@ -126,6 +126,16 @@
   }
 }
 
+.home {
+  @media screen and (min-width: $tablet-width) {
+    display: none;
+  }
+
+  @media screen and (min-width: $desktop-width) {
+    display: block;
+  }
+}
+
 .selected {
   text-decoration: underline;
 }
