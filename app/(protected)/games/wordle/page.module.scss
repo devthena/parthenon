@@ -117,10 +117,16 @@ button.play {
   border-radius: 30px;
   color: var(--white);
   cursor: pointer;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 500;
-  height: 62px;
-  width: 235px;
+  height: 50px;
+  width: 175px;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 24px;
+    height: 62px;
+    width: 235px;
+  }
 
   &:hover {
     background-color: var(--green-hover);
