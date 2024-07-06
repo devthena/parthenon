@@ -93,6 +93,10 @@
     margin-right: 0;
 
     @media screen and (min-width: $tablet-width) {
+      margin-right: 25px;
+    }
+
+    @media screen and (min-width: $desktop-width) {
       margin-right: 60px;
     }
   }
