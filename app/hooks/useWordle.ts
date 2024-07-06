@@ -30,6 +30,11 @@ const getLetterResult = (
   const answerArray = answer.split('');
   const guessArray = [...guess];
 
+  // reset keyboard tile colors for current guess
+  for (let i = 0; i < guessArray.length; i++) {
+    keyResults[guessArray[i]] = KeyStatus.Absent;
+  }
+
   // first pass: check for correct letters
   for (let i = 0; i < guessArray.length; i++) {
     if (guessArray[i] === answerArray[i]) {
