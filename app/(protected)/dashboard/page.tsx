@@ -1,15 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { useParthenonState } from '../../context';
 import { Loading } from '../../components';
 import { CoinIcon, StarIcon } from '../../images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
-
 import styles from './page.module.scss';
-import { useUser } from '@auth0/nextjs-auth0/client';
 
 const Dashboard = () => {
   const { user: userAuth0 } = useUser();

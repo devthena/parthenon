@@ -73,15 +73,18 @@ button.enter {
 
 button.absent {
   background-color: var(--grey);
+  border-color: var(--grey);
   color: var(--white);
 }
 
 button.correct {
   background-color: var(--green);
+  border-color: var(--green);
   color: var(--white);
 }
 
 button.present {
   background-color: var(--yellow);
+  border-color: var(--yellow);
   color: var(--white);
 }

@@ -5,7 +5,6 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 ChartJS.register(...registerables, ChartDataLabels);
 
 import { WordleObject } from '../../../../lib/types/wordle';
-
 import styles from '../styles/stats.module.scss';
 
 export const Stats = ({ data }: { data: WordleObject }) => {

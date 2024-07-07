@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { redirect } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading } from '../components';
 import { useParthenonState } from '../context';
@@ -10,7 +9,7 @@ import { useApi } from '../hooks';
 
 import { ApiUrl } from '../lib/enums/api';
 import { LoginMethod } from '../lib/enums/auth';
-import { DataObject, UserObject } from '../lib/types/db';
+import { DataObject } from '../lib/types/db';
 
 import styles from './layout.module.scss';
 
@@ -20,15 +19,15 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { data, dataError, dataProcessed, fetchData } = useApi();
-  const { user, isLoading, error } = useUser();
-  const { onSetLoading, onSetData } = useParthenonState();
+  const { user: userAuth0, isLoading, error } = useUser();
+  const { user, onSetLoading, onSetData } = useParthenonState();
 
   useEffect(() => {
-    if (!user || !user.sub) return;
+    if (!userAuth0 || !userAuth0.sub || user) return;
 
     onSetLoading();
 
-    const userSub = user.sub.split('|');
+    const userSub = userAuth0.sub.split('|');
     const userId = userSub[2];
     const loginMethod = userSub[1] as LoginMethod;
 
@@ -37,7 +36,7 @@ const ProtectedLayout = ({
     };
 
     getUser();
-  }, [user, fetchData, onSetLoading]);
+  }, [user, userAuth0, fetchData, onSetLoading]);
 
   useEffect(() => {
     if (!dataProcessed) return;
@@ -48,8 +47,6 @@ const ProtectedLayout = ({
       onSetData(null);
     }
   }, [data, dataProcessed, onSetData]);
-
-  if (!user && !isLoading) return redirect('/');
 
   if (isLoading)
     return (
@@ -62,11 +59,11 @@ const ProtectedLayout = ({
 
   return (
     <>
-      <Header hasAuth={!!user} />
+      <Header />
       <div className={styles.container}>{children}</div>
       {dataError && <p>Hook Error (useApi): {dataError}</p>}
     </>
   );
 };
 
-export default ProtectedLayout;
+export default withPageAuthRequired(ProtectedLayout);

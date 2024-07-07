@@ -30,6 +30,11 @@ const getLetterResult = (
   const answerArray = answer.split('');
   const guessArray = [...guess];
 
+  // reset keyboard tile colors for current guess
+  for (let i = 0; i < guessArray.length; i++) {
+    keyResults[guessArray[i]] = KeyStatus.Absent;
+  }
+
   // first pass: check for correct letters
   for (let i = 0; i < guessArray.length; i++) {
     if (guessArray[i] === answerArray[i]) {
@@ -38,7 +43,12 @@ const getLetterResult = (
       answerArray[i] = '';
       guessArray[i] = '';
     } else {
-      keyResults[guessArray[i]] = KeyStatus.Absent;
+      if (
+        keyResults[guessArray[i]] !== KeyStatus.Correct &&
+        keyResults[guessArray[i]] !== KeyStatus.Present
+      ) {
+        keyResults[guessArray[i]] = KeyStatus.Absent;
+      }
     }
   }
 
@@ -48,8 +58,11 @@ const getLetterResult = (
       const letterIndex = answerArray.indexOf(guessArray[i]);
 
       result[i] = KeyStatus.Present;
-      keyResults[guessArray[i]] = KeyStatus.Present;
       answerArray[letterIndex] = '';
+
+      if (keyResults[guessArray[i]] !== KeyStatus.Correct) {
+        keyResults[guessArray[i]] = KeyStatus.Present;
+      }
     }
   }
 

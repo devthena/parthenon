@@ -17,19 +17,18 @@
   font-size: 14px;
   margin: 0;
 
-  span {
-    font-weight: 500;
+  span:last-child {
     margin-left: 3px;
   }
 }
 
-.noteFade {
-  animation: fadeOut ease 2.5s;
+.reward {
+  margin-left: 3px;
 }
 
 .coin {
   height: 18px;
-  margin: 0 3px;
+  margin-right: 3px;
   width: 18px;
 
   svg {
@@ -37,6 +36,10 @@
     height: 18px;
     width: 18px;
   }
+}
+
+.noteFade {
+  animation: fadeOut ease 2.5s;
 }
 
 @keyframes fadeOut {

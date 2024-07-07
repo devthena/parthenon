@@ -1,6 +1,5 @@
 import { CoinIcon } from '../../../../images/icons';
 import { WordleStatus } from '../../../../lib/enums/wordle';
-
 import styles from '../styles/notice.module.scss';
 
 interface NoticeProps {
@@ -32,7 +31,7 @@ export const Notice = ({
           Congrats!{' '}
           {reward && (
             <>
-              Reward: <span>{reward}</span>
+              Reward: <span className={styles.reward}>{reward}</span>
               <span className={styles.coin}>
                 <CoinIcon />
               </span>
@@ -49,14 +48,14 @@ export const Notice = ({
       )}
       {status === WordleStatus.InvalidGuess && (
         <p className={`${styles.note} ${styles.noteFade}`}>
-          <span className={styles.answer}>{currentGuess}</span> does not have
-          enough letters.
+          <span className={styles.answer}>{currentGuess}</span>
+          <span>does not have enough letters.</span>
         </p>
       )}
       {status === WordleStatus.InvalidWord && (
         <p className={`${styles.note} ${styles.noteFade}`}>
-          <span className={styles.answer}>{currentGuess}</span> is not in the
-          dictionary.
+          <span className={styles.answer}>{currentGuess}</span>
+          <span>is not in the dictionary.</span>
         </p>
       )}
     </div>

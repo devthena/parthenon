@@ -19,7 +19,7 @@ const Home = () => {
 
   return (
     <>
-      <Header hasAuth={!!user} />
+      <Header />
       {isLoading ? (
         <Loading />
       ) : (

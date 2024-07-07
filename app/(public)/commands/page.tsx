@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { DiscordIcon, TwitchIcon } from '../../images/icons';
 import { CommandsDiscord, CommandsTwitch } from '../../lib/constants';
+
 import styles from './page.module.scss';
 
 const Commands = () => {

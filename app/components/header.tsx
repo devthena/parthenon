@@ -1,17 +1,25 @@
-import { useState } from 'react';
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+
+import { useParthenonState } from '../context';
 import { MenuCloseIcon, MenuIcon } from '../images/icons';
 import { Login } from './login';
 import { NavPaths } from '../lib/constants';
 
 import styles from '../styles/header.module.scss';
 
-export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
+export const Header = () => {
+  const { user } = useParthenonState();
+  const { user: userAuth0 } = useUser();
+
   const pathname = usePathname();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zIndex, setZIndex] = useState(false);
 
@@ -65,21 +73,26 @@ export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
         <nav className={styles.links}>
           {NavPaths.map(path => {
             const pathValue =
-              path.value === '/' && hasAuth ? '/dashboard' : path.value;
+              path.value === '/' && userAuth0 ? '/dashboard' : path.value;
+            const isRestricted = path.value === '/games' && !user?.discord_id;
+
+            const initialClass =
+              path.label === 'Home' ? styles.home : undefined;
+            const styleClass =
+              pathValue === pathname
+                ? `${styles.selected} ${initialClass}`
+                : initialClass;
+
             return (
-              (hasAuth || !path.protected) && (
-                <Link
-                  className={
-                    pathValue === pathname ? styles.selected : undefined
-                  }
-                  href={pathValue}
-                  key={path.label}>
+              (userAuth0 || !path.protected) &&
+              !isRestricted && (
+                <Link className={styleClass} href={pathValue} key={path.label}>
                   {path.label}
                 </Link>
               )
             );
           })}
-          {hasAuth ? (
+          {userAuth0 ? (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>
@@ -93,9 +106,13 @@ export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
           <div className={styles.modalLinks}>
             {NavPaths.map(path => {
               const pathValue =
-                path.value === '/' && hasAuth ? '/dashboard' : path.value;
+                path.value === '/' && userAuth0 ? '/dashboard' : path.value;
+
+              const isRestricted = path.value === '/games' && !user?.discord_id;
+
               return (
-                (hasAuth || !path.protected) && (
+                (userAuth0 || !path.protected) &&
+                !isRestricted && (
                   <Link
                     className={
                       pathValue === pathname ? styles.selected : undefined
@@ -109,7 +126,7 @@ export const Header = ({ hasAuth = true }: { hasAuth?: boolean }) => {
               );
             })}
           </div>
-          {hasAuth && (
+          {userAuth0 && (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>
