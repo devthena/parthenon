@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { Footer } from './components';
 import { ParthenonProvider } from './context';
 
-import './styles/globals.scss';
+import './globals.scss';
 import styles from './styles/layout.module.scss';
 
 export const metadata: Metadata = {
