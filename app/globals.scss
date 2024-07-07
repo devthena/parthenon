@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400..700&family=Nunito:wght@400..700&family=Source+Code+Pro:wght@400..700&display=swap');
-@import 'variables';
+@import 'styles/variables';
 
 :root {
   --black: #1d1d21;
@@ -10,7 +9,7 @@
   --discord-light: rgba(88, 101, 242, 0.8);
   --discord-lighter: rgba(88, 101, 242, 0.2);
   --green: #6aaa64;
-  --green-dark: forestgreen;
+  --green-dark: #228b22;
   --green-hover: rgba(106, 170, 100, 0.9);
   --grey: #787c7e;
   --grey-dark: #888888;
@@ -39,7 +38,7 @@
 body {
   background-color: var(--white);
   color: var(--black);
-  font-family: 'Figtree', sans-serif;
+  font-family: var(--font-figtree);
   font-optical-sizing: auto;
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -52,13 +51,13 @@ a {
 
 button {
   background: transparent;
-  font-family: 'Figtree', sans-serif;
+  font-family: var(--font-figtree);
   font-optical-sizing: auto;
 }
 
 code {
   background-color: var(--owl-blue-light);
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--font-source-code-pro), monospace;
   font-optical-sizing: auto;
   font-size: 12px;
   font-weight: 600;

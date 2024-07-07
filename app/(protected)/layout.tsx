@@ -19,8 +19,9 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { data, dataError, dataProcessed, fetchData } = useApi();
-  const { user: userAuth0, isLoading, error } = useUser();
-  const { user, onSetLoading, onSetData } = useParthenonState();
+  const { user: userAuth0, isLoading: isAuth0Loading } = useUser();
+  const { isFetched, isLoading, user, onSetLoading, onSetData } =
+    useParthenonState();
 
   useEffect(() => {
     if (!userAuth0 || !userAuth0.sub || user) return;
@@ -48,19 +49,16 @@ const ProtectedLayout = ({
     }
   }, [data, dataProcessed, onSetData]);
 
-  if (isLoading)
-    return (
-      <div className={styles.loading}>
-        <Loading />
-      </div>
-    );
-
-  if (error) return <div>{error.message}</div>;
-
   return (
     <>
       <Header />
-      <div className={styles.container}>{children}</div>
+      {isAuth0Loading ||
+        (isLoading && (
+          <div className={styles.loading}>
+            <Loading />
+          </div>
+        ))}
+      {isFetched && <div className={styles.container}>{children}</div>}
       {dataError && <p>Hook Error (useApi): {dataError}</p>}
     </>
   );
