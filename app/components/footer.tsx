@@ -4,14 +4,14 @@ import styles from '../styles/footer.module.scss';
 export const Footer = () => {
   return (
     <footer className={styles.footer}>
-      <p>Made with ♡ by Athena</p>
+      <p>made with ♡ by athena</p>
       <p>
         <Link href="/terms-of-service" target="_blank">
-          Terms of Service
+          TERMS OF SERVICE
         </Link>{' '}
         |{' '}
         <Link href="/privacy-policy" target="_blank">
-          Privacy Policy
+          PRIVACY POLICY
         </Link>
       </p>
     </footer>

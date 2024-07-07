@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { Figtree, Nunito, Source_Code_Pro } from 'next/font/google';
+
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -13,6 +15,24 @@ export const metadata: Metadata = {
   description: 'Official website of AthenaUS',
 };
 
+const figtree = Figtree({
+  variable: '--font-figtree',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const nunito = Nunito({
+  variable: '--font-nunito',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const sourceCodePro = Source_Code_Pro({
+  variable: '--font-source-code-pro',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -23,7 +43,8 @@ const RootLayout = ({
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body>
+      <body
+        className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
         <UserProvider>
           <ParthenonProvider>
             <main className={styles.main}>
