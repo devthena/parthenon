@@ -79,11 +79,12 @@ export const NavPaths = [
     value: '/',
     protected: false,
   },
-  {
-    label: 'Games',
-    value: '/games',
-    protected: true,
-  },
+  // @todo: Add back once Wordle is ready for release
+  // {
+  //   label: 'Games',
+  //   value: '/games',
+  //   protected: true,
+  // },
   {
     label: 'Commands',
     value: '/commands',
