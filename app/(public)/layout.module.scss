@@ -14,7 +14,11 @@
     font-size: 22px;
 
     @media screen and (min-width: $tablet-width) {
-      font-size: 36px;
+      font-size: 28px;
+    }
+
+    @media screen and (min-width: $desktop-width) {
+      font-size: 32px;
     }
   }
 }
