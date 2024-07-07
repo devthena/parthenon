@@ -1,6 +1,6 @@
 @import '../../styles/variables';
 
-.terms {
+.privacy {
   margin: 0 auto;
   max-width: 900px;
 }
@@ -64,6 +64,10 @@
       line-height: 1.45;
       margin-top: 10px;
     }
+  }
+
+  span {
+    font-weight: 600;
   }
 
   a {

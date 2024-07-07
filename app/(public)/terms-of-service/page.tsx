@@ -53,7 +53,7 @@ const Terms = () => {
         <li>
           <h2>USER CONDUCT</h2>
           <p>You agree not to engage in any activity that:</p>
-          <ul className={styles.conduct}>
+          <ul className={styles.list}>
             <li>
               <p>Violates any law or regulation.</p>
             </li>
