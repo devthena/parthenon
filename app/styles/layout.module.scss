@@ -20,17 +20,3 @@
   flex-direction: column;
   flex-grow: 1;
 }
-
-.footer {
-  align-items: center;
-  display: flex;
-  font-size: 12px;
-  font-weight: 300;
-  height: 30px;
-  justify-content: center;
-
-  @media screen and (min-width: $tablet-width) {
-    font-size: 14px;
-    height: 80px;
-  }
-}
