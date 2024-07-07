@@ -1,0 +1,47 @@
+@import '../../styles/variables';
+
+.invite > figure {
+  margin-top: 45px;
+}
+
+.invite > div {
+  margin-top: 45px;
+
+  p {
+    font-size: 14px;
+    line-height: 1.45;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 16px;
+      line-height: 2;
+    }
+  }
+
+  a {
+    color: var(--dark-blue);
+    text-decoration: underline;
+  }
+}
+
+.inviteButton {
+  background-color: var(--owl-blue-light);
+  border: 2px solid var(--dark-blue);
+  border-radius: 19.5rem;
+  color: var(--dark-blue);
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 45px;
+  padding: 5px 35px;
+  transition: all 0.1s ease;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 18px;
+    padding: 7px 28px 8px;
+  }
+
+  &:hover {
+    background-color: var(--dark-blue);
+    color: var(--white);
+  }
+}
