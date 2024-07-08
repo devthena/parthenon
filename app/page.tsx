@@ -6,7 +6,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { Header, Loading, Login } from './components';
 import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from './images/icons';
-import { SocialUrls } from './lib/constants';
+import { SOCIAL_URLS } from './lib/constants/navigation';
 
 import avatar from './images/avatar.png';
 import styles from './styles/page.module.scss';
@@ -44,16 +44,16 @@ const Home = () => {
           <div className={styles.social}>
             <p>Connect with me!</p>
             <div className={styles.socialIcons}>
-              <a href={SocialUrls.Twitch} target="_blank">
+              <a href={SOCIAL_URLS.Twitch} target="_blank">
                 <TwitchIcon />
               </a>
-              <a href={SocialUrls.X} target="_blank">
+              <a href={SOCIAL_URLS.X} target="_blank">
                 <XIcon />
               </a>
-              <a href={SocialUrls.Github} target="_blank">
+              <a href={SOCIAL_URLS.Github} target="_blank">
                 <GithubIcon />
               </a>
-              <a href={SocialUrls.Instagram} target="_blank">
+              <a href={SOCIAL_URLS.Instagram} target="_blank">
                 <InstagramIcon />
               </a>
             </div>

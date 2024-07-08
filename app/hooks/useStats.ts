@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 
-import { initialStats } from '../lib/constants/stats';
+import { INITIAL_STATS } from '../lib/constants/stats';
 import { ApiUrl } from '../lib/enums/api';
 import { WordleObject } from '../lib/types/wordle';
 import { GameCode } from '../lib/enums/games';
@@ -131,7 +131,7 @@ export const useStats = (code: GameCode) => {
       if (data) {
         dispatch({ type: 'fetch_ok', payload: data.data });
       } else {
-        dispatch({ type: 'fetch_ok', payload: initialStats[code] });
+        dispatch({ type: 'fetch_ok', payload: INITIAL_STATS[code] });
       }
     } else if (state.statsSaveLoading) {
       dispatch({ type: 'save_ok' });

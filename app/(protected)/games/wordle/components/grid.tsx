@@ -1,4 +1,4 @@
-import { WordLength } from '../../../../lib/constants/wordle';
+import { WORD_LENGTH } from '../../../../lib/constants/wordle';
 import { WordleStatus } from '../../../../lib/enums/wordle';
 import { Guess } from '../../../../lib/types/wordle';
 
@@ -15,7 +15,7 @@ export const AnswerGrid = ({ currentTurn, guesses, status }: GridProps) => {
     <div className={styles.grid}>
       {guesses.map((guess, index) => {
         const guessArray = guess.word.split('');
-        const wordArray = Array(WordLength)
+        const wordArray = Array(WORD_LENGTH)
           .fill('')
           .map((_l, i) => (guessArray[i] !== undefined ? guessArray[i] : ''));
 

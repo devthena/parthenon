@@ -8,7 +8,7 @@ import { Loading } from '../../../components';
 import { useStats, useWordle } from '../../../hooks';
 import { BackIcon, RulesIcon, StatsIcon } from '../../../images/icons';
 
-import { MaxAttempts, WordLength } from '../../../lib/constants/wordle';
+import { MAX_ATTEMPTS, WORD_LENGTH } from '../../../lib/constants/wordle';
 import { GameCode } from '../../../lib/enums/games';
 import { GameStatus, KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
 import { Guess } from '../../../lib/types/wordle';
@@ -146,10 +146,10 @@ const Wordle = () => {
     setIsInitialized(true);
   }
 
-  const initialGuessResult = Array(WordLength).fill(KeyStatus.Default);
+  const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
 
   // + 1 to take into account the current guess
-  const fillLength = MaxAttempts - (guesses.length + 1);
+  const fillLength = MAX_ATTEMPTS - (guesses.length + 1);
   const fillArray: Guess[] =
     fillLength > 0
       ? Array(fillLength).fill({
@@ -159,7 +159,7 @@ const Wordle = () => {
       : [];
 
   const currentGuessArray: Guess[] =
-    guesses.length < MaxAttempts
+    guesses.length < MAX_ATTEMPTS
       ? [
           {
             word: currentGuess,

@@ -1,4 +1,4 @@
-export const WordList = [
+export const WORD_LIST = [
   'aahed',
   'aalii',
   'aargh',

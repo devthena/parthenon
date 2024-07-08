@@ -1,5 +1,5 @@
 import { BackspaceIcon } from '../../../../images/icons';
-import { KeyList } from '../../../../lib/constants/wordle';
+import { KEY_LIST } from '../../../../lib/constants/wordle';
 import { KeyStatus } from '../../../../lib/enums/wordle';
 
 import styles from '../styles/keyboard.module.scss';
@@ -45,7 +45,7 @@ export const Keyboard = ({
 
   return (
     <div className={styles.container}>
-      {KeyList.map((row, i) => (
+      {KEY_LIST.map((row, i) => (
         <div className={styles.row} key={i}>
           {row.map(id => renderKey(id))}
         </div>

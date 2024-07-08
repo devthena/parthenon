@@ -10,7 +10,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import { useParthenonState } from '../context';
 import { MenuCloseIcon, MenuIcon } from '../images/icons';
 import { Login } from './login';
-import { NavPaths } from '../lib/constants';
+import { HEADER_PATHS } from '../lib/constants/navigation';
 
 import styles from '../styles/header.module.scss';
 
@@ -71,7 +71,7 @@ export const Header = () => {
           </a>
         </div>
         <nav className={styles.links}>
-          {NavPaths.map(path => {
+          {HEADER_PATHS.map(path => {
             const pathValue =
               path.value === '/' && userAuth0 ? '/dashboard' : path.value;
             const isRestricted = path.value === '/games' && !user?.discord_id;
@@ -104,7 +104,7 @@ export const Header = () => {
       <div className={modalClass}>
         <div className={styles.modalContent}>
           <div className={styles.modalLinks}>
-            {NavPaths.map(path => {
+            {HEADER_PATHS.map(path => {
               const pathValue =
                 path.value === '/' && userAuth0 ? '/dashboard' : path.value;
 

@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { DiscordIcon, TwitchIcon } from '../../images/icons';
-import { CommandsDiscord, CommandsTwitch } from '../../lib/constants';
+import {
+  DISCORD_COMMANDS,
+  TWITCH_COMMANDS,
+} from '../../lib/constants/commands';
 
 import styles from './page.module.scss';
 
@@ -38,7 +41,7 @@ const Commands = () => {
             <DiscordIcon />
           </h2>
           <ul className={styles.list}>
-            {CommandsDiscord.map((command, i) => (
+            {DISCORD_COMMANDS.map((command, i) => (
               <li key={i}>
                 <h3>
                   {command.name}
@@ -56,7 +59,7 @@ const Commands = () => {
             <TwitchIcon />
           </h2>
           <ul className={styles.list}>
-            {CommandsTwitch.map((command, i) => (
+            {TWITCH_COMMANDS.map((command, i) => (
               <li key={i}>
                 <h3>
                   {command.name}
