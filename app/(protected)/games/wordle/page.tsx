@@ -68,6 +68,9 @@ const Wordle = () => {
   const [page, setPage] = useState(GameStatus.Overview);
 
   useEffect(() => {
+    // generate a new answer for wordle
+    onReset();
+
     window.addEventListener('keydown', handleKeyPress);
     return () => {
       window.removeEventListener('keydown', handleKeyPress);

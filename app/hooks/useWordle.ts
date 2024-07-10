@@ -181,7 +181,7 @@ const generateAnswer = () => {
 };
 
 const initialState: WordleState = {
-  answer: generateAnswer(),
+  answer: '',
   currentGuess: '',
   guesses: [],
   keyResults: {},
