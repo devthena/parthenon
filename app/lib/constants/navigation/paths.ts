@@ -4,12 +4,11 @@ export const HEADER_PATHS = [
     value: '/',
     protected: false,
   },
-  // @todo: Add back once Wordle is ready for release
-  // {
-  //   label: 'Games',
-  //   value: '/games',
-  //   protected: true,
-  // },
+  {
+    label: 'Games',
+    value: '/games',
+    protected: true,
+  },
   {
     label: 'Commands',
     value: '/commands',
