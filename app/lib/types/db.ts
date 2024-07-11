@@ -1,9 +1,12 @@
 import { ObjectId } from 'mongodb';
-import { GameCode } from '../enums/games';
 import { WordleObject } from './wordle';
+import { BlackjackObject } from './blackjack';
+
+export type GameObject = BlackjackObject | WordleObject;
 
 export interface DataObject {
   stars?: StarObject | null;
+  stats?: StatsObject | null;
   user: UserObject | null;
 }
 
@@ -18,8 +21,8 @@ export interface StarObject {
 export interface StatsObject {
   _id?: ObjectId;
   discord_id: string;
-  code: GameCode;
-  data: WordleObject;
+  blk?: BlackjackObject;
+  wdl?: WordleObject;
 }
 
 export interface UserObject {

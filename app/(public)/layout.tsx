@@ -31,11 +31,11 @@ const PublicLayout = ({
     const userId = userSub[2];
     const loginMethod = userSub[1] as LoginMethod;
 
-    const getUser = async () => {
+    const getData = async () => {
       await fetchData(`${ApiUrl.Users}/${loginMethod}/${userId}`);
     };
 
-    getUser();
+    getData();
   }, [user, userAuth0, fetchData, onSetLoading]);
 
   useEffect(() => {

@@ -1,8 +1,3 @@
-export enum GameStatus {
-  Overview, // in the Wordle menu
-  Playing, // currently playing Wordle
-}
-
 export enum KeyStatus {
   Absent = 'absent', // does not exist
   Correct = 'correct', // exists and in the right position

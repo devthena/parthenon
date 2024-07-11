@@ -9,7 +9,7 @@ import styles from '../styles/modal.module.scss';
 
 interface ModalProps {
   content: ModalContent;
-  stats: WordleObject | null;
+  stats?: WordleObject;
   onModalClose: () => void;
 }
 

@@ -9,26 +9,37 @@ import {
   useReducer,
 } from 'react';
 
+import { INITIAL_STATS } from './lib/constants/stats';
 import { ApiUrl } from './lib/enums/api';
-import { DataObject, StarObject, UserObject } from './lib/types/db';
+
+import {
+  DataObject,
+  StarObject,
+  StatsObject,
+  UserObject,
+} from './lib/types/db';
+
 import { useApi } from './hooks';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
   stars: StarObject | null;
+  stats: StatsObject;
   user: UserObject | null;
 }
 
 type ParthenonAction =
   | { type: 'set_loading' }
   | { type: 'set_data'; payload: DataObject | null }
+  | { type: 'update_stats'; payload: StatsObject }
   | { type: 'update_user'; payload: UserObject | null };
 
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
   stars: null,
+  stats: INITIAL_STATS,
   user: null,
 };
 
@@ -46,13 +57,19 @@ const reducer = (
         ...state,
         isLoading: false,
         isFetched: true,
-        user: action.payload?.user ?? null,
         stars: action.payload?.stars ?? null,
+        stats: action.payload?.stats ?? state.stats,
+        user: action.payload?.user ?? null,
       };
     case 'set_loading':
       return {
         ...state,
         isLoading: true,
+      };
+    case 'update_stats':
+      return {
+        ...state,
+        stats: action.payload,
       };
     case 'update_user':
       return {
@@ -96,6 +113,13 @@ const useParthenonState = () => {
     [dispatch]
   );
 
+  const onUpdateStats = useCallback(
+    (stats: StatsObject) => {
+      dispatch({ type: 'update_stats', payload: stats });
+    },
+    [dispatch]
+  );
+
   const onUpdateUser = useCallback(
     (user: UserObject | null) => {
       dispatch({ type: 'update_user', payload: user });
@@ -103,12 +127,20 @@ const useParthenonState = () => {
     [dispatch]
   );
 
+  const saveStats = useCallback(async () => {
+    if (!state.stats.discord_id.length) return;
+    try {
+      const { _id, ...modifiedStats } = state.stats;
+      await saveData(ApiUrl.Stats, modifiedStats);
+    } catch (error) {
+      throw new Error('Hook Error: useParthenonState (saveStats)');
+    }
+  }, [state.stats, saveData]);
+
   const saveUser = useCallback(async () => {
     if (!state.user) return;
-
     try {
       const { _id, ...modifiedUser } = state.user;
-
       await saveData(ApiUrl.Users, modifiedUser);
     } catch (error) {
       throw new Error('Hook Error: useParthenonState (saveUser)');
@@ -119,7 +151,9 @@ const useParthenonState = () => {
     ...state,
     onSetLoading,
     onSetData,
+    onUpdateStats,
     onUpdateUser,
+    saveStats,
     saveUser,
   };
 };
