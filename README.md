@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Parthenon
 
-## Getting Started
+This is a Next.js application that serves as the official website for the AthenaUS community.
 
-First, run the development server:
+The following are for the Team Developers:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Preparation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Install `nvm` and `yarn`
+- Pull the latest `stage` branch after cloning the repository
+- Create a `.env.local` file (Ask the code owners for the secrets)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Enable developer mode in your Discord app by going to `Settings -> Advanced -> Developer Mode`
 
-## Learn More
+### Local Environment
 
-To learn more about Next.js, take a look at the following resources:
+- Run `nvm use` to use the proper Node version
+- Run `yarn install` to install dependencies
+- Run `yarn dev` to run a local instance using stage environment variables
+- Open [http://localhost:3000](http://localhost:3000) with your browser
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contribution
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+If you want to contribute to this project, reach out to the admins and ask to be added as collaborator. Once added, you should then get an invite to the project board.
 
-## Deploy on Vercel
+## Support or Feedback
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Join the AthenaUS community!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You can contact Athena if you have any questions or feedback by [sending an email](mailto:athena@parthenon.app) or joining her [Discord server](https://discord.com/invite/5dzECDz).
