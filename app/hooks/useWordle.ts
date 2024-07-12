@@ -1,11 +1,11 @@
 import { useCallback, useReducer } from 'react';
 
 import {
-  AnswerList,
-  MaxAttempts,
-  WordLength,
-  WordList,
-  WordleRewards,
+  ANSWER_LIST,
+  MAX_ATTEMPTS,
+  WORD_LENGTH,
+  WORD_LIST,
+  WORDLE_REWARDS,
 } from '../lib/constants/wordle';
 
 import { KeyStatus, ModalContent, WordleStatus } from '../lib/enums/wordle';
@@ -79,7 +79,7 @@ const wordleReducer = (
 
   switch (action.type) {
     case 'key':
-      if (!isGameOver && state.currentGuess.length < WordLength) {
+      if (!isGameOver && state.currentGuess.length < WORD_LENGTH) {
         return {
           ...state,
           currentGuess: state.currentGuess + action.letter,
@@ -98,8 +98,8 @@ const wordleReducer = (
       }
     case 'enter':
       if (!isGameOver) {
-        if (state.currentGuess.length === WordLength) {
-          if (!WordList.includes(state.currentGuess)) {
+        if (state.currentGuess.length === WORD_LENGTH) {
+          if (!WORD_LIST.includes(state.currentGuess)) {
             return {
               ...state,
               status: WordleStatus.InvalidWord,
@@ -120,13 +120,13 @@ const wordleReducer = (
           const newStatus =
             state.currentGuess === state.answer
               ? WordleStatus.Answered
-              : newGuesses.length >= MaxAttempts
+              : newGuesses.length >= MAX_ATTEMPTS
               ? WordleStatus.Completed
               : WordleStatus.Playing;
 
           const newReward =
             newStatus === WordleStatus.Answered
-              ? WordleRewards[newGuesses.length - 1]
+              ? WORDLE_REWARDS[newGuesses.length - 1]
               : null;
 
           return {
@@ -176,12 +176,12 @@ const wordleReducer = (
 };
 
 const generateAnswer = () => {
-  const i = Math.floor(Math.random() * AnswerList.length);
-  return AnswerList[i];
+  const i = Math.floor(Math.random() * ANSWER_LIST.length);
+  return ANSWER_LIST[i];
 };
 
 const initialState: WordleState = {
-  answer: generateAnswer(),
+  answer: '',
   currentGuess: '',
   guesses: [],
   keyResults: {},

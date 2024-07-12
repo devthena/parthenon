@@ -1,4 +1,4 @@
-export const WordList = [
+export const WORD_LIST = [
   'aahed',
   'aalii',
   'aargh',
@@ -6115,6 +6115,7 @@ export const WordList = [
   'laevo',
   'lagan',
   'lager',
+  'laggy',
   'lahal',
   'lahar',
   'laich',

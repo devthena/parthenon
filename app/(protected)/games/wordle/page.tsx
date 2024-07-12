@@ -5,29 +5,29 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useParthenonState } from '../../../context';
 import { Loading } from '../../../components';
-import { useStats, useWordle } from '../../../hooks';
+import { useWordle } from '../../../hooks';
 import { BackIcon, RulesIcon, StatsIcon } from '../../../images/icons';
 
-import { MaxAttempts, WordLength } from '../../../lib/constants/wordle';
-import { GameCode } from '../../../lib/enums/games';
-import { GameStatus, KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
+import { MAX_ATTEMPTS, WORD_LENGTH } from '../../../lib/constants/wordle';
+import { GameCode, GameStatus } from '../../../lib/enums/games';
+import { KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
 import { Guess } from '../../../lib/types/wordle';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const { user, onUpdateUser, saveUser } = useParthenonState();
-  if (!user?.discord_id) redirect('/dashboard');
-
   const {
+    isLoading,
     stats,
-    statsFetchLoading,
-    statsError,
-    fetchStats,
+    user,
+    onUpdateStats,
+    onUpdateUser,
     saveStats,
-    updateStats,
-  } = useStats(GameCode.Wordle);
+    saveUser,
+  } = useParthenonState();
+
+  if (!user?.discord_id) redirect('/dashboard');
 
   const {
     answer,
@@ -62,12 +62,14 @@ const Wordle = () => {
     [onEnter, onDelete, onKey]
   );
 
-  const [isInitialized, setIsInitialized] = useState(false);
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [isStatsSaved, setIsStatsSaved] = useState(false);
   const [page, setPage] = useState(GameStatus.Overview);
 
   useEffect(() => {
+    // generate a new answer for wordle
+    onReset();
+
     window.addEventListener('keydown', handleKeyPress);
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
@@ -75,20 +77,27 @@ const Wordle = () => {
   }, []);
 
   useEffect(() => {
-    if (!stats || isStatsUpdated) return;
+    if (!user.discord_id || !stats[GameCode.Wordle] || isStatsUpdated) return;
 
     if (status === WordleStatus.Answered) {
       setIsStatsUpdated(true);
 
-      const newDistribution = [...stats.distribution];
+      const newDistribution = [...stats[GameCode.Wordle].distribution];
       newDistribution[guesses.length - 1] += 1;
 
-      updateStats({
-        currentStreak: stats.currentStreak + 1,
-        distribution: newDistribution,
-        maxStreak: Math.max(stats.maxStreak, stats.currentStreak + 1),
-        totalPlayed: stats.totalPlayed + 1,
-        totalWon: stats.totalWon + 1,
+      onUpdateStats({
+        ...stats,
+        discord_id: user.discord_id,
+        [GameCode.Wordle]: {
+          currentStreak: stats[GameCode.Wordle].currentStreak + 1,
+          distribution: newDistribution,
+          maxStreak: Math.max(
+            stats[GameCode.Wordle].maxStreak,
+            stats[GameCode.Wordle].currentStreak + 1
+          ),
+          totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
+          totalWon: stats[GameCode.Wordle].totalWon + 1,
+        },
       });
 
       if (user && reward) {
@@ -100,12 +109,16 @@ const Wordle = () => {
     } else if (status === WordleStatus.Completed) {
       setIsStatsUpdated(true);
 
-      updateStats({
-        currentStreak: 0,
-        distribution: [...stats.distribution],
-        maxStreak: stats.maxStreak,
-        totalPlayed: stats.totalPlayed + 1,
-        totalWon: stats.totalWon,
+      onUpdateStats({
+        ...stats,
+        discord_id: user.discord_id,
+        [GameCode.Wordle]: {
+          currentStreak: 0,
+          distribution: [...stats[GameCode.Wordle].distribution],
+          maxStreak: stats[GameCode.Wordle].maxStreak,
+          totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
+          totalWon: stats[GameCode.Wordle].totalWon,
+        },
       });
     }
   }, [
@@ -115,8 +128,8 @@ const Wordle = () => {
     stats,
     status,
     user,
+    onUpdateStats,
     onUpdateUser,
-    updateStats,
   ]);
 
   useEffect(() => {
@@ -133,23 +146,18 @@ const Wordle = () => {
       return;
     }
 
-    saveStats(user.discord_id);
+    saveStats();
     setIsStatsSaved(true);
 
     // user is updated only when the Wordle is answered
     if (status === WordleStatus.Answered) saveUser();
   }, [user, isStatsSaved, isStatsUpdated, status, saveStats, saveUser]);
 
-  if (!isInitialized) {
-    if (!user || !user.discord_id) return;
-    fetchStats(user.discord_id);
-    setIsInitialized(true);
-  }
-
-  const initialGuessResult = Array(WordLength).fill(KeyStatus.Default);
+  const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
 
   // + 1 to take into account the current guess
-  const fillLength = MaxAttempts - (guesses.length + 1);
+  const fillLength = MAX_ATTEMPTS - (guesses.length + 1);
+
   const fillArray: Guess[] =
     fillLength > 0
       ? Array(fillLength).fill({
@@ -159,7 +167,7 @@ const Wordle = () => {
       : [];
 
   const currentGuessArray: Guess[] =
-    guesses.length < MaxAttempts
+    guesses.length < MAX_ATTEMPTS
       ? [
           {
             word: currentGuess,
@@ -179,7 +187,7 @@ const Wordle = () => {
       {modalDisplay && (
         <Modal
           content={modalContent}
-          stats={stats}
+          stats={stats[GameCode.Wordle]}
           onModalClose={onModalClose}
         />
       )}
@@ -243,9 +251,8 @@ const Wordle = () => {
             PLAY
           </button>
           <div className={styles.statsContainer}>
-            {(!stats || statsFetchLoading) && <Loading />}
-            {!statsFetchLoading && stats && <Stats data={stats} />}
-            {statsError && <p>Stats Fetch Error: {statsError}</p>}
+            {(!stats || isLoading) && <Loading />}
+            {!isLoading && stats && <Stats data={stats[GameCode.Wordle]} />}
           </div>
         </div>
       )}
