@@ -3,15 +3,15 @@
 import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { useParthenonState } from '../../../context';
-import { Loading } from '../../../components';
-import { useWordle } from '../../../hooks';
-import { BackIcon, RulesIcon, StatsIcon } from '../../../images/icons';
+import { Loading } from '@/components';
+import { useParthenonState } from '@/context';
+import { useWordle } from '@/hooks';
 
-import { MAX_ATTEMPTS, WORD_LENGTH } from '../../../lib/constants/wordle';
-import { GameCode, GameStatus } from '../../../lib/enums/games';
-import { KeyStatus, WordleStatus } from '../../../lib/enums/wordle';
-import { Guess } from '../../../lib/types/wordle';
+import { MAX_ATTEMPTS, WORD_LENGTH } from '@/constants/wordle';
+import { GameCode, GameStatus } from '@/enums/games';
+import { KeyStatus, WordleStatus } from '@/enums/wordle';
+import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
+import { Guess } from '@/types/wordle';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { StatsObject, UserObject } from '../lib/types/db';
-import { ApiUrl } from '../lib/enums/api';
+import { ApiUrl } from '@/enums/api';
+import { StatsObject, UserObject } from '@/types/db';
 
 interface ApiState {
   data: { [key: string]: any } | null;

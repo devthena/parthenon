@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import Image from 'next/image';
 
-import { useParthenonState } from '../../context';
-import { Loading } from '../../components';
-import { CoinIcon, StarIcon } from '../../images/icons';
+import { Loading } from '@/components';
+import { useParthenonState } from '@/context';
+import { CoinIcon, StarIcon } from '@/images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
 import styles from './page.module.scss';

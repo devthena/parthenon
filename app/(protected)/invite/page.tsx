@@ -1,8 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { useParthenonState } from '@/context';
 
-import { useParthenonState } from '../../context';
 import styles from './page.module.scss';
 
 const whitelist = process.env.NEXT_PUBLIC_DISCORD_TEAM_IDS?.split(',') ?? [];

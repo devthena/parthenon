@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { UserObject } from '../../lib/types/db';
+import { UserObject } from '@/types/db';
 
 const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
 const mongodbName = process.env.MONGODB_NAME;

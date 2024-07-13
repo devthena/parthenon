@@ -7,12 +7,12 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { useParthenonState } from '../context';
-import { MenuCloseIcon, MenuIcon } from '../images/icons';
-import { Login } from './login';
-import { HEADER_PATHS } from '../lib/constants/navigation';
+import { HEADER_PATHS } from '@/constants/navigation';
+import { useParthenonState } from '@/context';
+import { MenuCloseIcon, MenuIcon } from '@/images/icons';
+import styles from '@/styles/header.module.scss';
 
-import styles from '../styles/header.module.scss';
+import { Login } from './login';
 
 export const Header = () => {
   const { user } = useParthenonState();

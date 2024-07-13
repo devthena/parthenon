@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { DiscordIcon, TwitchIcon } from '../../images/icons';
-import {
-  DISCORD_COMMANDS,
-  TWITCH_COMMANDS,
-} from '../../lib/constants/commands';
+
+import { DISCORD_COMMANDS, TWITCH_COMMANDS } from '@/constants/commands';
+import { DiscordIcon, TwitchIcon } from '@/images/icons';
 
 import styles from './page.module.scss';
 

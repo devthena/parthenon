@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { useParthenonState } from '../../context';
-import { WordleIcon } from '../../images/icons';
+import { useParthenonState } from '@/context';
+import { WordleIcon } from '@/images/icons';
 
 import styles from './page.module.scss';
 

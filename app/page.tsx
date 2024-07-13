@@ -1,15 +1,16 @@
 'use client';
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { Header, Loading, Login } from './components';
-import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from './images/icons';
-import { SOCIAL_URLS } from './lib/constants/navigation';
+import { Header, Loading, Login } from '@/components';
+import { SOCIAL_URLS } from '@/constants/navigation';
 
-import avatar from './images/avatar.png';
-import styles from './styles/page.module.scss';
+import avatar from '@/images/avatar.png';
+import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from '@/images/icons';
+
+import styles from '@/styles/page.module.scss';
 
 const Home = () => {
   const { user, error, isLoading } = useUser();

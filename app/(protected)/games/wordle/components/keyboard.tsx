@@ -1,6 +1,6 @@
-import { BackspaceIcon } from '../../../../images/icons';
-import { KEY_LIST } from '../../../../lib/constants/wordle';
-import { KeyStatus } from '../../../../lib/enums/wordle';
+import { KEY_LIST } from '@/constants/wordle';
+import { KeyStatus } from '@/enums/wordle';
+import { BackspaceIcon } from '@/images/icons';
 
 import styles from '../styles/keyboard.module.scss';
 

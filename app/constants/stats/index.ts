@@ -1,6 +1,6 @@
-import { BlackjackObject } from '../../types/blackjack';
-import { StatsObject } from '../../types/db';
-import { WordleObject } from '../../types/wordle';
+import { BlackjackObject } from '@/types/blackjack';
+import { StatsObject } from '@/types/db';
+import { WordleObject } from '@/types/wordle';
 
 export const INITIAL_BLACKJACK: BlackjackObject = {
   totalBlackjack: 0,

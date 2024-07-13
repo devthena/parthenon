@@ -1,14 +1,14 @@
-import type { Metadata } from 'next';
-import { Figtree, Nunito, Source_Code_Pro } from 'next/font/google';
-
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Analytics } from '@vercel/analytics/react';
 
-import { Footer } from './components';
-import { ParthenonProvider } from './context';
+import type { Metadata } from 'next';
+import { Figtree, Nunito, Source_Code_Pro } from 'next/font/google';
+
+import { Footer } from '@/components';
+import { ParthenonProvider } from '@/context';
 
 import './globals.scss';
-import styles from './styles/layout.module.scss';
+import styles from '@/styles/layout.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon',

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { StarObject, StatsObject, UserObject } from '../../../lib/types/db';
-import { LoginMethod } from '../../../lib/enums/auth';
+import { LoginMethod } from '@/enums/auth';
+import { StarObject, StatsObject, UserObject } from '@/types/db';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;

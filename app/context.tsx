@@ -9,17 +9,10 @@ import {
   useReducer,
 } from 'react';
 
-import { INITIAL_STATS } from './lib/constants/stats';
-import { ApiUrl } from './lib/enums/api';
-
-import {
-  DataObject,
-  StarObject,
-  StatsObject,
-  UserObject,
-} from './lib/types/db';
-
-import { useApi } from './hooks';
+import { INITIAL_STATS } from '@/constants/stats';
+import { ApiUrl } from '@/enums/api';
+import { useApi } from '@/hooks';
+import { DataObject, StarObject, StatsObject, UserObject } from '@/types/db';
 
 interface ParthenonState {
   isFetched: boolean;

@@ -1,6 +1,6 @@
-import { CloseIcon } from '../../../../images/icons';
-import { ModalContent } from '../../../../lib/enums/wordle';
-import { WordleObject } from '../../../../lib/types/wordle';
+import { ModalContent } from '@/enums/wordle';
+import { CloseIcon } from '@/images/icons';
+import { WordleObject } from '@/types/wordle';
 
 import { Rules } from './rules';
 import { Stats } from './stats';

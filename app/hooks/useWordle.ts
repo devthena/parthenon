@@ -6,10 +6,10 @@ import {
   WORD_LENGTH,
   WORD_LIST,
   WORDLE_REWARDS,
-} from '../lib/constants/wordle';
+} from '@/constants/wordle';
 
-import { KeyStatus, ModalContent, WordleStatus } from '../lib/enums/wordle';
-import { Guess, WordleState } from '../lib/types/wordle';
+import { KeyStatus, ModalContent, WordleStatus } from '@/enums/wordle';
+import { Guess, WordleState } from '@/types/wordle';
 
 type WordleAction =
   | { type: 'delete' }

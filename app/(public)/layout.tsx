@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useEffect } from 'react';
 
-import { Header } from '../components';
-import { useApi } from '../hooks';
-import { useParthenonState } from '../context';
+import { Header } from '@/components';
+import { useParthenonState } from '@/context';
+import { useApi } from '@/hooks';
 
-import { ApiUrl } from '../lib/enums/api';
-import { LoginMethod } from '../lib/enums/auth';
-import { DataObject } from '../lib/types/db';
+import { ApiUrl } from '@/enums/api';
+import { LoginMethod } from '@/enums/auth';
+import { DataObject } from '@/types/db';
 
 import styles from './layout.module.scss';
 
