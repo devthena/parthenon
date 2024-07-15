@@ -5,17 +5,25 @@ import { BlackjackObject } from './blackjack';
 export type GameObject = BlackjackObject | WordleObject;
 
 export interface DataObject {
-  stars?: StarObject | null;
-  stats?: StatsObject | null;
+  activities: ActivityStateObject | null;
+  stats: StatsObject | null;
   user: UserStateObject | null;
 }
 
 export interface StarObject {
-  _id?: ObjectId;
-  discord_id: string;
   stars: number;
   last_given: string | null;
   total_given: number;
+}
+
+export interface ActivityObject {
+  _id: ObjectId;
+  discord_id: string;
+  str: StarObject;
+}
+
+export interface ActivityStateObject {
+  stars: number;
 }
 
 export interface StatsObject {

@@ -5,7 +5,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import { LoginMethod } from '@/enums/auth';
 
 import {
-  StarObject,
+  ActivityObject,
   StatsObject,
   UserObject,
   UserStateObject,
@@ -14,14 +14,14 @@ import {
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
 
-const starsCollectionName = process.env.MONGODB_COLLECTION_STARS;
+const actsCollectionName = process.env.MONGODB_COLLECTION_ACTS;
 const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
 if (
   !mongodbURI ||
   !mongodbName ||
-  !starsCollectionName ||
+  !actsCollectionName ||
   !statsCollectionName ||
   !usersCollectionName
 ) {
@@ -41,23 +41,23 @@ const getData = async (method: LoginMethod, id: string) => {
 
   const botDB = await client.db(mongodbName);
 
-  const starsCollection = botDB.collection<StarObject>(starsCollectionName);
+  const actsCollection = botDB.collection<ActivityObject>(actsCollectionName);
   const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
   const usersCollection = botDB.collection<UserObject>(usersCollectionName);
 
   const user = await usersCollection.findOne({ [`${method}_id`]: id });
 
-  let stars = null;
+  let acts = null;
   let stats = null;
 
   if (user?.discord_id) {
-    stars = await starsCollection.findOne({ discord_id: user.discord_id });
+    acts = await actsCollection.findOne({ discord_id: user.discord_id });
     stats = await statsCollection.findOne({ discord_id: user.discord_id });
   }
 
   await client.close();
   return {
-    stars,
+    activities: acts ? { stars: acts.str.stars } : null,
     stats,
     user: user
       ? {

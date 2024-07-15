@@ -14,8 +14,8 @@ import { ApiUrl } from '@/enums/api';
 import { useApi } from '@/hooks';
 
 import {
+  ActivityStateObject,
   DataObject,
-  StarObject,
   StatsObject,
   UserStateObject,
 } from '@/types/db';
@@ -23,7 +23,7 @@ import {
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
-  stars: StarObject | null;
+  activities: ActivityStateObject | null;
   stats: StatsObject;
   user: UserStateObject | null;
 }
@@ -37,7 +37,7 @@ type ParthenonAction =
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
-  stars: null,
+  activities: null,
   stats: INITIAL_STATS,
   user: null,
 };
@@ -56,7 +56,7 @@ const reducer = (
         ...state,
         isLoading: false,
         isFetched: true,
-        stars: action.payload?.stars ?? null,
+        activities: action.payload?.activities ?? null,
         stats: action.payload?.stats ?? state.stats,
         user: action.payload?.user ?? null,
       };
