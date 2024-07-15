@@ -1,10 +1,32 @@
+import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { UserObject } from '@/types/db';
 
-const mongodbCollection = process.env.MONGODB_COLLECTION_USERS ?? '';
+import { LoginMethod } from '@/enums/auth';
+
+import {
+  StarObject,
+  StatsObject,
+  UserObject,
+  UserStateObject,
+} from '@/types/db';
+
+const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
-const mongodbURI = process.env.MONGODB_URI ?? '';
+
+const starsCollectionName = process.env.MONGODB_COLLECTION_STARS;
+const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
+const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
+
+if (
+  !mongodbURI ||
+  !mongodbName ||
+  !starsCollectionName ||
+  !statsCollectionName ||
+  !usersCollectionName
+) {
+  throw new Error('Missing necessary environment variables');
+}
 
 const client = new MongoClient(mongodbURI, {
   serverApi: {
@@ -14,32 +36,105 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const saveUser = async (payload: UserObject) => {
+const getData = async (method: LoginMethod, id: string) => {
   await client.connect();
 
-  const collection = await client.db(mongodbName).collection(mongodbCollection);
+  const botDB = await client.db(mongodbName);
+
+  const starsCollection = botDB.collection<StarObject>(starsCollectionName);
+  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
+  const usersCollection = botDB.collection<UserObject>(usersCollectionName);
+
+  const user = await usersCollection.findOne({ [`${method}_id`]: id });
+
+  let stars = null;
+  let stats = null;
+
+  if (user?.discord_id) {
+    stars = await starsCollection.findOne({ discord_id: user.discord_id });
+    stats = await statsCollection.findOne({ discord_id: user.discord_id });
+  }
+
+  await client.close();
+  return {
+    stars,
+    stats,
+    user: user
+      ? {
+          cash: user.cash,
+          discord_name: user.discord_name,
+          discord_username: user.discord_username,
+          twitch_username: user.twitch_username,
+          code: user.twitch_id && !user.discord_id ? user.user_id : undefined,
+        }
+      : null,
+  };
+};
+
+const saveUser = async (
+  method: LoginMethod,
+  id: string,
+  payload: UserStateObject
+) => {
+  await client.connect();
+
+  const collection = await client
+    .db(mongodbName)
+    .collection(usersCollectionName);
 
   const data = await collection.updateOne(
-    { user_id: payload.user_id },
-    { $set: { ...payload } },
-    { upsert: true }
+    { [`${method}_id`]: id },
+    { $set: { ...payload } }
   );
 
   await client.close();
   return data;
 };
 
-export async function POST(request: NextRequest) {
+export const GET = async (request: NextRequest) => {
+  const res = new NextResponse();
+  const session = await getSession(request, res);
+
+  if (!session) return NextResponse.json({ data: null, error: null }, res);
+
+  const userSub = session.user.sub.split('|');
+  const method = userSub[1];
+  const id = userSub[2];
+
+  let responseData = null;
+  let responseError = null;
+
+  try {
+    responseData = await getData(method, id);
+  } catch (error) {
+    responseError = JSON.stringify(error);
+  } finally {
+    return NextResponse.json({ data: responseData, error: responseError }, res);
+  }
+};
+
+export const POST = withApiAuthRequired(async (request: NextRequest) => {
+  const res = new NextResponse();
+  const session = await getSession(request, res);
+
+  if (!session) {
+    return NextResponse.json({ data: null, error: 'Unauthorized' }, res);
+  }
+
+  const userSub = session.user.sub.split('|');
+  const method = userSub[1];
+  const id = userSub[2];
+
   let responseData = null;
   let responseError = null;
 
   const payload = await request.json();
 
   try {
-    responseData = await saveUser(payload);
+    responseData = await saveUser(method, id, payload);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
-    return NextResponse.json({ data: responseData, error: responseError });
+    return NextResponse.json({ data: responseData, error: responseError }, res);
   }
-}
+});

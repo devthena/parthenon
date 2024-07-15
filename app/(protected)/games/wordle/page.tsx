@@ -27,7 +27,7 @@ const Wordle = () => {
     saveUser,
   } = useParthenonState();
 
-  if (!user?.discord_id) redirect('/dashboard');
+  if (!user?.discord_username) redirect('/dashboard');
 
   const {
     answer,
@@ -77,7 +77,8 @@ const Wordle = () => {
   }, []);
 
   useEffect(() => {
-    if (!user.discord_id || !stats[GameCode.Wordle] || isStatsUpdated) return;
+    if (!user.discord_username || !stats[GameCode.Wordle] || isStatsUpdated)
+      return;
 
     if (status === WordleStatus.Answered) {
       setIsStatsUpdated(true);
@@ -87,7 +88,8 @@ const Wordle = () => {
 
       onUpdateStats({
         ...stats,
-        discord_id: user.discord_id,
+        // @todo: Update API calls  for stats
+        // discord_id: user.discord_id,
         [GameCode.Wordle]: {
           currentStreak: stats[GameCode.Wordle].currentStreak + 1,
           distribution: newDistribution,
@@ -111,7 +113,8 @@ const Wordle = () => {
 
       onUpdateStats({
         ...stats,
-        discord_id: user.discord_id,
+        // @todo: Update API calls  for stats
+        // discord_id: user.discord_id,
         [GameCode.Wordle]: {
           currentStreak: 0,
           distribution: [...stats[GameCode.Wordle].distribution],
@@ -140,7 +143,8 @@ const Wordle = () => {
   }, [status, isStatsSaved, isStatsUpdated]);
 
   useEffect(() => {
-    if (!user || !user.discord_id || !isStatsUpdated || isStatsSaved) return;
+    if (!user || !user.discord_username || !isStatsUpdated || isStatsSaved)
+      return;
 
     if (status !== WordleStatus.Answered && status !== WordleStatus.Completed) {
       return;

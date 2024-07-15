@@ -10,7 +10,7 @@ import styles from './page.module.scss';
 
 const Games = () => {
   const { user } = useParthenonState();
-  if (!user?.discord_id) redirect('/dashboard');
+  if (!user?.discord_username) redirect('/dashboard');
 
   return (
     <div className={styles.games}>

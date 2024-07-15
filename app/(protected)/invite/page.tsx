@@ -5,13 +5,14 @@ import { useParthenonState } from '@/context';
 
 import styles from './page.module.scss';
 
-const whitelist = process.env.NEXT_PUBLIC_DISCORD_TEAM_IDS?.split(',') ?? [];
+const whitelist = process.env.NEXT_PUBLIC_DISCORD_TEAM?.split(',') ?? [];
 const inviteURL = process.env.NEXT_PUBLIC_DISCORD_INVITE_URL ?? '';
 
 const Invite = () => {
   const { user } = useParthenonState();
 
-  const isRestricted = !user || !whitelist.includes(user.discord_id ?? '');
+  const isRestricted =
+    !user || !whitelist.includes(user.discord_username ?? '');
 
   return (
     <div className={styles.invite}>

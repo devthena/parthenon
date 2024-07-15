@@ -12,21 +12,27 @@ import {
 import { INITIAL_STATS } from '@/constants/stats';
 import { ApiUrl } from '@/enums/api';
 import { useApi } from '@/hooks';
-import { DataObject, StarObject, StatsObject, UserObject } from '@/types/db';
+
+import {
+  DataObject,
+  StarObject,
+  StatsObject,
+  UserStateObject,
+} from '@/types/db';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
   stars: StarObject | null;
   stats: StatsObject;
-  user: UserObject | null;
+  user: UserStateObject | null;
 }
 
 type ParthenonAction =
   | { type: 'set_loading' }
   | { type: 'set_data'; payload: DataObject | null }
   | { type: 'update_stats'; payload: StatsObject }
-  | { type: 'update_user'; payload: UserObject | null };
+  | { type: 'update_user'; payload: UserStateObject | null };
 
 const initialState: ParthenonState = {
   isFetched: false,
@@ -114,7 +120,7 @@ const useParthenonState = () => {
   );
 
   const onUpdateUser = useCallback(
-    (user: UserObject | null) => {
+    (user: UserStateObject | null) => {
       dispatch({ type: 'update_user', payload: user });
     },
     [dispatch]
@@ -126,17 +132,16 @@ const useParthenonState = () => {
       const { _id, ...modifiedStats } = state.stats;
       await saveData(ApiUrl.Stats, modifiedStats);
     } catch (error) {
-      throw new Error('Hook Error: useParthenonState (saveStats)');
+      console.error(error);
     }
   }, [state.stats, saveData]);
 
   const saveUser = useCallback(async () => {
     if (!state.user) return;
     try {
-      const { _id, ...modifiedUser } = state.user;
-      await saveData(ApiUrl.Users, modifiedUser);
+      await saveData(ApiUrl.Users, state.user);
     } catch (error) {
-      throw new Error('Hook Error: useParthenonState (saveUser)');
+      console.error(error);
     }
   }, [state.user, saveData]);
 

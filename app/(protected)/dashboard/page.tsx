@@ -30,8 +30,8 @@ const Dashboard = () => {
       return;
     }
 
-    if (user.discord_id) {
-      if (user.twitch_id) {
+    if (user.discord_username) {
+      if (user.twitch_username) {
         return (
           <AccountLinked
             discord={user.discord_username ?? 'Discord'}
@@ -42,7 +42,7 @@ const Dashboard = () => {
         return <Instructions />;
       }
     } else {
-      return user.twitch_id && <Instructions code={user.user_id} />;
+      return user.twitch_username && <Instructions code={user.code} />;
     }
   };
 

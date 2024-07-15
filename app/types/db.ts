@@ -7,7 +7,7 @@ export type GameObject = BlackjackObject | WordleObject;
 export interface DataObject {
   stars?: StarObject | null;
   stats?: StatsObject | null;
-  user: UserObject | null;
+  user: UserStateObject | null;
 }
 
 export interface StarObject {
@@ -26,7 +26,7 @@ export interface StatsObject {
 }
 
 export interface UserObject {
-  _id?: ObjectId;
+  _id: ObjectId;
   user_id: string;
   discord_id: string | null;
   discord_username: string | null;
@@ -34,7 +34,12 @@ export interface UserObject {
   twitch_id: string | null;
   twitch_username: string | null;
   cash: number;
-  gamble_wins?: number;
-  gamble_losses?: number;
-  times_given?: number;
+}
+
+export interface UserStateObject {
+  cash: number;
+  discord_name: string;
+  discord_username: string;
+  twitch_username: string;
+  code?: string;
 }
