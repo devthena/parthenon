@@ -1,9 +1,13 @@
 export enum GameCode {
-  Blackjack = 'blk',
   Wordle = 'wdl',
 }
 
-export enum GameStatus {
+export enum GamePage {
   Overview,
   Playing,
+}
+
+export enum GameStatus {
+  OnGoing,
+  GameOver,
 }

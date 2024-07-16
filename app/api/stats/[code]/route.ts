@@ -1,20 +1,21 @@
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
 import { LoginMethod } from '@/enums/auth';
-import { ActivityObject, UserObject, UserStateObject } from '@/types/db';
+import { StatsObject, UserObject } from '@/types/db';
+import { GameCode } from '@/enums/games';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
 
-const actsCollectionName = process.env.MONGODB_COLLECTION_ACTS;
+const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
 if (
   !mongodbURI ||
   !mongodbName ||
-  !actsCollectionName ||
+  !statsCollectionName ||
   !usersCollectionName
 ) {
   throw new Error('Missing necessary environment variables');
@@ -28,36 +29,33 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getData = async (method: LoginMethod, id: string) => {
+const getStats = async (method: LoginMethod, id: string, code: string) => {
   await client.connect();
 
   const botDB = await client.db(mongodbName);
 
-  const actsCollection = botDB.collection<ActivityObject>(actsCollectionName);
+  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
   const usersCollection = botDB.collection<UserObject>(usersCollectionName);
 
   const user = await usersCollection.findOne({ [`${method}_id`]: id });
 
-  const acts = user?.discord_id
-    ? await actsCollection.findOne({ discord_id: user.discord_id })
-    : null;
+  let stats = null;
+
+  if (user?.discord_id) {
+    stats = await statsCollection.findOne({ discord_id: user.discord_id });
+  }
 
   await client.close();
-  return {
-    activities: acts ? { stars: acts.str.stars } : null,
-    user: user
-      ? {
-          cash: user.cash,
-          discord_name: user.discord_name,
-          discord_username: user.discord_username,
-          twitch_username: user.twitch_username,
-          code: user.twitch_id && !user.discord_id ? user.user_id : undefined,
-        }
-      : null,
-  };
+
+  if (!stats) return null;
+
+  return stats[code as GameCode] ?? null;
 };
 
-export const GET = async (request: NextRequest) => {
+export const GET = async (
+  request: NextRequest,
+  { params }: { params: { code: string } }
+) => {
   const res = new NextResponse();
   const session = await getSession(request, res);
 
@@ -71,7 +69,7 @@ export const GET = async (request: NextRequest) => {
   let responseError = null;
 
   try {
-    responseData = await getData(method, id);
+    responseData = await getStats(method, id, params.code);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

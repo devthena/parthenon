@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ApiUrl } from '@/enums/api';
-import { StatsObject, UserStateObject } from '@/types/db';
+import { StatsStatePayload } from '@/types/db';
 
 interface ApiState {
   data: { [key: string]: any } | null;
@@ -40,7 +40,7 @@ export const useApi = () => {
   }, []);
 
   const saveData = useCallback(
-    async (url: ApiUrl, payload: StatsObject | UserStateObject) => {
+    async (url: ApiUrl, payload: StatsStatePayload) => {
       setApiData(prev => ({ ...prev, dataLoading: true, dataError: null }));
 
       try {

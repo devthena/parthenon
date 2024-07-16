@@ -5,29 +5,28 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
-import { useWordle } from '@/hooks';
+import { useApi, useWordle } from '@/hooks';
 
+import { INITIAL_WORDLE } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORD_LENGTH } from '@/constants/wordle';
-import { GameCode, GameStatus } from '@/enums/games';
+
+import { ApiUrl } from '@/enums/api';
+import { GameCode, GamePage } from '@/enums/games';
 import { KeyStatus, WordleStatus } from '@/enums/wordle';
+
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
-import { Guess } from '@/types/wordle';
+import { Guess, WordleObject } from '@/types/wordle';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const {
-    isLoading,
-    stats,
-    user,
-    onUpdateStats,
-    onUpdateUser,
-    saveStats,
-    saveUser,
-  } = useParthenonState();
+  const { isLoading, stats, user, onSetStats, onSetUser, saveStats } =
+    useParthenonState();
 
   if (!user?.discord_username) redirect('/dashboard');
+
+  const { data, isLoading: isApiLoading, isProcessed, fetchData } = useApi();
 
   const {
     answer,
@@ -64,17 +63,31 @@ const Wordle = () => {
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [isStatsSaved, setIsStatsSaved] = useState(false);
-  const [page, setPage] = useState(GameStatus.Overview);
+  const [page, setPage] = useState(GamePage.Overview);
 
   useEffect(() => {
     // generate a new answer for wordle
     onReset();
 
     window.addEventListener('keydown', handleKeyPress);
+
+    if (!stats[GameCode.Wordle]) {
+      const getStats = async () => {
+        await fetchData(`${ApiUrl.Stats}/${GameCode.Wordle}`);
+      };
+
+      getStats();
+    }
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isProcessed) return;
+    if (data) onSetStats({ [GameCode.Wordle]: data as WordleObject });
+    else onSetStats({ [GameCode.Wordle]: INITIAL_WORDLE });
+  }, [data, isProcessed, onSetStats]);
 
   useEffect(() => {
     if (!user.discord_username || !stats[GameCode.Wordle] || isStatsUpdated)
@@ -86,10 +99,7 @@ const Wordle = () => {
       const newDistribution = [...stats[GameCode.Wordle].distribution];
       newDistribution[guesses.length - 1] += 1;
 
-      onUpdateStats({
-        ...stats,
-        // @todo: Update API calls  for stats
-        // discord_id: user.discord_id,
+      onSetStats({
         [GameCode.Wordle]: {
           currentStreak: stats[GameCode.Wordle].currentStreak + 1,
           distribution: newDistribution,
@@ -103,7 +113,7 @@ const Wordle = () => {
       });
 
       if (user && reward) {
-        onUpdateUser({
+        onSetUser({
           ...user,
           cash: user.cash + reward,
         });
@@ -111,10 +121,7 @@ const Wordle = () => {
     } else if (status === WordleStatus.Completed) {
       setIsStatsUpdated(true);
 
-      onUpdateStats({
-        ...stats,
-        // @todo: Update API calls  for stats
-        // discord_id: user.discord_id,
+      onSetStats({
         [GameCode.Wordle]: {
           currentStreak: 0,
           distribution: [...stats[GameCode.Wordle].distribution],
@@ -131,8 +138,8 @@ const Wordle = () => {
     stats,
     status,
     user,
-    onUpdateStats,
-    onUpdateUser,
+    onSetStats,
+    onSetUser,
   ]);
 
   useEffect(() => {
@@ -150,12 +157,10 @@ const Wordle = () => {
       return;
     }
 
-    saveStats();
-    setIsStatsSaved(true);
+    saveStats(GameCode.Wordle, reward ?? undefined);
 
-    // user is updated only when the Wordle is answered
-    if (status === WordleStatus.Answered) saveUser();
-  }, [user, isStatsSaved, isStatsUpdated, status, saveStats, saveUser]);
+    setIsStatsSaved(true);
+  }, [user, isStatsSaved, isStatsUpdated, reward, status, saveStats]);
 
   const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
 
@@ -197,13 +202,13 @@ const Wordle = () => {
       )}
       <div className={styles.header}>
         <div className={styles.leftButtons}>
-          {page !== GameStatus.Overview && (
+          {page !== GamePage.Overview && (
             <>
               <button
                 className={styles.back}
                 onClick={() => {
                   onReset();
-                  setPage(GameStatus.Overview);
+                  setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
               </button>
@@ -211,7 +216,7 @@ const Wordle = () => {
                 className={styles.backDesktop}
                 onClick={() => {
                   onReset();
-                  setPage(GameStatus.Overview);
+                  setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
                 <span>QUIT</span>
@@ -221,7 +226,7 @@ const Wordle = () => {
         </div>
         <h1>WORDLE</h1>
         <div className={styles.rightButtons}>
-          {page === GameStatus.Overview && (
+          {page === GamePage.Overview && (
             <>
               <button
                 className={styles.rulesOverview}
@@ -235,7 +240,7 @@ const Wordle = () => {
               </button>
             </>
           )}
-          {page !== GameStatus.Overview && (
+          {page !== GamePage.Overview && (
             <>
               <button className={styles.rules} onClick={() => onModalRules()}>
                 <RulesIcon />
@@ -247,20 +252,24 @@ const Wordle = () => {
           )}
         </div>
       </div>
-      {page === GameStatus.Overview && (
+      {page === GamePage.Overview && (
         <div className={styles.overview}>
           <button
             className={styles.play}
-            onClick={() => setPage(GameStatus.Playing)}>
+            onClick={() => setPage(GamePage.Playing)}>
             PLAY
           </button>
           <div className={styles.statsContainer}>
-            {(!stats || isLoading) && <Loading />}
-            {!isLoading && stats && <Stats data={stats[GameCode.Wordle]} />}
+            {(!stats[GameCode.Wordle] || isLoading || isApiLoading) && (
+              <Loading />
+            )}
+            {stats[GameCode.Wordle] && !isLoading && !isApiLoading && (
+              <Stats data={stats[GameCode.Wordle]} />
+            )}
           </div>
         </div>
       )}
-      {page === GameStatus.Playing && (
+      {page === GamePage.Playing && (
         <div className={styles.playing}>
           <Notice
             answer={answer}

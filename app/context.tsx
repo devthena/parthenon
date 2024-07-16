@@ -9,14 +9,15 @@ import {
   useReducer,
 } from 'react';
 
-import { INITIAL_STATS } from '@/constants/stats';
+import { GAME_REWARDS } from '@/constants/games';
 import { ApiUrl } from '@/enums/api';
+import { GameCode } from '@/enums/games';
 import { useApi } from '@/hooks';
 
 import {
   ActivityStateObject,
   DataObject,
-  StatsObject,
+  StatsStateObject,
   UserStateObject,
 } from '@/types/db';
 
@@ -24,21 +25,21 @@ interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
   activities: ActivityStateObject | null;
-  stats: StatsObject;
+  stats: StatsStateObject;
   user: UserStateObject | null;
 }
 
 type ParthenonAction =
   | { type: 'set_loading' }
   | { type: 'set_data'; payload: DataObject | null }
-  | { type: 'update_stats'; payload: StatsObject }
-  | { type: 'update_user'; payload: UserStateObject | null };
+  | { type: 'set_stats'; payload: StatsStateObject }
+  | { type: 'set_user'; payload: UserStateObject };
 
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
   activities: null,
-  stats: INITIAL_STATS,
+  stats: {},
   user: null,
 };
 
@@ -57,7 +58,6 @@ const reducer = (
         isLoading: false,
         isFetched: true,
         activities: action.payload?.activities ?? null,
-        stats: action.payload?.stats ?? state.stats,
         user: action.payload?.user ?? null,
       };
     case 'set_loading':
@@ -65,12 +65,12 @@ const reducer = (
         ...state,
         isLoading: true,
       };
-    case 'update_stats':
+    case 'set_stats':
       return {
         ...state,
         stats: action.payload,
       };
-    case 'update_user':
+    case 'set_user':
       return {
         ...state,
         user: action.payload,
@@ -112,47 +112,52 @@ const useParthenonState = () => {
     [dispatch]
   );
 
-  const onUpdateStats = useCallback(
-    (stats: StatsObject) => {
-      dispatch({ type: 'update_stats', payload: stats });
+  const onSetStats = useCallback(
+    (stats: StatsStateObject) => {
+      dispatch({ type: 'set_stats', payload: stats });
     },
     [dispatch]
   );
 
-  const onUpdateUser = useCallback(
-    (user: UserStateObject | null) => {
-      dispatch({ type: 'update_user', payload: user });
+  const onSetUser = useCallback(
+    (user: UserStateObject) => {
+      dispatch({ type: 'set_user', payload: user });
     },
     [dispatch]
   );
 
-  const saveStats = useCallback(async () => {
-    if (!state.stats.discord_id.length) return;
-    try {
-      const { _id, ...modifiedStats } = state.stats;
-      await saveData(ApiUrl.Stats, modifiedStats);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [state.stats, saveData]);
+  const saveStats = useCallback(
+    async (code: GameCode, reward?: number) => {
+      const rewards = GAME_REWARDS[code];
 
-  const saveUser = useCallback(async () => {
-    if (!state.user) return;
-    try {
-      await saveData(ApiUrl.Users, state.user);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [state.user, saveData]);
+      let rewardKey = reward
+        ? rewards.find(obj => obj.value === reward)
+        : undefined;
+
+      try {
+        const payload = {
+          code,
+          key: rewardKey?.label,
+          data: {
+            [code]: state.stats?.[code],
+          },
+        };
+
+        await saveData(ApiUrl.Stats, payload);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [state.stats, saveData]
+  );
 
   return {
     ...state,
     onSetLoading,
     onSetData,
-    onUpdateStats,
-    onUpdateUser,
+    onSetStats,
+    onSetUser,
     saveStats,
-    saveUser,
   };
 };
 

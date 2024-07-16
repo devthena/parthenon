@@ -2,8 +2,9 @@ import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
+import { GAME_REWARDS } from '@/constants/games';
 import { LoginMethod } from '@/enums/auth';
-import { StatsObject, UserObject } from '@/types/db';
+import { StatsObject, StatsStatePayload, UserObject } from '@/types/db';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
@@ -31,16 +32,16 @@ const client = new MongoClient(mongodbURI, {
 const saveStats = async (
   method: LoginMethod,
   id: string,
-  payload: StatsObject // @todo: Update payload params
+  payload: StatsStatePayload
 ) => {
   await client.connect();
   const botDB = await client.db(mongodbName);
   const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
+  const usersCollection = botDB.collection<UserObject>(usersCollectionName);
 
   let discordId = null;
 
   if (method !== 'discord') {
-    const usersCollection = botDB.collection<UserObject>(usersCollectionName);
     const user = await usersCollection.findOne({ [`${method}_id`]: id });
 
     if (user?.discord_id) discordId = user.discord_id;
@@ -53,8 +54,21 @@ const saveStats = async (
   if (discordId) {
     data = await statsCollection.updateOne(
       { discord_id: discordId },
-      { $set: { ...payload } }
+      { $set: { discord_id: discordId, ...payload.data } },
+      { upsert: true }
     );
+
+    if (payload.key) {
+      const rewards = GAME_REWARDS[payload.code];
+      const reward = rewards.find(obj => obj.label === payload.key);
+
+      if (reward) {
+        await usersCollection.updateOne(
+          { discord_id: discordId },
+          { $inc: { cash: reward.value } }
+        );
+      }
+    }
   }
 
   await client.close();
