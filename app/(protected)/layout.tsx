@@ -7,7 +7,7 @@ import { Header, Loading } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
-import { ApiUrl } from '@/enums/api';
+import { ApiDataType, ApiUrl } from '@/enums/api';
 import { DataObject } from '@/types/db';
 
 import styles from './layout.module.scss';
@@ -27,7 +27,7 @@ const ProtectedLayout = ({
     onSetLoading();
 
     const getData = async () => {
-      await fetchData(ApiUrl.Users);
+      await fetchData(ApiUrl.Users, ApiDataType.Users);
     };
 
     getData();
@@ -36,8 +36,8 @@ const ProtectedLayout = ({
   useEffect(() => {
     if (!isProcessed) return;
 
-    if (data) {
-      onSetData(data as DataObject);
+    if (data?.data) {
+      onSetData(data.data as DataObject);
     } else {
       onSetData(null);
     }

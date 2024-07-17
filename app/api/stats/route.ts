@@ -2,7 +2,6 @@ import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { GAME_REWARDS } from '@/constants/games';
 import { LoginMethod } from '@/enums/auth';
 import { StatsObject, StatsStatePayload, UserObject } from '@/types/db';
 
@@ -57,18 +56,6 @@ const saveStats = async (
       { $set: { discord_id: discordId, ...payload.data } },
       { upsert: true }
     );
-
-    if (payload.key) {
-      const rewards = GAME_REWARDS[payload.code];
-      const reward = rewards.find(obj => obj.label === payload.key);
-
-      if (reward) {
-        await usersCollection.updateOne(
-          { discord_id: discordId },
-          { $inc: { cash: reward.value } }
-        );
-      }
-    }
   }
 
   await client.close();

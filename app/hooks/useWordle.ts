@@ -12,6 +12,7 @@ import { KeyStatus, ModalContent, WordleStatus } from '@/enums/wordle';
 import { Guess, WordleState } from '@/types/wordle';
 
 type WordleAction =
+  | { type: 'play' }
   | { type: 'delete' }
   | { type: 'enter' }
   | { type: 'key'; letter: string }
@@ -78,8 +79,18 @@ const wordleReducer = (
     state.status === WordleStatus.Completed;
 
   switch (action.type) {
+    case 'play':
+      return {
+        ...initialState,
+        status: WordleStatus.Playing,
+        answer: generateAnswer(),
+      };
     case 'key':
-      if (!isGameOver && state.currentGuess.length < WORD_LENGTH) {
+      if (
+        !isGameOver &&
+        state.currentGuess.length < WORD_LENGTH &&
+        state.status !== WordleStatus.Standby
+      ) {
         return {
           ...state,
           currentGuess: state.currentGuess + action.letter,
@@ -88,7 +99,7 @@ const wordleReducer = (
         return state;
       }
     case 'delete':
-      if (!isGameOver) {
+      if (!isGameOver && state.status !== WordleStatus.Standby) {
         return {
           ...state,
           currentGuess: state.currentGuess.slice(0, -1),
@@ -97,54 +108,50 @@ const wordleReducer = (
         return state;
       }
     case 'enter':
-      if (!isGameOver) {
-        if (state.currentGuess.length === WORD_LENGTH) {
-          if (!WORD_LIST.includes(state.currentGuess)) {
-            return {
-              ...state,
-              status: WordleStatus.InvalidWord,
-            };
-          }
-
-          const newKeyResults = { ...state.keyResults };
-
-          const result = getLetterResult(
-            state.currentGuess.split(''),
-            state.answer,
-            newKeyResults
-          );
-
-          const newGuess: Guess = { word: state.currentGuess, result };
-          const newGuesses = [...state.guesses, newGuess];
-
-          const newStatus =
-            state.currentGuess === state.answer
-              ? WordleStatus.Answered
-              : newGuesses.length >= MAX_ATTEMPTS
-              ? WordleStatus.Completed
-              : WordleStatus.Playing;
-
-          const newReward =
-            newStatus === WordleStatus.Answered
-              ? WORDLE_REWARDS[newGuesses.length - 1]
-              : null;
-
+      if (state.currentGuess.length === WORD_LENGTH) {
+        if (!WORD_LIST.includes(state.currentGuess)) {
           return {
             ...state,
-            currentGuess: '',
-            guesses: newGuesses,
-            keyResults: newKeyResults,
-            reward: newReward,
-            status: newStatus,
-          };
-        } else {
-          return {
-            ...state,
-            status: WordleStatus.InvalidGuess,
+            status: WordleStatus.InvalidWord,
           };
         }
+
+        const newKeyResults = { ...state.keyResults };
+
+        const result = getLetterResult(
+          state.currentGuess.split(''),
+          state.answer,
+          newKeyResults
+        );
+
+        const newGuess: Guess = { word: state.currentGuess, result };
+        const newGuesses = [...state.guesses, newGuess];
+
+        const newStatus =
+          state.currentGuess === state.answer
+            ? WordleStatus.Answered
+            : newGuesses.length >= MAX_ATTEMPTS
+            ? WordleStatus.Completed
+            : WordleStatus.Playing;
+
+        const newReward =
+          newStatus === WordleStatus.Answered
+            ? WORDLE_REWARDS[newGuesses.length - 1]
+            : null;
+
+        return {
+          ...state,
+          currentGuess: '',
+          guesses: newGuesses,
+          keyResults: newKeyResults,
+          reward: newReward,
+          status: newStatus,
+        };
       } else {
-        return { ...initialState, answer: generateAnswer() };
+        return {
+          ...state,
+          status: WordleStatus.InvalidGuess,
+        };
       }
     case 'modal_close':
       return {
@@ -164,12 +171,9 @@ const wordleReducer = (
         modalDisplay: true,
       };
     case 'reset':
-      return { ...initialState, answer: generateAnswer() };
+      return { ...initialState };
     case 'resume':
-      return {
-        ...state,
-        status: WordleStatus.Playing,
-      };
+      return { ...state, status: WordleStatus.Playing };
     default:
       return state;
   }
@@ -188,11 +192,15 @@ const initialState: WordleState = {
   modalContent: ModalContent.Rules,
   modalDisplay: false,
   reward: null,
-  status: WordleStatus.Playing,
+  status: WordleStatus.Standby,
 };
 
 export const useWordle = () => {
   const [state, dispatch] = useReducer(wordleReducer, initialState);
+
+  const onPlay = useCallback(() => {
+    dispatch({ type: 'play' });
+  }, []);
 
   const onDelete = useCallback(() => {
     dispatch({ type: 'delete' });
@@ -234,6 +242,7 @@ export const useWordle = () => {
     onModalClose,
     onModalRules,
     onModalStats,
+    onPlay,
     onReset,
     onResume,
   };

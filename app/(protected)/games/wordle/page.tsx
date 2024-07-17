@@ -1,32 +1,49 @@
 'use client';
 
 import { redirect } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi, useWordle } from '@/hooks';
 
 import { INITIAL_WORDLE } from '@/constants/stats';
-import { MAX_ATTEMPTS, WORD_LENGTH } from '@/constants/wordle';
+import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
-import { ApiUrl } from '@/enums/api';
+import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
 import { KeyStatus, WordleStatus } from '@/enums/wordle';
 
-import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
+import { GameStateObject } from '@/types/games';
 import { Guess, WordleObject } from '@/types/wordle';
+
+import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
+import { encrypt } from '@/utils';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const { isLoading, stats, user, onSetStats, onSetUser, saveStats } =
-    useParthenonState();
+  const {
+    isLoading,
+    games,
+    stats,
+    user,
+    onSetGame,
+    onSetStats,
+    onSetUser,
+    saveStats,
+  } = useParthenonState();
 
   if (!user?.discord_username) redirect('/dashboard');
 
-  const { data, isLoading: isApiLoading, isProcessed, fetchData } = useApi();
+  const {
+    data,
+    isLoading: isApiLoading,
+    isProcessed,
+    fetchData,
+    fetchGameData,
+  } = useApi();
 
   const {
     answer,
@@ -43,37 +60,83 @@ const Wordle = () => {
     onModalClose,
     onModalRules,
     onModalStats,
+    onPlay,
     onReset,
     onResume,
   } = useWordle();
-
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      const { key } = event;
-      if (key === 'Enter') {
-        onEnter();
-      } else if (key === 'Backspace') {
-        onDelete();
-      } else if (/^[a-zA-Z]$/.test(key)) {
-        onKey(key.toLowerCase());
-      }
-    },
-    [onEnter, onDelete, onKey]
-  );
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [isStatsSaved, setIsStatsSaved] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
 
-  useEffect(() => {
-    // generate a new answer for wordle
-    onReset();
+  const answerRef = useRef(answer);
+  const currentGuessRef = useRef(currentGuess);
+  const gameKeyRef = useRef(games[GameCode.Wordle]);
+  const gameStatusRef = useRef(status);
 
+  const getGame = useCallback(async () => {
+    await fetchGameData(
+      ApiUrl.Games,
+      ApiDataType.Games,
+      {
+        code: GameCode.Wordle,
+        data: {
+          sessionKey: encrypt(answerRef.current),
+        },
+      },
+      true
+    );
+  }, [fetchGameData]);
+
+  const updateGame = async (guess: string) => {
+    await fetchGameData(ApiUrl.Games, ApiDataType.Games, {
+      code: GameCode.Wordle,
+      key: gameKeyRef.current,
+      data: {
+        sessionCode: encrypt(guess),
+      },
+    });
+  };
+
+  const modifiedEnter = async () => {
+    if (gameStatusRef.current === WordleStatus.Standby) return;
+
+    if (
+      gameStatusRef.current === WordleStatus.Answered ||
+      gameStatusRef.current === WordleStatus.Completed
+    ) {
+      onPlay();
+      return;
+    }
+
+    onEnter();
+
+    if (currentGuessRef.current.length < WORD_LENGTH) return;
+    if (!WORD_LIST.includes(currentGuessRef.current)) return;
+
+    updateGame(currentGuessRef.current);
+  };
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    const { key } = event;
+    if (key === 'Enter') {
+      modifiedEnter();
+    } else if (key === 'Backspace') {
+      onDelete();
+    } else if (/^[a-zA-Z]$/.test(key)) {
+      onKey(key.toLowerCase());
+    }
+  };
+
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
 
     if (!stats[GameCode.Wordle]) {
       const getStats = async () => {
-        await fetchData(`${ApiUrl.Stats}/${GameCode.Wordle}`);
+        await fetchData(
+          `${ApiUrl.Stats}/${GameCode.Wordle}`,
+          ApiDataType.Stats
+        );
       };
 
       getStats();
@@ -84,10 +147,41 @@ const Wordle = () => {
   }, []);
 
   useEffect(() => {
-    if (!isProcessed) return;
-    if (data) onSetStats({ [GameCode.Wordle]: data as WordleObject });
-    else onSetStats({ [GameCode.Wordle]: INITIAL_WORDLE });
-  }, [data, isProcessed, onSetStats]);
+    if (answer.length === 0) return;
+    answerRef.current = answer;
+    getGame();
+  }, [answer, getGame]);
+
+  useEffect(() => {
+    currentGuessRef.current = currentGuess;
+  }, [currentGuess]);
+
+  useEffect(() => {
+    gameKeyRef.current = games[GameCode.Wordle];
+  }, [games]);
+
+  useEffect(() => {
+    gameStatusRef.current = status;
+  }, [status]);
+
+  useEffect(() => {
+    if (!isProcessed || !data) return;
+
+    switch (data.type) {
+      case ApiDataType.Games:
+        if (data.data) {
+          onSetGame(data.data as GameStateObject);
+        }
+        break;
+      case ApiDataType.Stats:
+        if (data.data) {
+          onSetStats({ [GameCode.Wordle]: data.data as WordleObject });
+        } else {
+          onSetStats({ [GameCode.Wordle]: INITIAL_WORDLE });
+        }
+        break;
+    }
+  }, [data, isProcessed, onSetGame, onSetStats]);
 
   useEffect(() => {
     if (!user.discord_username || !stats[GameCode.Wordle] || isStatsUpdated)
@@ -157,7 +251,7 @@ const Wordle = () => {
       return;
     }
 
-    saveStats(GameCode.Wordle, reward ?? undefined);
+    saveStats(GameCode.Wordle);
 
     setIsStatsSaved(true);
   }, [user, isStatsSaved, isStatsUpdated, reward, status, saveStats]);
@@ -256,7 +350,10 @@ const Wordle = () => {
         <div className={styles.overview}>
           <button
             className={styles.play}
-            onClick={() => setPage(GamePage.Playing)}>
+            onClick={() => {
+              onPlay();
+              setPage(GamePage.Playing);
+            }}>
             PLAY
           </button>
           <div className={styles.statsContainer}>
@@ -271,24 +368,29 @@ const Wordle = () => {
       )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
-          <Notice
-            answer={answer}
-            currentGuess={currentGuess}
-            status={status}
-            reward={reward}
-            onResume={onResume}
-          />
-          <AnswerGrid
-            currentTurn={guesses.length}
-            guesses={guessesArray}
-            status={status}
-          />
-          <Keyboard
-            keyResults={keyResults}
-            onDelete={onDelete}
-            onEnter={onEnter}
-            onKey={onKey}
-          />
+          {(isApiLoading || !games[GameCode.Wordle]) && <Loading />}
+          {!isApiLoading && games[GameCode.Wordle] && (
+            <>
+              <Notice
+                answer={answer}
+                currentGuess={currentGuess}
+                status={status}
+                reward={reward}
+                onResume={onResume}
+              />
+              <AnswerGrid
+                currentTurn={guesses.length}
+                guesses={guessesArray}
+                status={status}
+              />
+              <Keyboard
+                keyResults={keyResults}
+                onDelete={onDelete}
+                onEnter={modifiedEnter}
+                onKey={onKey}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

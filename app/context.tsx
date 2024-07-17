@@ -9,7 +9,6 @@ import {
   useReducer,
 } from 'react';
 
-import { GAME_REWARDS } from '@/constants/games';
 import { ApiUrl } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 import { useApi } from '@/hooks';
@@ -21,10 +20,13 @@ import {
   UserStateObject,
 } from '@/types/db';
 
+import { GameStateObject } from '@/types/games';
+
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
   activities: ActivityStateObject | null;
+  games: GameStateObject;
   stats: StatsStateObject;
   user: UserStateObject | null;
 }
@@ -32,6 +34,7 @@ interface ParthenonState {
 type ParthenonAction =
   | { type: 'set_loading' }
   | { type: 'set_data'; payload: DataObject | null }
+  | { type: 'set_game'; payload: GameStateObject }
   | { type: 'set_stats'; payload: StatsStateObject }
   | { type: 'set_user'; payload: UserStateObject };
 
@@ -39,6 +42,7 @@ const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
   activities: null,
+  games: {},
   stats: {},
   user: null,
 };
@@ -52,6 +56,11 @@ const reducer = (
   action: ParthenonAction
 ): ParthenonState => {
   switch (action.type) {
+    case 'set_loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
     case 'set_data':
       return {
         ...state,
@@ -60,15 +69,21 @@ const reducer = (
         activities: action.payload?.activities ?? null,
         user: action.payload?.user ?? null,
       };
-    case 'set_loading':
+    case 'set_game':
       return {
         ...state,
-        isLoading: true,
+        games: {
+          ...state.games,
+          ...action.payload,
+        },
       };
     case 'set_stats':
       return {
         ...state,
-        stats: action.payload,
+        stats: {
+          ...state.stats,
+          ...action.payload,
+        },
       };
     case 'set_user':
       return {
@@ -91,7 +106,7 @@ const ParthenonProvider = ({ children }: { children: ReactNode }) => {
 
 const useParthenonState = () => {
   const context = useContext(ParthenonContext);
-  const { saveData } = useApi();
+  const { saveStatsData } = useApi();
 
   if (context === undefined) {
     throw new Error(
@@ -112,6 +127,13 @@ const useParthenonState = () => {
     [dispatch]
   );
 
+  const onSetGame = useCallback(
+    (game: GameStateObject) => {
+      dispatch({ type: 'set_game', payload: game });
+    },
+    [dispatch]
+  );
+
   const onSetStats = useCallback(
     (stats: StatsStateObject) => {
       dispatch({ type: 'set_stats', payload: stats });
@@ -127,34 +149,28 @@ const useParthenonState = () => {
   );
 
   const saveStats = useCallback(
-    async (code: GameCode, reward?: number) => {
-      const rewards = GAME_REWARDS[code];
-
-      let rewardKey = reward
-        ? rewards.find(obj => obj.value === reward)
-        : undefined;
-
+    async (code: GameCode) => {
       try {
         const payload = {
           code,
-          key: rewardKey?.label,
           data: {
-            [code]: state.stats?.[code],
+            [code]: state.stats[code],
           },
         };
 
-        await saveData(ApiUrl.Stats, payload);
+        await saveStatsData(ApiUrl.Stats, payload);
       } catch (error) {
         console.error(error);
       }
     },
-    [state.stats, saveData]
+    [state.stats, saveStatsData]
   );
 
   return {
     ...state,
     onSetLoading,
     onSetData,
+    onSetGame,
     onSetStats,
     onSetUser,
     saveStats,
