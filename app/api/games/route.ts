@@ -3,23 +3,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
+import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
+
 import { LoginMethod } from '@/enums/auth';
 import { GameCode } from '@/enums/games';
+
 import { GameObject, GamePayload } from '@/types/games';
-import { UserObject } from '@/types/db';
+import { StatsObject, UserObject } from '@/types/db';
+
 import { decrypt } from '@/utils';
-import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
+import { INITIAL_STATS } from '@/constants/stats';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
 
 const gamesCollectionName = process.env.MONGODB_COLLECTION_GAMES;
+const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
 if (
   !mongodbURI ||
   !mongodbName ||
   !gamesCollectionName ||
+  !statsCollectionName ||
   !usersCollectionName
 ) {
   throw new Error('Missing necessary environment variables');
@@ -39,8 +45,10 @@ const updateGame = async (
   payload: GamePayload
 ) => {
   await client.connect();
+
   const botDB = await client.db(mongodbName);
   const gamesCollection = botDB.collection<GameObject>(gamesCollectionName);
+  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
   const usersCollection = botDB.collection<UserObject>(usersCollectionName);
 
   let discordId = null;
@@ -123,9 +131,38 @@ const updateGame = async (
         const isAttempt = newGuesses.length < MAX_ATTEMPTS;
 
         if (isWin) {
+          const stats =
+            (await statsCollection.findOne({
+              discord_id: discordId,
+            })) ?? INITIAL_STATS;
+
+          // add the user rewards
           await usersCollection.updateOne(
             { discord_id: discordId },
             { $inc: { cash: WORDLE_REWARDS[newGuesses.length - 1] } }
+          );
+
+          // update the user game stats
+          const newDistribution = [...stats[GameCode.Wordle].distribution];
+          newDistribution[newGuesses.length - 1] += 1;
+
+          await statsCollection.updateOne(
+            { discord_id: discordId },
+            {
+              $set: {
+                [GameCode.Wordle]: {
+                  currentStreak: stats[GameCode.Wordle].currentStreak + 1,
+                  distribution: newDistribution,
+                  maxStreak: Math.max(
+                    stats[GameCode.Wordle].maxStreak,
+                    stats[GameCode.Wordle].currentStreak + 1
+                  ),
+                  totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
+                  totalWon: stats[GameCode.Wordle].totalWon + 1,
+                },
+              },
+            },
+            { upsert: true }
           );
 
           data = { key: uuidv4() };
@@ -145,6 +182,25 @@ const updateGame = async (
             }
           );
         } else {
+          // add to total times played for a loss
+          const stats =
+            (await statsCollection.findOne({
+              discord_id: discordId,
+            })) ?? INITIAL_STATS;
+
+          await statsCollection.updateOne(
+            { discord_id: discordId },
+            {
+              $set: {
+                [GameCode.Wordle]: {
+                  ...stats[GameCode.Wordle],
+                  currentStreak: 0,
+                  totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
+                },
+              },
+            }
+          );
+
           data = { key: uuidv4() };
           await deleteGame(game.key);
         }

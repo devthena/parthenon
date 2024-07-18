@@ -24,16 +24,8 @@ import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const {
-    isLoading,
-    games,
-    stats,
-    user,
-    onSetGame,
-    onSetStats,
-    onSetUser,
-    saveStats,
-  } = useParthenonState();
+  const { isLoading, games, stats, user, onSetGame, onSetStats, onSetUser } =
+    useParthenonState();
 
   if (!user?.discord_username) redirect('/dashboard');
 
@@ -66,7 +58,6 @@ const Wordle = () => {
   } = useWordle();
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
-  const [isStatsSaved, setIsStatsSaved] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
 
   const answerRef = useRef(answer);
@@ -217,11 +208,9 @@ const Wordle = () => {
 
       onSetStats({
         [GameCode.Wordle]: {
+          ...stats[GameCode.Wordle],
           currentStreak: 0,
-          distribution: [...stats[GameCode.Wordle].distribution],
-          maxStreak: stats[GameCode.Wordle].maxStreak,
           totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
-          totalWon: stats[GameCode.Wordle].totalWon,
         },
       });
     }
@@ -237,24 +226,10 @@ const Wordle = () => {
   ]);
 
   useEffect(() => {
-    if (status === WordleStatus.Playing && isStatsSaved && isStatsUpdated) {
+    if (status === WordleStatus.Playing && isStatsUpdated) {
       setIsStatsUpdated(false);
-      setIsStatsSaved(false);
     }
-  }, [status, isStatsSaved, isStatsUpdated]);
-
-  useEffect(() => {
-    if (!user || !user.discord_username || !isStatsUpdated || isStatsSaved)
-      return;
-
-    if (status !== WordleStatus.Answered && status !== WordleStatus.Completed) {
-      return;
-    }
-
-    saveStats(GameCode.Wordle);
-
-    setIsStatsSaved(true);
-  }, [user, isStatsSaved, isStatsUpdated, reward, status, saveStats]);
+  }, [status, isStatsUpdated]);
 
   const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
 

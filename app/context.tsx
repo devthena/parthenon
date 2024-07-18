@@ -9,10 +9,6 @@ import {
   useReducer,
 } from 'react';
 
-import { ApiUrl } from '@/enums/api';
-import { GameCode } from '@/enums/games';
-import { useApi } from '@/hooks';
-
 import {
   ActivityStateObject,
   DataObject,
@@ -106,7 +102,6 @@ const ParthenonProvider = ({ children }: { children: ReactNode }) => {
 
 const useParthenonState = () => {
   const context = useContext(ParthenonContext);
-  const { saveStatsData } = useApi();
 
   if (context === undefined) {
     throw new Error(
@@ -148,24 +143,6 @@ const useParthenonState = () => {
     [dispatch]
   );
 
-  const saveStats = useCallback(
-    async (code: GameCode) => {
-      try {
-        const payload = {
-          code,
-          data: {
-            [code]: state.stats[code],
-          },
-        };
-
-        await saveStatsData(ApiUrl.Stats, payload);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    [state.stats, saveStatsData]
-  );
-
   return {
     ...state,
     onSetLoading,
@@ -173,7 +150,6 @@ const useParthenonState = () => {
     onSetGame,
     onSetStats,
     onSetUser,
-    saveStats,
   };
 };
 

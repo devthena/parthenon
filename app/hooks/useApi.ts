@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ApiDataType, ApiUrl } from '@/enums/api';
 import { ApiStateObject, StatsStatePayload } from '@/types/db';
-import { GamePayload, GameStateObject } from '@/types/games';
+import { GamePayload } from '@/types/games';
 
 interface ApiState {
   data: ApiStateObject | null;
@@ -96,43 +96,9 @@ export const useApi = () => {
     []
   );
 
-  const saveStatsData = useCallback(
-    async (url: ApiUrl, payload: StatsStatePayload) => {
-      setApiData(prev => ({
-        ...prev,
-        isLoading: false,
-        isProcessed: false,
-        error: null,
-      }));
-
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-        setApiData({
-          data: null,
-          error: null,
-          isLoading: false,
-          isProcessed: true,
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    []
-  );
-
   return {
     ...apiData,
     fetchData,
     fetchGameData,
-    saveStatsData,
   };
 };
