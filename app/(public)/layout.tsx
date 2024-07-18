@@ -6,7 +6,7 @@ import { Header } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
+import { ApiUrl } from '@/enums/api';
 import { DataObject } from '@/types/db';
 
 import styles from './layout.module.scss';
@@ -16,8 +16,8 @@ const PublicLayout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { data, isProcessed, fetchData } = useApi();
-  const { user, onSetLoading, onSetData } = useParthenonState();
+  const { dataUser, isFetched, fetchGetData } = useApi();
+  const { user, onSetData, onSetLoading } = useParthenonState();
 
   useEffect(() => {
     if (user) return;
@@ -25,21 +25,21 @@ const PublicLayout = ({
     onSetLoading();
 
     const getData = async () => {
-      await fetchData(ApiUrl.Users, ApiDataType.Users);
+      await fetchGetData(ApiUrl.Users);
     };
 
     getData();
   }, []);
 
   useEffect(() => {
-    if (!isProcessed) return;
+    if (!isFetched) return;
 
-    if (data?.data) {
-      onSetData(data.data as DataObject);
+    if (dataUser) {
+      onSetData(dataUser as DataObject);
     } else {
       onSetData(null);
     }
-  }, [data, isProcessed, onSetData]);
+  }, [dataUser, isFetched, onSetData]);
 
   return (
     <>

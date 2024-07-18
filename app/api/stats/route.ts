@@ -1,4 +1,4 @@
-import { getSession } from '@auth0/nextjs-auth0';
+import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
@@ -29,7 +29,7 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const getStats = async (method: LoginMethod, id: string, code: string) => {
+const getStats = async (method: LoginMethod, id: string, code: GameCode) => {
   await client.connect();
 
   const botDB = await client.db(mongodbName);
@@ -49,17 +49,16 @@ const getStats = async (method: LoginMethod, id: string, code: string) => {
 
   if (!stats) return null;
 
-  return stats[code as GameCode] ?? null;
+  return stats[code] ?? null;
 };
 
-export const GET = async (
-  request: NextRequest,
-  { params }: { params: { code: string } }
-) => {
+export const POST = withApiAuthRequired(async (request: NextRequest) => {
   const res = new NextResponse();
   const session = await getSession(request, res);
 
-  if (!session) return NextResponse.json({ data: null, error: null }, res);
+  if (!session) {
+    return NextResponse.json({ data: null, error: 'Unauthorized' });
+  }
 
   const userSub = session.user.sub.split('|');
   const method = userSub[1];
@@ -68,11 +67,16 @@ export const GET = async (
   let responseData = null;
   let responseError = null;
 
+  const payload = await request.json();
+
   try {
-    responseData = await getStats(method, id, params.code);
+    responseData = await getStats(method, id, payload.code);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
-    return NextResponse.json({ data: responseData, error: responseError }, res);
+    return NextResponse.json({
+      data: responseData,
+      error: responseError,
+    });
   }
-};
+});

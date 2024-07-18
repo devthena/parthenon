@@ -7,18 +7,18 @@ import { Header, Loading } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
-import { DataObject } from '@/types/db';
+import { ApiUrl } from '@/enums/api';
 
 import styles from './layout.module.scss';
+import { DataObject } from '@/types/db';
 
 const ProtectedLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { data, isProcessed, fetchData } = useApi();
-  const { isFetched, isLoading, user, onSetLoading, onSetData } =
+  const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
+  const { isFetched, isLoading, user, onSetData, onSetLoading } =
     useParthenonState();
 
   useEffect(() => {
@@ -27,21 +27,21 @@ const ProtectedLayout = ({
     onSetLoading();
 
     const getData = async () => {
-      await fetchData(ApiUrl.Users, ApiDataType.Users);
+      await fetchGetData(ApiUrl.Users);
     };
 
     getData();
   }, []);
 
   useEffect(() => {
-    if (!isProcessed) return;
+    if (!isApiFetched) return;
 
-    if (data?.data) {
-      onSetData(data.data as DataObject);
+    if (dataUser) {
+      onSetData(dataUser as DataObject);
     } else {
       onSetData(null);
     }
-  }, [data, isProcessed, onSetData]);
+  }, [dataUser, isApiFetched, onSetData]);
 
   return (
     <>

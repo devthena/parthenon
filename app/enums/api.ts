@@ -1,7 +1,7 @@
 export enum ApiDataType {
-  Games = 'games',
-  Stats = 'stats',
-  Users = 'users',
+  Games,
+  Stats,
+  Users,
 }
 
 export enum ApiUrl {

@@ -1,31 +1,41 @@
 import { useCallback, useState } from 'react';
+
+import { INITIAL_STATS } from '@/constants/stats';
+
 import { ApiDataType, ApiUrl } from '@/enums/api';
-import { ApiStateObject, StatsStatePayload } from '@/types/db';
-import { GamePayload } from '@/types/games';
+import { GameCode } from '@/enums/games';
+
+import { GamePayload, GameStateObject } from '@/types/games';
+import { DataObject, StatsStateObject } from '@/types/db';
 
 interface ApiState {
-  data: ApiStateObject | null;
+  dataGame: GameStateObject | null;
+  dataUser: DataObject | null;
+  dataStats: StatsStateObject | null;
   error: string | null;
+  isFetched: boolean;
   isLoading: boolean;
-  isProcessed: boolean;
 }
 
+type ApiPostPayload = GamePayload | { code: GameCode };
+
 const initialState = {
-  data: null,
+  dataGame: null,
+  dataUser: null,
+  dataStats: null,
   error: null,
+  isFetched: false,
   isLoading: false,
-  isProcessed: false,
 };
 
 export const useApi = () => {
-  const [apiData, setApiData] = useState<ApiState>(initialState);
+  const [data, setData] = useState<ApiState>(initialState);
 
-  const fetchData = useCallback(async (url: string, type: ApiDataType) => {
-    setApiData(prev => ({
+  const fetchGetData = useCallback(async (url: ApiUrl) => {
+    setData(prev => ({
       ...prev,
+      isFetched: false,
       isLoading: true,
-      isProcessed: false,
-      error: null,
     }));
 
     try {
@@ -35,32 +45,28 @@ export const useApi = () => {
 
       const response = await res.json();
 
-      setApiData({
-        data: {
-          type,
-          data: response.data,
-        },
-        error: null,
+      setData(prev => ({
+        ...prev,
+        dataUser: response.data,
+        isFetched: true,
         isLoading: false,
-        isProcessed: true,
-      });
+      }));
     } catch (error) {
       console.error(error);
     }
   }, []);
 
-  const fetchGameData = useCallback(
+  const fetchPostData = useCallback(
     async (
       url: ApiUrl,
       type: ApiDataType,
-      payload: GamePayload,
-      hasLoading?: boolean
+      payload: ApiPostPayload,
+      noLoad?: boolean
     ) => {
-      setApiData(prev => ({
+      setData(prev => ({
         ...prev,
-        isLoading: hasLoading ?? false,
-        isProcessed: false,
-        error: null,
+        isFetched: false,
+        isLoading: !noLoad,
       }));
 
       try {
@@ -76,19 +82,45 @@ export const useApi = () => {
 
         const response = await res.json();
 
-        setApiData({
-          data: {
-            type,
-            data: response.data
-              ? {
-                  [payload.code]: response.data.key,
-                }
-              : {},
-          },
-          error: null,
-          isLoading: false,
-          isProcessed: true,
-        });
+        switch (type) {
+          case ApiDataType.Games:
+            if (response.data) {
+              setData(prev => ({
+                ...prev,
+                dataGame: { [payload.code]: response.data.key },
+                isFetched: true,
+                isLoading: false,
+              }));
+            } else {
+              setData(prev => ({
+                ...prev,
+                isFetched: true,
+                isLoading: false,
+              }));
+            }
+            break;
+          case ApiDataType.Stats:
+            if (response.data) {
+              setData(prev => ({
+                ...prev,
+                dataStats: {
+                  [payload.code]: response.data,
+                },
+                isFetched: true,
+                isLoading: false,
+              }));
+            } else {
+              setData(prev => ({
+                ...prev,
+                dataStats: {
+                  [payload.code]: INITIAL_STATS[payload.code],
+                },
+                isFetched: true,
+                isLoading: false,
+              }));
+            }
+            break;
+        }
       } catch (error) {
         console.error(error);
       }
@@ -97,8 +129,8 @@ export const useApi = () => {
   );
 
   return {
-    ...apiData,
-    fetchData,
-    fetchGameData,
+    ...data,
+    fetchGetData,
+    fetchPostData,
   };
 };

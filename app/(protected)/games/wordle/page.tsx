@@ -7,15 +7,13 @@ import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi, useWordle } from '@/hooks';
 
-import { INITIAL_WORDLE } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
 import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
 import { KeyStatus, WordleStatus } from '@/enums/wordle';
 
-import { GameStateObject } from '@/types/games';
-import { Guess, WordleObject } from '@/types/wordle';
+import { Guess } from '@/types/wordle';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/utils';
@@ -29,13 +27,7 @@ const Wordle = () => {
 
   if (!user?.discord_username) redirect('/dashboard');
 
-  const {
-    data,
-    isLoading: isApiLoading,
-    isProcessed,
-    fetchData,
-    fetchGameData,
-  } = useApi();
+  const { dataGame, dataStats, isFetched, fetchPostData } = useApi();
 
   const {
     answer,
@@ -65,28 +57,36 @@ const Wordle = () => {
   const gameKeyRef = useRef(games[GameCode.Wordle]);
   const gameStatusRef = useRef(status);
 
+  const getStats = useCallback(async () => {
+    await fetchPostData(ApiUrl.Stats, ApiDataType.Stats, {
+      code: GameCode.Wordle,
+    });
+  }, [fetchPostData]);
+
   const getGame = useCallback(async () => {
-    await fetchGameData(
+    await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
+      code: GameCode.Wordle,
+      data: {
+        sessionKey: encrypt(answerRef.current),
+      },
+    });
+  }, [fetchPostData]);
+
+  const updateGame = async (guess: string) => {
+    if (!gameKeyRef.current) return;
+
+    await fetchPostData(
       ApiUrl.Games,
       ApiDataType.Games,
       {
         code: GameCode.Wordle,
+        key: gameKeyRef.current,
         data: {
-          sessionKey: encrypt(answerRef.current),
+          sessionCode: encrypt(guess),
         },
       },
       true
     );
-  }, [fetchGameData]);
-
-  const updateGame = async (guess: string) => {
-    await fetchGameData(ApiUrl.Games, ApiDataType.Games, {
-      code: GameCode.Wordle,
-      key: gameKeyRef.current,
-      data: {
-        sessionCode: encrypt(guess),
-      },
-    });
   };
 
   const modifiedEnter = async () => {
@@ -120,18 +120,10 @@ const Wordle = () => {
   };
 
   useEffect(() => {
+    if (!stats[GameCode.Wordle]) getStats();
+
     window.addEventListener('keydown', handleKeyPress);
 
-    if (!stats[GameCode.Wordle]) {
-      const getStats = async () => {
-        await fetchData(
-          `${ApiUrl.Stats}/${GameCode.Wordle}`,
-          ApiDataType.Stats
-        );
-      };
-
-      getStats();
-    }
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
@@ -156,23 +148,14 @@ const Wordle = () => {
   }, [status]);
 
   useEffect(() => {
-    if (!isProcessed || !data) return;
+    if (!isFetched || !dataGame) return;
+    onSetGame(dataGame);
+  }, [dataGame, isFetched, onSetGame]);
 
-    switch (data.type) {
-      case ApiDataType.Games:
-        if (data.data) {
-          onSetGame(data.data as GameStateObject);
-        }
-        break;
-      case ApiDataType.Stats:
-        if (data.data) {
-          onSetStats({ [GameCode.Wordle]: data.data as WordleObject });
-        } else {
-          onSetStats({ [GameCode.Wordle]: INITIAL_WORDLE });
-        }
-        break;
-    }
-  }, [data, isProcessed, onSetGame, onSetStats]);
+  useEffect(() => {
+    if (!isFetched || !dataStats || stats[GameCode.Wordle]) return;
+    onSetStats(dataStats);
+  }, [dataStats, isFetched, stats, onSetStats]);
 
   useEffect(() => {
     if (!user.discord_username || !stats[GameCode.Wordle] || isStatsUpdated)
@@ -332,10 +315,8 @@ const Wordle = () => {
             PLAY
           </button>
           <div className={styles.statsContainer}>
-            {(!stats[GameCode.Wordle] || isLoading || isApiLoading) && (
-              <Loading />
-            )}
-            {stats[GameCode.Wordle] && !isLoading && !isApiLoading && (
+            {(!stats[GameCode.Wordle] || isLoading) && <Loading />}
+            {stats[GameCode.Wordle] && !isLoading && (
               <Stats data={stats[GameCode.Wordle]} />
             )}
           </div>
@@ -343,8 +324,8 @@ const Wordle = () => {
       )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
-          {(isApiLoading || !games[GameCode.Wordle]) && <Loading />}
-          {!isApiLoading && games[GameCode.Wordle] && (
+          {(isLoading || !games[GameCode.Wordle]) && <Loading />}
+          {!isLoading && games[GameCode.Wordle] && (
             <>
               <Notice
                 answer={answer}

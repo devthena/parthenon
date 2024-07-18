@@ -60,8 +60,8 @@ const reducer = (
     case 'set_data':
       return {
         ...state,
-        isLoading: false,
         isFetched: true,
+        isLoading: false,
         activities: action.payload?.activities ?? null,
         user: action.payload?.user ?? null,
       };

@@ -1,15 +1,8 @@
 import { ObjectId } from 'mongodb';
 
-import { ApiDataType } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
-import { GameStateObject } from './games';
 import { WordleObject } from './wordle';
-
-export interface ApiStateObject {
-  type: ApiDataType;
-  data: DataObject | GameStateObject | StatsStateObject;
-}
 
 export interface DataObject {
   activities: ActivityStateObject | null;
