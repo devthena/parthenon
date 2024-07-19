@@ -3,7 +3,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
 
-import { Header, Loading } from '@/components';
+import { Header } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
@@ -18,11 +18,10 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
-  const { isFetched, isLoading, user, onSetData, onSetLoading } =
-    useParthenonState();
+  const { isFetched, user, onSetData, onSetLoading } = useParthenonState();
 
   useEffect(() => {
-    if (user) return;
+    if (user || isFetched) return;
 
     onSetLoading();
 
@@ -31,7 +30,7 @@ const ProtectedLayout = ({
     };
 
     getData();
-  }, []);
+  }, [isFetched, user, fetchGetData, onSetLoading]);
 
   useEffect(() => {
     if (!isApiFetched) return;
@@ -46,12 +45,7 @@ const ProtectedLayout = ({
   return (
     <>
       <Header />
-      {isLoading && (
-        <div className={styles.loading}>
-          <Loading />
-        </div>
-      )}
-      {isFetched && <div className={styles.container}>{children}</div>}
+      <div className={styles.container}>{children}</div>
     </>
   );
 };

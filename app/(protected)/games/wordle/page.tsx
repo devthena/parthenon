@@ -22,12 +22,23 @@ import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
-  const { isLoading, games, stats, user, onSetGame, onSetStats, onSetUser } =
-    useParthenonState();
+  const {
+    isFetched,
+    isLoading,
+    games,
+    stats,
+    user,
+    onSetGame,
+    onSetStats,
+    onSetUser,
+  } = useParthenonState();
 
-  if (!user?.discord_username) redirect('/dashboard');
-
-  const { dataGame, dataStats, isFetched, fetchPostData } = useApi();
+  const {
+    dataGame,
+    dataStats,
+    isFetched: isApiFetched,
+    fetchPostData,
+  } = useApi();
 
   const {
     answer,
@@ -148,17 +159,22 @@ const Wordle = () => {
   }, [status]);
 
   useEffect(() => {
-    if (!isFetched || !dataGame) return;
+    if (!isApiFetched || !dataGame) return;
     onSetGame(dataGame);
-  }, [dataGame, isFetched, onSetGame]);
+  }, [dataGame, isApiFetched, onSetGame]);
 
   useEffect(() => {
-    if (!isFetched || !dataStats || stats[GameCode.Wordle]) return;
+    if (!isApiFetched || !dataStats || stats[GameCode.Wordle]) return;
     onSetStats(dataStats);
-  }, [dataStats, isFetched, stats, onSetStats]);
+  }, [dataStats, isApiFetched, stats, onSetStats]);
 
   useEffect(() => {
-    if (!user.discord_username || !stats[GameCode.Wordle] || isStatsUpdated)
+    if (
+      !user ||
+      !user.discord_username ||
+      !stats[GameCode.Wordle] ||
+      isStatsUpdated
+    )
       return;
 
     if (status === WordleStatus.Answered) {
@@ -180,7 +196,7 @@ const Wordle = () => {
         },
       });
 
-      if (user && reward) {
+      if (reward) {
         onSetUser({
           ...user,
           cash: user.cash + reward,
@@ -213,6 +229,8 @@ const Wordle = () => {
       setIsStatsUpdated(false);
     }
   }, [status, isStatsUpdated]);
+
+  if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
   const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
 
@@ -315,8 +333,8 @@ const Wordle = () => {
             PLAY
           </button>
           <div className={styles.statsContainer}>
-            {(!stats[GameCode.Wordle] || isLoading) && <Loading />}
-            {stats[GameCode.Wordle] && !isLoading && (
+            {(isLoading || !stats[GameCode.Wordle]) && <Loading />}
+            {!isLoading && stats[GameCode.Wordle] && (
               <Stats data={stats[GameCode.Wordle]} />
             )}
           </div>
