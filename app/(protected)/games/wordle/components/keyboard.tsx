@@ -29,15 +29,14 @@ export const Keyboard = ({
       ? `${styles.enter} ${styles[keyResult]}`
       : styles[keyResult];
 
+    const handleKeyClick = () => {
+      if (isBackspace) onDelete();
+      else if (isEnter) onEnter();
+      else onKey(letter);
+    };
+
     return (
-      <button
-        key={letter}
-        className={styleClass}
-        onClick={() => {
-          if (isBackspace) onDelete();
-          else if (isEnter) onEnter();
-          else onKey(letter);
-        }}>
+      <button key={letter} className={styleClass} onClick={handleKeyClick}>
         {isBackspace ? <BackspaceIcon /> : letter}
       </button>
     );

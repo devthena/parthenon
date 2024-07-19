@@ -120,7 +120,10 @@ const Wordle = () => {
   };
 
   const handleKeyPress = (event: KeyboardEvent) => {
+    event.preventDefault();
+
     const { key } = event;
+
     if (key === 'Enter') {
       modifiedEnter();
     } else if (key === 'Backspace') {
