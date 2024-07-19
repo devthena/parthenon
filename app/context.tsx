@@ -9,37 +9,37 @@ import {
   useReducer,
 } from 'react';
 
-import { INITIAL_STATS } from './lib/constants/stats';
-import { ApiUrl } from './lib/enums/api';
-
 import {
+  ActivityStateObject,
   DataObject,
-  StarObject,
-  StatsObject,
-  UserObject,
-} from './lib/types/db';
+  StatsStateObject,
+  UserStateObject,
+} from '@/types/db';
 
-import { useApi } from './hooks';
+import { GameStateObject } from '@/types/games';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
-  stars: StarObject | null;
-  stats: StatsObject;
-  user: UserObject | null;
+  activities: ActivityStateObject | null;
+  games: GameStateObject;
+  stats: StatsStateObject;
+  user: UserStateObject | null;
 }
 
 type ParthenonAction =
   | { type: 'set_loading' }
   | { type: 'set_data'; payload: DataObject | null }
-  | { type: 'update_stats'; payload: StatsObject }
-  | { type: 'update_user'; payload: UserObject | null };
+  | { type: 'set_game'; payload: GameStateObject }
+  | { type: 'set_stats'; payload: StatsStateObject }
+  | { type: 'set_user'; payload: UserStateObject };
 
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
-  stars: null,
-  stats: INITIAL_STATS,
+  activities: null,
+  games: {},
+  stats: {},
   user: null,
 };
 
@@ -52,26 +52,36 @@ const reducer = (
   action: ParthenonAction
 ): ParthenonState => {
   switch (action.type) {
-    case 'set_data':
-      return {
-        ...state,
-        isLoading: false,
-        isFetched: true,
-        stars: action.payload?.stars ?? null,
-        stats: action.payload?.stats ?? state.stats,
-        user: action.payload?.user ?? null,
-      };
     case 'set_loading':
       return {
         ...state,
         isLoading: true,
       };
-    case 'update_stats':
+    case 'set_data':
       return {
         ...state,
-        stats: action.payload,
+        isFetched: true,
+        isLoading: false,
+        activities: action.payload?.activities ?? null,
+        user: action.payload?.user ?? null,
       };
-    case 'update_user':
+    case 'set_game':
+      return {
+        ...state,
+        games: {
+          ...state.games,
+          ...action.payload,
+        },
+      };
+    case 'set_stats':
+      return {
+        ...state,
+        stats: {
+          ...state.stats,
+          ...action.payload,
+        },
+      };
+    case 'set_user':
       return {
         ...state,
         user: action.payload,
@@ -92,7 +102,6 @@ const ParthenonProvider = ({ children }: { children: ReactNode }) => {
 
 const useParthenonState = () => {
   const context = useContext(ParthenonContext);
-  const { saveData } = useApi();
 
   if (context === undefined) {
     throw new Error(
@@ -113,48 +122,34 @@ const useParthenonState = () => {
     [dispatch]
   );
 
-  const onUpdateStats = useCallback(
-    (stats: StatsObject) => {
-      dispatch({ type: 'update_stats', payload: stats });
+  const onSetGame = useCallback(
+    (game: GameStateObject) => {
+      dispatch({ type: 'set_game', payload: game });
     },
     [dispatch]
   );
 
-  const onUpdateUser = useCallback(
-    (user: UserObject | null) => {
-      dispatch({ type: 'update_user', payload: user });
+  const onSetStats = useCallback(
+    (stats: StatsStateObject) => {
+      dispatch({ type: 'set_stats', payload: stats });
     },
     [dispatch]
   );
 
-  const saveStats = useCallback(async () => {
-    if (!state.stats.discord_id.length) return;
-    try {
-      const { _id, ...modifiedStats } = state.stats;
-      await saveData(ApiUrl.Stats, modifiedStats);
-    } catch (error) {
-      throw new Error('Hook Error: useParthenonState (saveStats)');
-    }
-  }, [state.stats, saveData]);
-
-  const saveUser = useCallback(async () => {
-    if (!state.user) return;
-    try {
-      const { _id, ...modifiedUser } = state.user;
-      await saveData(ApiUrl.Users, modifiedUser);
-    } catch (error) {
-      throw new Error('Hook Error: useParthenonState (saveUser)');
-    }
-  }, [state.user, saveData]);
+  const onSetUser = useCallback(
+    (user: UserStateObject) => {
+      dispatch({ type: 'set_user', payload: user });
+    },
+    [dispatch]
+  );
 
   return {
     ...state,
     onSetLoading,
     onSetData,
-    onUpdateStats,
-    onUpdateUser,
-    saveStats,
-    saveUser,
+    onSetGame,
+    onSetStats,
+    onSetUser,
   };
 };
 

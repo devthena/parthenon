@@ -1,52 +1,45 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { Header } from '../components';
-import { useApi } from '../hooks';
-import { useParthenonState } from '../context';
+import { Header } from '@/components';
+import { useParthenonState } from '@/context';
+import { useApi } from '@/hooks';
 
-import { ApiUrl } from '../lib/enums/api';
-import { LoginMethod } from '../lib/enums/auth';
-import { DataObject } from '../lib/types/db';
+import { ApiUrl } from '@/enums/api';
+import { DataObject } from '@/types/db';
 
 import styles from './layout.module.scss';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 const PublicLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { data, dataProcessed, fetchData } = useApi();
+  const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
+  const { isFetched, user, onSetData } = useParthenonState();
   const { user: userAuth0 } = useUser();
-  const { user, onSetLoading, onSetData } = useParthenonState();
 
   useEffect(() => {
-    if (!userAuth0 || !userAuth0.sub || user) return;
-
-    onSetLoading();
-
-    const userSub = userAuth0.sub.split('|');
-    const userId = userSub[2];
-    const loginMethod = userSub[1] as LoginMethod;
+    if (!userAuth0 || user || isFetched) return;
 
     const getData = async () => {
-      await fetchData(`${ApiUrl.Users}/${loginMethod}/${userId}`);
+      await fetchGetData(ApiUrl.Users);
     };
 
     getData();
-  }, [user, userAuth0, fetchData, onSetLoading]);
+  }, [isFetched, user, userAuth0, fetchGetData]);
 
   useEffect(() => {
-    if (!dataProcessed) return;
+    if (!isApiFetched) return;
 
-    if (data) {
-      onSetData(data as DataObject);
+    if (dataUser) {
+      onSetData(dataUser as DataObject);
     } else {
       onSetData(null);
     }
-  }, [data, dataProcessed, onSetData]);
+  }, [dataUser, isApiFetched, onSetData]);
 
   return (
     <>

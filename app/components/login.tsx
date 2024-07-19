@@ -1,4 +1,4 @@
-import styles from '../styles/login.module.scss';
+import styles from '@/styles/login.module.scss';
 
 export const Login = () => {
   return (

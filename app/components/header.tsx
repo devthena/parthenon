@@ -1,18 +1,19 @@
 'use client';
 
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
 
-import { useParthenonState } from '../context';
-import { MenuCloseIcon, MenuIcon } from '../images/icons';
+import { HEADER_PATHS } from '@/constants/navigation';
+import { useParthenonState } from '@/context';
+import { MenuCloseIcon, MenuIcon } from '@/images/icons';
+import styles from '@/styles/header.module.scss';
+
 import { Login } from './login';
-import { HEADER_PATHS } from '../lib/constants/navigation';
-
-import styles from '../styles/header.module.scss';
 
 export const Header = () => {
   const { user } = useParthenonState();
@@ -74,7 +75,8 @@ export const Header = () => {
           {HEADER_PATHS.map(path => {
             const pathValue =
               path.value === '/' && userAuth0 ? '/dashboard' : path.value;
-            const isRestricted = path.value === '/games' && !user?.discord_id;
+            const isRestricted =
+              path.value === '/games' && !user?.discord_username;
 
             const initialClass =
               path.label === 'Home' ? styles.home : undefined;
@@ -108,7 +110,8 @@ export const Header = () => {
               const pathValue =
                 path.value === '/' && userAuth0 ? '/dashboard' : path.value;
 
-              const isRestricted = path.value === '/games' && !user?.discord_id;
+              const isRestricted =
+                path.value === '/games' && !user?.discord_username;
 
               return (
                 (userAuth0 || !path.protected) &&

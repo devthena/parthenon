@@ -1,47 +1,73 @@
 import { useCallback, useState } from 'react';
-import { StatsObject, UserObject } from '../lib/types/db';
-import { ApiUrl } from '../lib/enums/api';
+
+import { INITIAL_STATS } from '@/constants/stats';
+
+import { ApiDataType, ApiUrl } from '@/enums/api';
+import { GameCode } from '@/enums/games';
+
+import { GamePayload, GameStateObject } from '@/types/games';
+import { DataObject, StatsStateObject } from '@/types/db';
 
 interface ApiState {
-  data: { [key: string]: any } | null;
-  dataLoading: boolean;
-  dataError: string | null;
-  dataProcessed: boolean;
+  dataGame: GameStateObject | null;
+  dataUser: DataObject | null;
+  dataStats: StatsStateObject | null;
+  error: string | null;
+  isFetched: boolean;
+  isLoading: boolean;
 }
 
+type ApiPostPayload = GamePayload | { code: GameCode };
+
 const initialState = {
-  data: null,
-  dataError: null,
-  dataLoading: false,
-  dataProcessed: false,
+  dataGame: null,
+  dataUser: null,
+  dataStats: null,
+  error: null,
+  isFetched: false,
+  isLoading: false,
 };
 
 export const useApi = () => {
-  const [apiData, setApiData] = useState<ApiState>(initialState);
+  const [data, setData] = useState<ApiState>(initialState);
 
-  const fetchData = useCallback(async (url: string) => {
-    setApiData(prev => ({ ...prev, dataLoading: true, dataError: null }));
+  const fetchGetData = useCallback(async (url: ApiUrl) => {
+    setData(prev => ({
+      ...prev,
+      isFetched: false,
+      isLoading: true,
+    }));
 
     try {
       const res = await fetch(url);
+
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
       const response = await res.json();
 
-      if (!res.ok) throw new Error('Hook Error: useApi (fetchData)');
-
-      setApiData({
-        data: response.data,
-        dataError: null,
-        dataLoading: false,
-        dataProcessed: true,
-      });
+      setData(prev => ({
+        ...prev,
+        dataUser: response.data,
+        isFetched: true,
+        isLoading: false,
+      }));
     } catch (error) {
-      throw new Error('Hook Error: useApi (fetchData)');
+      console.error(error);
     }
   }, []);
 
-  const saveData = useCallback(
-    async (url: ApiUrl, payload: StatsObject | UserObject) => {
-      setApiData(prev => ({ ...prev, dataLoading: true, dataError: null }));
+  const fetchPostData = useCallback(
+    async (
+      url: ApiUrl,
+      type: ApiDataType,
+      payload: ApiPostPayload,
+      noLoad?: boolean
+    ) => {
+      setData(prev => ({
+        ...prev,
+        isFetched: false,
+        isLoading: !noLoad,
+      }));
 
       try {
         const res = await fetch(url, {
@@ -52,26 +78,59 @@ export const useApi = () => {
           body: JSON.stringify(payload),
         });
 
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
         const response = await res.json();
 
-        if (!res.ok) throw new Error('Hook Error: useApi (saveData)');
-
-        setApiData({
-          data: response.data,
-          dataError: null,
-          dataLoading: false,
-          dataProcessed: true,
-        });
+        switch (type) {
+          case ApiDataType.Games:
+            if (response.data) {
+              setData(prev => ({
+                ...prev,
+                dataGame: { [payload.code]: response.data.key },
+                isFetched: true,
+                isLoading: false,
+              }));
+            } else {
+              setData(prev => ({
+                ...prev,
+                isFetched: true,
+                isLoading: false,
+              }));
+            }
+            break;
+          case ApiDataType.Stats:
+            if (response.data) {
+              setData(prev => ({
+                ...prev,
+                dataStats: {
+                  [payload.code]: response.data,
+                },
+                isFetched: true,
+                isLoading: false,
+              }));
+            } else {
+              setData(prev => ({
+                ...prev,
+                dataStats: {
+                  [payload.code]: INITIAL_STATS[payload.code],
+                },
+                isFetched: true,
+                isLoading: false,
+              }));
+            }
+            break;
+        }
       } catch (error) {
-        throw new Error('Hook Error: useApi (saveData)');
+        console.error(error);
       }
     },
     []
   );
 
   return {
-    ...apiData,
-    fetchData,
-    saveData,
+    ...data,
+    fetchGetData,
+    fetchPostData,
   };
 };

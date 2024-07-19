@@ -11,6 +11,7 @@ export enum ModalContent {
 }
 
 export enum WordleStatus {
+  Standby, // no game has started
   Answered, // answered the wordle correctly
   Completed, // reached maximum number of guesses
   Playing, // currently playing the game

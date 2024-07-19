@@ -1,15 +1,13 @@
-import { Bar } from 'react-chartjs-2';
-import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { Chart as ChartJS, registerables } from 'chart.js';
+import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
+import { Bar } from 'react-chartjs-2';
+
+import { WordleObject } from '@/types/wordle';
+import styles from '../styles/stats.module.scss';
 
 ChartJS.register(...registerables, ChartDataLabels);
 
-import { INITIAL_WORDLE } from '../../../../lib/constants/stats';
-import { WordleObject } from '../../../../lib/types/wordle';
-
-import styles from '../styles/stats.module.scss';
-
-export const Stats = ({ data = INITIAL_WORDLE }: { data?: WordleObject }) => {
+export const Stats = ({ data }: { data: WordleObject }) => {
   const winPercentage = !data.totalPlayed
     ? 'N/A'
     : Math.round((data.totalWon / data.totalPlayed) * 100) + '%';

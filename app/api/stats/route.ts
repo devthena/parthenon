@@ -1,10 +1,25 @@
+import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
-import { StatsObject } from '../../lib/types/db';
 
-const mongodbCollection = process.env.MONGODB_COLLECTION_STATS ?? '';
+import { LoginMethod } from '@/enums/auth';
+import { StatsObject, UserObject } from '@/types/db';
+import { GameCode } from '@/enums/games';
+
+const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
-const mongodbURI = process.env.MONGODB_URI ?? '';
+
+const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
+const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
+
+if (
+  !mongodbURI ||
+  !mongodbName ||
+  !statsCollectionName ||
+  !usersCollectionName
+) {
+  throw new Error('Missing necessary environment variables');
+}
 
 const client = new MongoClient(mongodbURI, {
   serverApi: {
@@ -14,32 +29,54 @@ const client = new MongoClient(mongodbURI, {
   },
 });
 
-const saveStats = async (payload: StatsObject) => {
+const getStats = async (method: LoginMethod, id: string, code: GameCode) => {
   await client.connect();
 
-  const collection = await client.db(mongodbName).collection(mongodbCollection);
+  const botDB = await client.db(mongodbName);
 
-  const data = await collection.updateOne(
-    { discord_id: payload.discord_id },
-    { $set: { ...payload } },
-    { upsert: true }
-  );
+  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
+  const usersCollection = botDB.collection<UserObject>(usersCollectionName);
+
+  const user = await usersCollection.findOne({ [`${method}_id`]: id });
+
+  let stats = null;
+
+  if (user?.discord_id) {
+    stats = await statsCollection.findOne({ discord_id: user.discord_id });
+  }
 
   await client.close();
-  return data;
+
+  if (!stats) return null;
+
+  return stats[code] ?? null;
 };
 
-export async function POST(request: NextRequest) {
+export const POST = withApiAuthRequired(async (request: NextRequest) => {
+  const res = new NextResponse();
+  const session = await getSession(request, res);
+
+  if (!session) {
+    return NextResponse.json({ data: null, error: 'Unauthorized' });
+  }
+
+  const userSub = session.user.sub.split('|');
+  const method = userSub[1];
+  const id = userSub[2];
+
   let responseData = null;
   let responseError = null;
 
   const payload = await request.json();
 
   try {
-    responseData = await saveStats(payload);
+    responseData = await getStats(method, id, payload.code);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
-    return NextResponse.json({ data: responseData, error: responseError });
+    return NextResponse.json({
+      data: responseData,
+      error: responseError,
+    });
   }
-}
+});

@@ -1,6 +1,6 @@
-import { WORD_LENGTH } from '../../../../lib/constants/wordle';
-import { WordleStatus } from '../../../../lib/enums/wordle';
-import { Guess } from '../../../../lib/types/wordle';
+import { WORD_LENGTH } from '@/constants/wordle';
+import { WordleStatus } from '@/enums/wordle';
+import { Guess } from '@/types/wordle';
 
 import styles from '../styles/grid.module.scss';
 
