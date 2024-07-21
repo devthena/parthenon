@@ -57,6 +57,7 @@ const Dashboard = () => {
                 alt="Avatar"
                 height={200}
                 priority
+                quality={100}
                 src={userAuth0.picture}
                 width={200}
               />
