@@ -2,7 +2,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { Bar } from 'react-chartjs-2';
 
-import { WordleObject } from '@/types/wordle';
+import { WordleObject } from '@/interfaces/games';
 import styles from '../styles/stats.module.scss';
 
 ChartJS.register(...registerables, ChartDataLabels);

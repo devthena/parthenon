@@ -3,16 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
+import { INITIAL_STATS } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
 
-import { LoginMethod } from '@/enums/auth';
+import { GameDocument, GamePayload } from '@/interfaces/games';
+import { StatsDocument } from '@/interfaces/statistics';
+import { UserAuthMethod, UserDocument } from '@/interfaces/user';
+
 import { GameCode } from '@/enums/games';
-
-import { GameObject, GamePayload } from '@/types/games';
-import { StatsObject, UserObject } from '@/types/db';
-
 import { decrypt } from '@/utils';
-import { INITIAL_STATS } from '@/constants/stats';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
@@ -40,16 +39,16 @@ const client = new MongoClient(mongodbURI, {
 });
 
 const updateGame = async (
-  method: LoginMethod,
+  method: UserAuthMethod,
   id: string,
   payload: GamePayload
 ) => {
   await client.connect();
 
   const botDB = await client.db(mongodbName);
-  const gamesCollection = botDB.collection<GameObject>(gamesCollectionName);
-  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
-  const usersCollection = botDB.collection<UserObject>(usersCollectionName);
+  const gamesCollection = botDB.collection<GameDocument>(gamesCollectionName);
+  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
+  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
 
   let discordId = null;
 
@@ -131,10 +130,15 @@ const updateGame = async (
         const isAttempt = newGuesses.length < MAX_ATTEMPTS;
 
         if (isWin) {
-          const stats =
-            (await statsCollection.findOne({
-              discord_id: discordId,
-            })) ?? INITIAL_STATS;
+          let stats = INITIAL_STATS[GameCode.Wordle];
+
+          const statsDoc = await statsCollection.findOne({
+            discord_id: discordId,
+          });
+
+          if (statsDoc && statsDoc[GameCode.Wordle]) {
+            stats = statsDoc[GameCode.Wordle];
+          }
 
           // add the user rewards
           await usersCollection.updateOne(
@@ -143,7 +147,7 @@ const updateGame = async (
           );
 
           // update the user game stats
-          const newDistribution = [...stats[GameCode.Wordle].distribution];
+          const newDistribution = [...stats.distribution];
           newDistribution[newGuesses.length - 1] += 1;
 
           await statsCollection.updateOne(
@@ -151,14 +155,11 @@ const updateGame = async (
             {
               $set: {
                 [GameCode.Wordle]: {
-                  currentStreak: stats[GameCode.Wordle].currentStreak + 1,
+                  currentStreak: stats.currentStreak + 1,
                   distribution: newDistribution,
-                  maxStreak: Math.max(
-                    stats[GameCode.Wordle].maxStreak,
-                    stats[GameCode.Wordle].currentStreak + 1
-                  ),
-                  totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
-                  totalWon: stats[GameCode.Wordle].totalWon + 1,
+                  maxStreak: Math.max(stats.maxStreak, stats.currentStreak + 1),
+                  totalPlayed: stats.totalPlayed + 1,
+                  totalWon: stats.totalWon + 1,
                 },
               },
             },
@@ -183,19 +184,24 @@ const updateGame = async (
           );
         } else {
           // add to total times played for a loss
-          const stats =
-            (await statsCollection.findOne({
-              discord_id: discordId,
-            })) ?? INITIAL_STATS;
+          let stats = INITIAL_STATS[GameCode.Wordle];
+
+          const statsDoc = await statsCollection.findOne({
+            discord_id: discordId,
+          });
+
+          if (statsDoc && statsDoc[GameCode.Wordle]) {
+            stats = statsDoc[GameCode.Wordle];
+          }
 
           await statsCollection.updateOne(
             { discord_id: discordId },
             {
               $set: {
                 [GameCode.Wordle]: {
-                  ...stats[GameCode.Wordle],
+                  ...stats,
                   currentStreak: 0,
-                  totalPlayed: stats[GameCode.Wordle].totalPlayed + 1,
+                  totalPlayed: stats.totalPlayed + 1,
                 },
               },
             }

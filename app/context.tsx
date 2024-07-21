@@ -9,35 +9,28 @@ import {
   useReducer,
 } from 'react';
 
-import {
-  ActivityStateObject,
-  DataObject,
-  StatsStateObject,
-  UserStateObject,
-} from '@/types/db';
-
-import { GameStateObject } from '@/types/games';
+import { GameObject } from '@/interfaces/games';
+import { UserObject } from '@/interfaces/user';
+import { StatsObject } from './interfaces/statistics';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
-  activities: ActivityStateObject | null;
-  games: GameStateObject;
-  stats: StatsStateObject;
-  user: UserStateObject | null;
+  games: GameObject;
+  stats: StatsObject;
+  user: UserObject | null;
 }
 
 type ParthenonAction =
+  | { type: 'init_user'; payload: UserObject | null }
   | { type: 'set_loading' }
-  | { type: 'set_data'; payload: DataObject | null }
-  | { type: 'set_game'; payload: GameStateObject }
-  | { type: 'set_stats'; payload: StatsStateObject }
-  | { type: 'set_user'; payload: UserStateObject };
+  | { type: 'set_game'; payload: GameObject }
+  | { type: 'set_stats'; payload: StatsObject }
+  | { type: 'set_user'; payload: UserObject };
 
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
-  activities: null,
   games: {},
   stats: {},
   user: null,
@@ -52,18 +45,17 @@ const reducer = (
   action: ParthenonAction
 ): ParthenonState => {
   switch (action.type) {
-    case 'set_loading':
-      return {
-        ...state,
-        isLoading: true,
-      };
-    case 'set_data':
+    case 'init_user':
       return {
         ...state,
         isFetched: true,
         isLoading: false,
-        activities: action.payload?.activities ?? null,
-        user: action.payload?.user ?? null,
+        user: action.payload,
+      };
+    case 'set_loading':
+      return {
+        ...state,
+        isLoading: true,
       };
     case 'set_game':
       return {
@@ -111,33 +103,33 @@ const useParthenonState = () => {
 
   const { state, dispatch } = context;
 
-  const onSetLoading = useCallback(() => {
-    dispatch({ type: 'set_loading' });
-  }, [dispatch]);
-
-  const onSetData = useCallback(
-    (data: DataObject | null) => {
-      dispatch({ type: 'set_data', payload: data });
+  const onInitUser = useCallback(
+    (user: UserObject | null) => {
+      dispatch({ type: 'init_user', payload: user });
     },
     [dispatch]
   );
 
+  const onSetLoading = useCallback(() => {
+    dispatch({ type: 'set_loading' });
+  }, [dispatch]);
+
   const onSetGame = useCallback(
-    (game: GameStateObject) => {
+    (game: GameObject) => {
       dispatch({ type: 'set_game', payload: game });
     },
     [dispatch]
   );
 
   const onSetStats = useCallback(
-    (stats: StatsStateObject) => {
+    (stats: StatsObject) => {
       dispatch({ type: 'set_stats', payload: stats });
     },
     [dispatch]
   );
 
   const onSetUser = useCallback(
-    (user: UserStateObject) => {
+    (user: UserObject) => {
       dispatch({ type: 'set_user', payload: user });
     },
     [dispatch]
@@ -145,8 +137,8 @@ const useParthenonState = () => {
 
   return {
     ...state,
+    onInitUser,
     onSetLoading,
-    onSetData,
     onSetGame,
     onSetStats,
     onSetUser,

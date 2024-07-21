@@ -21,12 +21,15 @@ const Invite = () => {
   return (
     isFetched && (
       <div className={styles.invite}>
-        <h1>INVITE LITTLE OWL</h1>
+        <h1>
+          INVITE <span>LITTLEOWL</span>
+        </h1>
         <figure className={styles.avatar}>
           <Image
             alt="Little Owl"
             height={72}
             priority
+            quality={100}
             src="/owl.png"
             width={72}
           />

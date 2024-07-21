@@ -1,14 +1,6 @@
 import { GameCode } from '@/enums/games';
-import { BlackjackObject } from '@/types/blackjack';
-import { StatsObject } from '@/types/db';
-import { WordleObject } from '@/types/wordle';
-
-export const INITIAL_BLACKJACK: BlackjackObject = {
-  totalBlackjack: 0,
-  totalPlayed: 0,
-  totalPush: 0,
-  totalWon: 0,
-};
+import { WordleObject } from '@/interfaces/games';
+import { StatsInitObject } from '@/interfaces/statistics';
 
 export const INITIAL_WORDLE: WordleObject = {
   currentStreak: 0,
@@ -18,8 +10,7 @@ export const INITIAL_WORDLE: WordleObject = {
   totalWon: 0,
 };
 
-export const INITIAL_STATS: StatsObject = {
-  discord_id: '',
+export const INITIAL_STATS: StatsInitObject = {
   // @todo: add property once Blackjack is implemented
   // [GameCode.Blackjack]: INITIAL_BLACKJACK,
   [GameCode.Wordle]: INITIAL_WORDLE,

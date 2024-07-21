@@ -1,5 +1,9 @@
 @import '@/styles/variables';
 
+.invite > h1 span {
+  color: var(--dark-blue);
+}
+
 .invite > figure {
   margin-top: 45px;
 }
@@ -32,7 +36,7 @@
   font-size: 16px;
   font-weight: 700;
   margin-top: 45px;
-  padding: 5px 35px;
+  padding: 7px 28px;
   transition: all 0.1s ease;
 
   @media screen and (min-width: $tablet-width) {

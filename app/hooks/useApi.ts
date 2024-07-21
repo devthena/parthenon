@@ -5,13 +5,14 @@ import { INITIAL_STATS } from '@/constants/stats';
 import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
-import { GamePayload, GameStateObject } from '@/types/games';
-import { DataObject, StatsStateObject } from '@/types/db';
+import { GamePayload, GameObject } from '@/interfaces/games';
+import { StatsObject } from '@/interfaces/statistics';
+import { UserObject } from '@/interfaces/user';
 
 interface ApiState {
-  dataGame: GameStateObject | null;
-  dataUser: DataObject | null;
-  dataStats: StatsStateObject | null;
+  dataGame: GameObject | null;
+  dataUser: UserObject | null;
+  dataStats: StatsObject | null;
   error: string | null;
   isFetched: boolean;
   isLoading: boolean;
@@ -87,7 +88,10 @@ export const useApi = () => {
             if (response.data) {
               setData(prev => ({
                 ...prev,
-                dataGame: { [payload.code]: response.data.key },
+                dataGame: {
+                  ...data.dataGame,
+                  [payload.code]: response.data.key,
+                },
                 isFetched: true,
                 isLoading: false,
               }));
@@ -104,6 +108,7 @@ export const useApi = () => {
               setData(prev => ({
                 ...prev,
                 dataStats: {
+                  ...data.dataStats,
                   [payload.code]: response.data,
                 },
                 isFetched: true,
@@ -113,7 +118,8 @@ export const useApi = () => {
               setData(prev => ({
                 ...prev,
                 dataStats: {
-                  [payload.code]: INITIAL_STATS[payload.code],
+                  ...data.dataStats,
+                  [payload.code]: INITIAL_STATS[payload.code as GameCode],
                 },
                 isFetched: true,
                 isLoading: false,
@@ -125,7 +131,7 @@ export const useApi = () => {
         console.error(error);
       }
     },
-    []
+    [data.dataGame, data.dataStats]
   );
 
   return {
