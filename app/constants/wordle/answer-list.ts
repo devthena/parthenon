@@ -1225,7 +1225,6 @@ export const ANSWER_LIST = [
   'robot',
   'rocky',
   'rodeo',
-  'roger',
   'rogue',
   'roomy',
   'rough',
