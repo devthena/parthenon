@@ -8,9 +8,9 @@ import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
 import { ApiUrl } from '@/enums/api';
+import { UserObject } from '@/interfaces/user';
 
 import styles from './layout.module.scss';
-import { DataObject } from '@/types/db';
 
 const ProtectedLayout = ({
   children,
@@ -18,29 +18,29 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
-  const { isFetched, user, onSetData, onSetLoading } = useParthenonState();
+  const { isFetched, user, onInitUser, onSetLoading } = useParthenonState();
 
   useEffect(() => {
     if (user || isFetched) return;
 
     onSetLoading();
 
-    const getData = async () => {
+    const getUser = async () => {
       await fetchGetData(ApiUrl.Users);
     };
 
-    getData();
+    getUser();
   }, [isFetched, user, fetchGetData, onSetLoading]);
 
   useEffect(() => {
     if (!isApiFetched) return;
 
     if (dataUser) {
-      onSetData(dataUser as DataObject);
+      onInitUser(dataUser as UserObject);
     } else {
-      onSetData(null);
+      onInitUser(null);
     }
-  }, [dataUser, isApiFetched, onSetData]);
+  }, [dataUser, isApiFetched, onInitUser]);
 
   return (
     <>

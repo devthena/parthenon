@@ -12,7 +12,7 @@ import styles from './page.module.scss';
 
 const Dashboard = () => {
   const { user: userAuth0 } = useUser();
-  const { isFetched, activities, user } = useParthenonState();
+  const { isFetched, user } = useParthenonState();
 
   let displayName = '';
 
@@ -73,7 +73,7 @@ const Dashboard = () => {
             <div className={styles.item}>
               <p className={styles.label}>
                 <span>STARS</span>
-                <span>{activities ? activities.stars : 0}</span>
+                <span>{user ? user.stars ?? 0 : 0}</span>
               </p>
               <StarIcon />
             </div>

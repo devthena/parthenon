@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
+import { INITIAL_STATS } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
 
-import { LoginMethod } from '@/enums/auth';
 import { GameCode } from '@/enums/games';
+import { UserAuthMethod, UserDocument } from '@/interfaces/user';
 
 import { GameObject, GamePayload } from '@/types/games';
-import { StatsObject, UserObject } from '@/types/db';
+import { StatsObject } from '@/types/db';
 
 import { decrypt } from '@/utils';
-import { INITIAL_STATS } from '@/constants/stats';
 
 const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
@@ -40,7 +40,7 @@ const client = new MongoClient(mongodbURI, {
 });
 
 const updateGame = async (
-  method: LoginMethod,
+  method: UserAuthMethod,
   id: string,
   payload: GamePayload
 ) => {
@@ -49,7 +49,7 @@ const updateGame = async (
   const botDB = await client.db(mongodbName);
   const gamesCollection = botDB.collection<GameObject>(gamesCollectionName);
   const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
-  const usersCollection = botDB.collection<UserObject>(usersCollectionName);
+  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
 
   let discordId = null;
 

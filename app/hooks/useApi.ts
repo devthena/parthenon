@@ -5,12 +5,14 @@ import { INITIAL_STATS } from '@/constants/stats';
 import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
+import { UserObject } from '@/interfaces/user';
+
 import { GamePayload, GameStateObject } from '@/types/games';
-import { DataObject, StatsStateObject } from '@/types/db';
+import { StatsStateObject } from '@/types/db';
 
 interface ApiState {
   dataGame: GameStateObject | null;
-  dataUser: DataObject | null;
+  dataUser: UserObject | null;
   dataStats: StatsStateObject | null;
   error: string | null;
   isFetched: boolean;
