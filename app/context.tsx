@@ -9,23 +9,23 @@ import {
   useReducer,
 } from 'react';
 
+import { GameObject } from '@/interfaces/games';
 import { UserObject } from '@/interfaces/user';
-import { StatsStateObject } from '@/types/db';
-import { GameStateObject } from '@/types/games';
+import { StatsObject } from './interfaces/statistics';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
-  games: GameStateObject;
-  stats: StatsStateObject;
+  games: GameObject;
+  stats: StatsObject;
   user: UserObject | null;
 }
 
 type ParthenonAction =
   | { type: 'init_user'; payload: UserObject | null }
   | { type: 'set_loading' }
-  | { type: 'set_game'; payload: GameStateObject }
-  | { type: 'set_stats'; payload: StatsStateObject }
+  | { type: 'set_game'; payload: GameObject }
+  | { type: 'set_stats'; payload: StatsObject }
   | { type: 'set_user'; payload: UserObject };
 
 const initialState: ParthenonState = {
@@ -115,14 +115,14 @@ const useParthenonState = () => {
   }, [dispatch]);
 
   const onSetGame = useCallback(
-    (game: GameStateObject) => {
+    (game: GameObject) => {
       dispatch({ type: 'set_game', payload: game });
     },
     [dispatch]
   );
 
   const onSetStats = useCallback(
-    (stats: StatsStateObject) => {
+    (stats: StatsObject) => {
       dispatch({ type: 'set_stats', payload: stats });
     },
     [dispatch]

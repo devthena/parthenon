@@ -1,7 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { GameCode } from '@/enums/games';
 
-export interface GameObject {
+export * from './wordle';
+
+export interface GameDocument {
   _id?: ObjectId;
   discord_id: string;
   key: string;
@@ -9,12 +11,12 @@ export interface GameObject {
   data: { [key: string]: string | string[] };
 }
 
-export type GameStateObject = {
+export type GameObject = {
   [GameCode.Wordle]?: string;
 };
 
 export interface GamePayload {
-  code: GameCode;
   key?: string;
+  code: GameCode;
   data: { [key: string]: string };
 }

@@ -2,8 +2,8 @@ import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-import { StatsObject } from '@/types/db';
 import { GameCode } from '@/enums/games';
+import { StatsDocument } from '@/interfaces/statistics';
 import { UserAuthMethod, UserDocument } from '@/interfaces/user';
 
 const mongodbURI = process.env.MONGODB_URI;
@@ -34,7 +34,7 @@ const getStats = async (method: UserAuthMethod, id: string, code: GameCode) => {
 
   const botDB = await client.db(mongodbName);
 
-  const statsCollection = botDB.collection<StatsObject>(statsCollectionName);
+  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
   const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
 
   const user = await usersCollection.findOne({ [`${method}_id`]: id });

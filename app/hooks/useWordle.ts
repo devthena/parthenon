@@ -9,7 +9,7 @@ import {
 } from '@/constants/wordle';
 
 import { KeyStatus, ModalContent, WordleStatus } from '@/enums/wordle';
-import { Guess, WordleState } from '@/types/wordle';
+import { WordleGuess, WordleState } from '@/interfaces/games';
 
 type WordleAction =
   | { type: 'play' }
@@ -124,7 +124,7 @@ const wordleReducer = (
           newKeyResults
         );
 
-        const newGuess: Guess = { word: state.currentGuess, result };
+        const newGuess: WordleGuess = { word: state.currentGuess, result };
         const newGuesses = [...state.guesses, newGuess];
 
         const newStatus =

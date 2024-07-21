@@ -13,7 +13,7 @@ import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
 import { KeyStatus, WordleStatus } from '@/enums/wordle';
 
-import { Guess } from '@/types/wordle';
+import { WordleGuess } from '@/interfaces/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/utils';
@@ -90,8 +90,8 @@ const Wordle = () => {
       ApiUrl.Games,
       ApiDataType.Games,
       {
-        code: GameCode.Wordle,
         key: gameKeyRef.current,
+        code: GameCode.Wordle,
         data: {
           sessionCode: encrypt(guess),
         },
@@ -144,7 +144,7 @@ const Wordle = () => {
   }, []);
 
   useEffect(() => {
-    if (answer.length === 0) return;
+    if (answer.length === 0 || answer === answerRef.current) return;
     answerRef.current = answer;
     getGame();
   }, [answer, getGame]);
@@ -240,7 +240,7 @@ const Wordle = () => {
   // + 1 to take into account the current guess
   const fillLength = MAX_ATTEMPTS - (guesses.length + 1);
 
-  const fillArray: Guess[] =
+  const fillArray: WordleGuess[] =
     fillLength > 0
       ? Array(fillLength).fill({
           word: '',
@@ -248,7 +248,7 @@ const Wordle = () => {
         })
       : [];
 
-  const currentGuessArray: Guess[] =
+  const currentGuessArray: WordleGuess[] =
     guesses.length < MAX_ATTEMPTS
       ? [
           {
@@ -258,7 +258,7 @@ const Wordle = () => {
         ]
       : [];
 
-  const guessesArray: Guess[] = [
+  const guessesArray: WordleGuess[] = [
     ...guesses,
     ...currentGuessArray,
     ...fillArray,
