@@ -1,12 +1,12 @@
 import { WORD_LENGTH } from '@/constants/wordle';
 import { WordleStatus } from '@/enums/wordle';
-import { Guess } from '@/types/wordle';
+import { WordleGuess } from '@/interfaces/games';
 
 import styles from '../styles/grid.module.scss';
 
 interface GridProps {
   currentTurn: number;
-  guesses: Guess[];
+  guesses: WordleGuess[];
   status: WordleStatus;
 }
 
