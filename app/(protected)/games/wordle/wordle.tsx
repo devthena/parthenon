@@ -16,7 +16,7 @@ import { KeyStatus, WordleStatus } from '@/enums/wordle';
 import { WordleGuess } from '@/interfaces/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
-import { encrypt } from '@/utils';
+import { encrypt } from '@/lib/utils';
 
 import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
 import styles from './page.module.scss';
