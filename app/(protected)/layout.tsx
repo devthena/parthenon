@@ -3,7 +3,7 @@
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
 
-import { Header } from '@/components';
+import { Header, Modal } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
@@ -18,7 +18,8 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
-  const { isFetched, user, onInitUser, onSetLoading } = useParthenonState();
+  const { isFetched, modal, user, onInitUser, onSetLoading } =
+    useParthenonState();
 
   useEffect(() => {
     if (user || isFetched) return;
@@ -46,6 +47,7 @@ const ProtectedLayout = ({
     <>
       <Header />
       <div className={styles.container}>{children}</div>
+      {modal.isOpen && <Modal />}
     </>
   );
 };

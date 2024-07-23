@@ -1,11 +1,11 @@
 import { KEY_LIST } from '@/constants/wordle';
-import { KeyStatus } from '@/enums/wordle';
+import { WordleKeyStatus } from '@/enums/games';
 import { BackspaceIcon } from '@/images/icons';
 
 import styles from '../styles/keyboard.module.scss';
 
 interface KeyboardProps {
-  keyResults: { [letter: string]: KeyStatus };
+  keyResults: { [letter: string]: WordleKeyStatus };
   onDelete: () => void;
   onEnter: () => void;
   onKey: (key: string) => void;
