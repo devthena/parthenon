@@ -9,7 +9,7 @@ import { useApi, useWordle } from '@/hooks';
 
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
+import { ApiDataError, ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
@@ -37,7 +37,9 @@ const Wordle = () => {
   const {
     dataGame,
     dataStats,
+    error,
     isFetched: isApiFetched,
+    clearError,
     fetchPostData,
   } = useApi();
 
@@ -161,6 +163,29 @@ const Wordle = () => {
     if (!isApiFetched || !dataGame) return;
     onSetGame(dataGame);
   }, [dataGame, isApiFetched, onSetGame]);
+
+  useEffect(() => {
+    if (!isApiFetched || !error) return;
+
+    // @todo: Create a separate component for errors
+    if (error === ApiDataError.HoneyCake) {
+      onSetModal({
+        isOpen: true,
+        content: (
+          <div>
+            <h3>Rewards Not Added</h3>
+            <p>
+              Earning coins has been halted until Cerberus has returned. You can
+              revive him with Honey Cake or wait for his natural resurrection.
+              Check the Discord server for more details.
+            </p>
+          </div>
+        ),
+      });
+
+      clearError();
+    }
+  }, [error, isApiFetched, clearError, onSetModal]);
 
   useEffect(() => {
     if (!isApiFetched || !dataStats || stats[GameCode.Wordle]) return;

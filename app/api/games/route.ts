@@ -4,9 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { INITIAL_STATS } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
+import { ApiDataError } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
 import { GameDocument, GamePayload } from '@/interfaces/games';
+import { PetDocument } from '@/interfaces/pet';
 import { StatsDocument } from '@/interfaces/statistics';
 import { UserAuthMethod, UserDocument } from '@/interfaces/user';
 
@@ -16,12 +18,14 @@ import { decrypt } from '@/lib/utils';
 const mongodbName = process.env.MONGODB_NAME;
 
 const gamesCollectionName = process.env.MONGODB_COLLECTION_GAMES;
+const petsCollectionName = process.env.MONGODB_COLLECTION_PETS;
 const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
 if (
   !mongodbName ||
   !gamesCollectionName ||
+  !petsCollectionName ||
   !statsCollectionName ||
   !usersCollectionName
 ) {
@@ -37,6 +41,7 @@ const updateGame = async (
   const botDB = await client.db(mongodbName);
 
   const gamesCollection = botDB.collection<GameDocument>(gamesCollectionName);
+  const petsCollection = botDB.collection<PetDocument>(petsCollectionName);
   const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
   const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
 
@@ -124,11 +129,15 @@ const updateGame = async (
           stats = statsDoc[GameCode.Wordle];
         }
 
-        // add the user rewards
-        await usersCollection.updateOne(
-          { discord_id: discordId },
-          { $inc: { cash: WORDLE_REWARDS[newGuesses.length - 1] } }
-        );
+        const pet = await petsCollection.findOne();
+
+        if (!pet || pet.isAlive) {
+          // add the user rewards
+          await usersCollection.updateOne(
+            { discord_id: discordId },
+            { $inc: { cash: WORDLE_REWARDS[newGuesses.length - 1] } }
+          );
+        }
 
         // update the user game stats
         const newDistribution = [...stats.distribution];
@@ -150,7 +159,10 @@ const updateGame = async (
           { upsert: true }
         );
 
-        data = { key: uuidv4() };
+        data = {
+          key: uuidv4(),
+          error: pet && !pet.isAlive ? ApiDataError.HoneyCake : undefined,
+        };
         await deleteGame(game.key);
       } else if (isAttempt) {
         data = { key: uuidv4() };
