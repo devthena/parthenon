@@ -9,16 +9,16 @@ import { useApi, useWordle } from '@/hooks';
 
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
+import { ApiDataError, ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
-import { KeyStatus, WordleStatus } from '@/enums/wordle';
+import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
 import { WordleGuess } from '@/interfaces/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
-import { encrypt } from '@/utils';
+import { encrypt } from '@/lib/utils';
 
-import { AnswerGrid, Keyboard, Modal, Notice, Stats } from './components';
+import { AnswerGrid, Keyboard, Notice, Rules, Stats } from './components';
 import styles from './page.module.scss';
 
 const Wordle = () => {
@@ -28,6 +28,7 @@ const Wordle = () => {
     games,
     stats,
     user,
+    onSetModal,
     onSetGame,
     onSetStats,
     onSetUser,
@@ -36,7 +37,9 @@ const Wordle = () => {
   const {
     dataGame,
     dataStats,
+    error,
     isFetched: isApiFetched,
+    clearError,
     fetchPostData,
   } = useApi();
 
@@ -45,16 +48,11 @@ const Wordle = () => {
     currentGuess,
     guesses,
     keyResults,
-    modalContent,
-    modalDisplay,
     reward,
     status,
     onDelete,
     onEnter,
     onKey,
-    onModalClose,
-    onModalRules,
-    onModalStats,
     onPlay,
     onReset,
     onResume,
@@ -167,6 +165,29 @@ const Wordle = () => {
   }, [dataGame, isApiFetched, onSetGame]);
 
   useEffect(() => {
+    if (!isApiFetched || !error) return;
+
+    // @todo: Create a separate component for errors
+    if (error === ApiDataError.HoneyCake) {
+      onSetModal({
+        isOpen: true,
+        content: (
+          <div>
+            <h3>Rewards Not Added</h3>
+            <p>
+              Earning coins has been halted until Cerberus has returned. You can
+              revive him with Honey Cake or wait for his natural resurrection.
+              Check the Discord server for more details.
+            </p>
+          </div>
+        ),
+      });
+
+      clearError();
+    }
+  }, [error, isApiFetched, clearError, onSetModal]);
+
+  useEffect(() => {
     if (!isApiFetched || !dataStats || stats[GameCode.Wordle]) return;
     onSetStats(dataStats);
   }, [dataStats, isApiFetched, stats, onSetStats]);
@@ -235,7 +256,7 @@ const Wordle = () => {
 
   if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
-  const initialGuessResult = Array(WORD_LENGTH).fill(KeyStatus.Default);
+  const initialGuessResult = Array(WORD_LENGTH).fill(WordleKeyStatus.Default);
 
   // + 1 to take into account the current guess
   const fillLength = MAX_ATTEMPTS - (guesses.length + 1);
@@ -266,13 +287,6 @@ const Wordle = () => {
 
   return (
     <div className={styles.wordle}>
-      {modalDisplay && (
-        <Modal
-          content={modalContent}
-          stats={stats[GameCode.Wordle]}
-          onModalClose={onModalClose}
-        />
-      )}
       <div className={styles.header}>
         <div className={styles.leftButtons}>
           {page !== GamePage.Overview && (
@@ -303,22 +317,48 @@ const Wordle = () => {
             <>
               <button
                 className={styles.rulesOverview}
-                onClick={() => onModalRules()}>
+                onClick={() =>
+                  onSetModal({
+                    isOpen: true,
+                    content: <Rules />,
+                  })
+                }>
                 <RulesIcon />
               </button>
               <button
                 className={styles.rulesDesktop}
-                onClick={() => onModalRules()}>
+                onClick={() =>
+                  onSetModal({
+                    isOpen: true,
+                    content: <Rules />,
+                  })
+                }>
                 RULES
               </button>
             </>
           )}
           {page !== GamePage.Overview && (
             <>
-              <button className={styles.rules} onClick={() => onModalRules()}>
+              <button
+                className={styles.rules}
+                onClick={() =>
+                  onSetModal({
+                    isOpen: true,
+                    content: <Rules />,
+                  })
+                }>
                 <RulesIcon />
               </button>
-              <button className={styles.stats} onClick={() => onModalStats()}>
+              <button
+                className={styles.stats}
+                onClick={() =>
+                  onSetModal({
+                    isOpen: true,
+                    content: stats[GameCode.Wordle] ? (
+                      <Stats data={stats[GameCode.Wordle]} />
+                    ) : null,
+                  })
+                }>
                 <StatsIcon />
               </button>
             </>

@@ -2,6 +2,7 @@
 
 import {
   Dispatch,
+  ReactElement,
   ReactNode,
   createContext,
   useCallback,
@@ -11,19 +12,26 @@ import {
 
 import { GameObject } from '@/interfaces/games';
 import { UserObject } from '@/interfaces/user';
-import { StatsObject } from './interfaces/statistics';
+import { StatsObject } from '@/interfaces/statistics';
 
 interface ParthenonState {
   isFetched: boolean;
   isLoading: boolean;
+  modal: ModalState;
   games: GameObject;
   stats: StatsObject;
   user: UserObject | null;
 }
 
+interface ModalState {
+  isOpen: boolean;
+  content: ReactElement | null;
+}
+
 type ParthenonAction =
   | { type: 'init_user'; payload: UserObject | null }
   | { type: 'set_loading' }
+  | { type: 'set_modal'; payload: Partial<ModalState> }
   | { type: 'set_game'; payload: GameObject }
   | { type: 'set_stats'; payload: StatsObject }
   | { type: 'set_user'; payload: UserObject };
@@ -31,6 +39,7 @@ type ParthenonAction =
 const initialState: ParthenonState = {
   isFetched: false,
   isLoading: false,
+  modal: { isOpen: false, content: null },
   games: {},
   stats: {},
   user: null,
@@ -56,6 +65,14 @@ const reducer = (
       return {
         ...state,
         isLoading: true,
+      };
+    case 'set_modal':
+      return {
+        ...state,
+        modal: {
+          ...state.modal,
+          ...action.payload,
+        },
       };
     case 'set_game':
       return {
@@ -114,6 +131,13 @@ const useParthenonState = () => {
     dispatch({ type: 'set_loading' });
   }, [dispatch]);
 
+  const onSetModal = useCallback(
+    (modal: Partial<ModalState>) => {
+      dispatch({ type: 'set_modal', payload: modal });
+    },
+    [dispatch]
+  );
+
   const onSetGame = useCallback(
     (game: GameObject) => {
       dispatch({ type: 'set_game', payload: game });
@@ -139,6 +163,7 @@ const useParthenonState = () => {
     ...state,
     onInitUser,
     onSetLoading,
+    onSetModal,
     onSetGame,
     onSetStats,
     onSetUser,

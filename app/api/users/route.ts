@@ -1,34 +1,22 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient, ServerApiVersion } from 'mongodb';
 
 import { UserAuthMethod, UserDocument } from '@/interfaces/user';
+import { dbClientPromise } from '@/lib/db';
 
-const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
-
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
-if (!mongodbURI || !mongodbName || !usersCollectionName) {
+if (!mongodbName || !usersCollectionName) {
   throw new Error('Missing necessary environment variables');
 }
 
-const client = new MongoClient(mongodbURI, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
 const getUser = async (method: UserAuthMethod, id: string) => {
-  await client.connect();
-
+  const client = await dbClientPromise;
   const botDB = await client.db(mongodbName);
+
   const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
   const user = await usersCollection.findOne({ [`${method}_id`]: id });
-
-  await client.close();
 
   return user
     ? {

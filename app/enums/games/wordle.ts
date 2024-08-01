@@ -1,13 +1,8 @@
-export enum KeyStatus {
+export enum WordleKeyStatus {
   Absent = 'absent', // does not exist
   Correct = 'correct', // exists and in the right position
   Default = 'default', // not yet submitted
   Present = 'present', // exists but in the wrong position
-}
-
-export enum ModalContent {
-  Rules,
-  Stats,
 }
 
 export enum WordleStatus {

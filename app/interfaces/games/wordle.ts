@@ -1,9 +1,8 @@
-import { ModalContent } from '@/enums/wordle';
-import { KeyStatus, WordleStatus } from '@/enums/wordle';
+import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
 export interface WordleGuess {
   word: string;
-  result: Array<KeyStatus>;
+  result: Array<WordleKeyStatus>;
 }
 
 export type WordleGuessesObject = {
@@ -14,9 +13,7 @@ export interface WordleState {
   answer: string;
   currentGuess: string;
   guesses: WordleGuess[];
-  keyResults: { [letter: string]: KeyStatus };
-  modalContent: ModalContent;
-  modalDisplay: boolean;
+  keyResults: { [letter: string]: WordleKeyStatus };
   reward: number | null;
   status: WordleStatus;
 }

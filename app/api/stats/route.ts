@@ -1,37 +1,21 @@
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient, ServerApiVersion } from 'mongodb';
 
 import { GameCode } from '@/enums/games';
 import { StatsDocument } from '@/interfaces/statistics';
 import { UserAuthMethod, UserDocument } from '@/interfaces/user';
+import { dbClientPromise } from '@/lib/db';
 
-const mongodbURI = process.env.MONGODB_URI;
 const mongodbName = process.env.MONGODB_NAME;
-
 const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
 const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
 
-if (
-  !mongodbURI ||
-  !mongodbName ||
-  !statsCollectionName ||
-  !usersCollectionName
-) {
+if (!mongodbName || !statsCollectionName || !usersCollectionName) {
   throw new Error('Missing necessary environment variables');
 }
 
-const client = new MongoClient(mongodbURI, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
 const getStats = async (method: UserAuthMethod, id: string, code: GameCode) => {
-  await client.connect();
-
+  const client = await dbClientPromise;
   const botDB = await client.db(mongodbName);
 
   const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
@@ -44,8 +28,6 @@ const getStats = async (method: UserAuthMethod, id: string, code: GameCode) => {
   if (user?.discord_id) {
     stats = await statsCollection.findOne({ discord_id: user.discord_id });
   }
-
-  await client.close();
 
   if (!stats) return null;
 

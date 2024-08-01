@@ -1,4 +1,4 @@
-import { WordleStatus } from '@/enums/wordle';
+import { WordleStatus } from '@/enums/games';
 import { CoinIcon } from '@/images/icons';
 
 import styles from '../styles/notice.module.scss';

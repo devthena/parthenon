@@ -1,5 +1,5 @@
 import { WORD_LENGTH } from '@/constants/wordle';
-import { WordleStatus } from '@/enums/wordle';
+import { WordleStatus } from '@/enums/games';
 import { WordleGuess } from '@/interfaces/games';
 
 import styles from '../styles/grid.module.scss';
