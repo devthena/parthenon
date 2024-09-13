@@ -22,7 +22,7 @@ export const Notice = ({
     status === WordleStatus.InvalidGuess ||
     status === WordleStatus.InvalidWord
   ) {
-    setTimeout(onResume, 2250);
+    setTimeout(onResume, 750);
   }
 
   return (
