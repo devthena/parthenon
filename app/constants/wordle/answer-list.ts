@@ -192,7 +192,6 @@ export const ANSWER_LIST = [
   'bonus',
   'boost',
   'booth',
-  'booty',
   'bosom',
   'bound',
   'boxer',
