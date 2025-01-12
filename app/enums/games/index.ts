@@ -1,8 +1,7 @@
 export * from './wordle';
 
 export enum GameCode {
-  // @todo: add more codes for other games
-  // Blackjack = 'blk',
+  Blackjack = 'blk',
   Wordle = 'wdl',
 }
 

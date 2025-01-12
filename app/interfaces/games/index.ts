@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { GameCode } from '@/enums/games';
 
+export * from './blackjack';
 export * from './wordle';
 
 export interface GameDocument {
@@ -12,6 +13,7 @@ export interface GameDocument {
 }
 
 export type GameObject = {
+  [GameCode.Blackjack]?: string;
   [GameCode.Wordle]?: string;
 };
 

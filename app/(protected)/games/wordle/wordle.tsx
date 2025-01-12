@@ -14,12 +14,11 @@ import { GameCode, GamePage } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
 import { WordleGuess } from '@/interfaces/games';
-
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils';
 
 import { AnswerGrid, Keyboard, Notice, Rules, Stats } from './components';
-import styles from './page.module.scss';
+import styles from '../shared/styles/page.module.scss';
 
 const Wordle = () => {
   const {

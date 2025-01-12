@@ -1,0 +1,13 @@
+.stats {
+  text-align: center;
+}
+
+.statsBox {
+  & > h3 {
+    margin-top: 0;
+  }
+
+  & > p {
+    margin: 10px 0;
+  }
+}
