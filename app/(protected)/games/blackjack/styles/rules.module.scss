@@ -1,9 +1,13 @@
 .rules {
-  padding: 0 15px;
+  padding: 0 10px 0 25px;
   text-align: center;
 
   h3 {
-    margin: 0 0 10px 0;
+    margin: 15px 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
   }
 
   p {
@@ -25,13 +29,9 @@
 }
 
 .list {
-  display: inline-block;
-
-  &:last-child ul {
-    margin-top: 0;
-  }
+  margin-top: 15px;
 }
 
 .green {
-  color: var(--green);
+  color: var(--green-casino);
 }

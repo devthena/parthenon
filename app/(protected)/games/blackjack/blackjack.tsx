@@ -1,10 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { redirect } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
+import { useApi } from '@/hooks';
+
+import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
+
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 
 import { Rules, Stats } from './components';
@@ -23,7 +28,34 @@ const Blackjack = () => {
     onSetUser,
   } = useParthenonState();
 
+  const {
+    dataGame,
+    dataStats,
+    error,
+    isFetched: isApiFetched,
+    clearError,
+    fetchPostData,
+  } = useApi();
+
+  const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
+
+  const getStats = useCallback(async () => {
+    await fetchPostData(ApiUrl.Stats, ApiDataType.Stats, {
+      code: GameCode.Blackjack,
+    });
+  }, [fetchPostData]);
+
+  useEffect(() => {
+    if (!stats[GameCode.Blackjack]) getStats();
+  }, []);
+
+  useEffect(() => {
+    if (!isApiFetched || !dataStats || stats[GameCode.Blackjack]) return;
+    onSetStats(dataStats);
+  }, [dataStats, isApiFetched, stats, onSetStats]);
+
+  if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
   return (
     <div className={styles.blackjack}>
@@ -105,7 +137,16 @@ const Blackjack = () => {
           )}
         </div>
       </div>
-      {page === GamePage.Overview && <div className={styles.overview}></div>}
+      {page === GamePage.Overview && (
+        <div className={styles.overview}>
+          <div className={styles.statsContainer}>
+            {(isLoading || !stats[GameCode.Blackjack]) && <Loading />}
+            {!isLoading && stats[GameCode.Blackjack] && (
+              <Stats data={stats[GameCode.Blackjack]} />
+            )}
+          </div>
+        </div>
+      )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
           {(isLoading || !games[GameCode.Blackjack]) && <Loading />}
