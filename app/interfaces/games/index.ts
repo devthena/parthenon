@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { GameCode } from '@/enums/games';
 
 export * from './blackjack';
+export * from './cards';
 export * from './wordle';
 
 export interface GameDocument {

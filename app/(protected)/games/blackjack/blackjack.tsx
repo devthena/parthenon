@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
-import { useApi } from '@/hooks';
+import { useApi, useBlackjack } from '@/hooks';
 
 import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
@@ -36,6 +36,8 @@ const Blackjack = () => {
     clearError,
     fetchPostData,
   } = useApi();
+
+  const { balance, bet, startGame } = useBlackjack();
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
@@ -139,6 +141,14 @@ const Blackjack = () => {
       </div>
       {page === GamePage.Overview && (
         <div className={styles.overview}>
+          <button
+            className={`${styles.play} ${styles.casino}`}
+            disabled={!bet || bet > balance || balance === 0}
+            onClick={() => {
+              if (bet) startGame(bet);
+            }}>
+            PLAY
+          </button>
           <div className={styles.statsContainer}>
             {(isLoading || !stats[GameCode.Blackjack]) && <Loading />}
             {!isLoading && stats[GameCode.Blackjack] && (

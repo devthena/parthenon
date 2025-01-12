@@ -1,27 +1,5 @@
-export type BlackjackSuit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
-
-export type BlackjackRank =
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | '10'
-  | 'J'
-  | 'Q'
-  | 'K'
-  | 'A';
-
-export interface BlackjackCard {
-  small?: boolean;
-  suit: BlackjackSuit;
-  rank: BlackjackRank;
-}
-
-export type BlackjackDeck = BlackjackCard[];
+import { BlackjackStatus } from '@/enums/games';
+import { CardDeck, PlayCard } from './cards';
 
 export interface BlackjackObject {
   totalBlackjack: number;
@@ -32,7 +10,17 @@ export interface BlackjackObject {
 export interface BlackjackState {
   balance: number;
   bet: number | null;
-  deck: BlackjackDeck;
-  playerHand: BlackjackCard[];
-  dealerHand: BlackjackCard[];
+  deck: CardDeck;
+  playerHand: PlayCard[];
+  dealerHand: PlayCard[];
+  status: BlackjackStatus;
 }
+
+export type BlackjackAction =
+  | { type: 'BET_UPDATE'; payload: number }
+  | { type: 'GAME_START'; payload: { bet: number; deck: PlayCard[] } }
+  | { type: 'DOUBLE' }
+  | { type: 'HIT' }
+  | { type: 'STAND' }
+  | { type: 'GAME_END'; payload: BlackjackStatus }
+  | { type: 'GAME_RESET' };

@@ -1,3 +1,4 @@
+export * from './blackjack';
 export * from './wordle';
 
 export enum GameCode {

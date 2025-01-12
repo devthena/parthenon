@@ -131,4 +131,9 @@ button.play {
   &:hover {
     background-color: var(--green-hover);
   }
+
+  &.casino {
+    background-color: var(--green-casino);
+    border: 2px solid var(--green-casino-dark);
+  }
 }
