@@ -11,7 +11,7 @@ export const useBlackjack = () => {
   const [state, dispatch] = useReducer(blackjackReducer, INITIAL_STATE_BLK);
 
   const updateBet = useCallback(
-    (bet: number) => {
+    (bet: number | null) => {
       dispatch({ type: 'BET_UPDATE', payload: bet });
     },
     [dispatch]

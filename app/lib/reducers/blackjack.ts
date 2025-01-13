@@ -28,13 +28,6 @@ export const blackjackReducer = (
       };
 
     case 'GAME_START':
-      if (action.payload.bet > state.balance) {
-        return {
-          ...state,
-          status: BlackjackStatus.Standby,
-        };
-      }
-
       const deck: PlayCard[] = [...action.payload.deck];
 
       const playerHand = [drawCard(deck), drawCard(deck)];
@@ -42,7 +35,7 @@ export const blackjackReducer = (
 
       return {
         ...state,
-        balance: state.balance - action.payload.bet,
+        // @todo: update user points (minus bet)
         bet: action.payload.bet,
         deck: deck,
         playerHand: playerHand,
@@ -65,7 +58,7 @@ export const blackjackReducer = (
 
       return {
         ...state,
-        balance: state.balance - state.bet,
+        // @todo: update user points (minus bet)
         bet: state.bet * 2,
         deck: copyDeck,
         dealerHand: newDealerHand,
@@ -117,14 +110,13 @@ export const blackjackReducer = (
 
       return {
         ...state,
-        balance: state.balance + reward,
+        // @todo: add the reward to the user points
         status: action.payload,
       };
 
     case 'GAME_RESET':
       return {
         ...INITIAL_STATE_BLK,
-        balance: state.balance,
         bet: state.bet,
       };
 

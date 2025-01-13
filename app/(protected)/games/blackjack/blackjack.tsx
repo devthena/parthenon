@@ -12,7 +12,7 @@ import { GameCode, GamePage } from '@/enums/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 
-import { Rules, Stats } from './components';
+import { Balance, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
 
 const Blackjack = () => {
@@ -37,7 +37,7 @@ const Blackjack = () => {
     fetchPostData,
   } = useApi();
 
-  const { balance, bet, startGame } = useBlackjack();
+  const { bet, startGame } = useBlackjack();
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
@@ -141,16 +141,22 @@ const Blackjack = () => {
       </div>
       {page === GamePage.Overview && (
         <div className={styles.overview}>
-          <button
-            className={`${styles.play} ${styles.casino}`}
-            disabled={!bet || bet > balance || balance === 0}
-            onClick={() => {
-              if (bet) startGame(bet);
-            }}>
-            PLAY
-          </button>
+          <p>Adjust your bet then hit PLAY when ready!</p>
+          {(isLoading || !user) && <Loading />}
+          {!isLoading && user && (
+            <>
+              <Balance cash={user.cash} />
+              <button
+                className={`${styles.play} ${styles.casino}`}
+                disabled={!bet || bet > user.cash || user.cash === 0}
+                onClick={() => {
+                  if (bet) startGame(bet);
+                }}>
+                PLAY
+              </button>
+            </>
+          )}
           <div className={styles.statsContainer}>
-            {(isLoading || !stats[GameCode.Blackjack]) && <Loading />}
             {!isLoading && stats[GameCode.Blackjack] && (
               <Stats data={stats[GameCode.Blackjack]} />
             )}

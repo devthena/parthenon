@@ -7,13 +7,6 @@ export const Rules = () => {
       <p>Get closer to 21 than the Dealer</p>
       <div className={styles.list}>
         <ul>
-          <li>Aces can be used as a 1 or 11</li>
-          <li>Cards 2-10 are worth their face value</li>
-          <li>Face cards J, Q, and K are worth 10</li>
-        </ul>
-      </div>
-      <div className={styles.list}>
-        <ul>
           <li>
             <span className={styles.green}>HIT</span> - Draw another card
           </li>

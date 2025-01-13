@@ -8,7 +8,6 @@ export interface BlackjackObject {
 }
 
 export interface BlackjackState {
-  balance: number;
   bet: number | null;
   deck: CardDeck;
   playerHand: PlayCard[];
@@ -17,7 +16,7 @@ export interface BlackjackState {
 }
 
 export type BlackjackAction =
-  | { type: 'BET_UPDATE'; payload: number }
+  | { type: 'BET_UPDATE'; payload: number | null }
   | { type: 'GAME_START'; payload: { bet: number; deck: PlayCard[] } }
   | { type: 'DOUBLE' }
   | { type: 'HIT' }
