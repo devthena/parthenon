@@ -41,6 +41,10 @@
   margin-top: 35px;
 }
 
+.description {
+  margin-bottom: 35px;
+}
+
 .playing {
   margin: 20px auto 0;
   max-width: 575px;
@@ -128,7 +132,7 @@ button.play {
     width: 235px;
   }
 
-  &:hover {
+  &:hover:enabled {
     background-color: var(--green-hover);
   }
 
@@ -137,7 +141,13 @@ button.play {
     border: 2px solid var(--green-casino-dark);
   }
 
-  &.casino:hover {
+  &.casino:hover:enabled {
     background-color: var(--green-casino-hover);
+  }
+
+  &:disabled {
+    background-color: var(--grey);
+    border-color: var(--black-lighter);
+    cursor: default;
   }
 }

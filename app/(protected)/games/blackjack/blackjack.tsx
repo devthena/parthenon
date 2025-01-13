@@ -37,7 +37,7 @@ const Blackjack = () => {
     fetchPostData,
   } = useApi();
 
-  const { bet, startGame } = useBlackjack();
+  const { bet, startGame, updateBet } = useBlackjack();
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
@@ -141,11 +141,13 @@ const Blackjack = () => {
       </div>
       {page === GamePage.Overview && (
         <div className={styles.overview}>
-          <p>Adjust your bet then hit PLAY when ready!</p>
+          <p className={styles.description}>
+            Adjust your bet then hit PLAY when ready!
+          </p>
           {(isLoading || !user) && <Loading />}
           {!isLoading && user && (
             <>
-              <Balance cash={user.cash} />
+              <Balance bet={bet} cash={user.cash} onUpdate={updateBet} />
               <button
                 className={`${styles.play} ${styles.casino}`}
                 disabled={!bet || bet > user.cash || user.cash === 0}

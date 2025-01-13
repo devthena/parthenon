@@ -1,17 +1,17 @@
-import { useBlackjack } from '@/hooks';
 import { CoinIcon } from '@/images/icons';
-
 import styles from '../styles/balance.module.scss';
 
 export const Balance = ({
-  disabled = false,
+  bet,
   cash,
+  disabled = false,
+  onUpdate,
 }: {
-  disabled?: boolean;
+  bet: number | null;
   cash: number;
+  disabled?: boolean;
+  onUpdate: Function;
 }) => {
-  const { bet, updateBet } = useBlackjack();
-
   const betValue = !bet || bet < 1 ? '' : bet;
 
   return (
@@ -20,13 +20,17 @@ export const Balance = ({
         <span>BET:</span>
         <input
           disabled={disabled}
-          type="number"
+          max={cash}
+          min={1}
           onChange={e => {
-            if (e.target.value === '') return updateBet(null);
+            if (e.target.value === '') return onUpdate(null);
 
             const newBet = parseInt(e.target.value, 10);
-            if (newBet > 0) updateBet(newBet);
+
+            if (isNaN(newBet)) return onUpdate(null);
+            else if (newBet > 0) onUpdate(newBet);
           }}
+          type="number"
           value={betValue}
         />
       </div>
