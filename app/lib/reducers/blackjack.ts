@@ -52,12 +52,11 @@ export const blackjackReducer = (
 
       const newDealerHand =
         playerHandValue < 21
-          ? dealerPlay(copyDeck, state.dealerHand)
+          ? dealerPlay(copyDeck, [...state.dealerHand])
           : state.dealerHand;
 
       return {
         ...state,
-        // @todo: update user points (minus bet)
         bet: state.bet * 2,
         deck: copyDeck,
         dealerHand: newDealerHand,
@@ -78,7 +77,7 @@ export const blackjackReducer = (
 
     case 'STAND':
       const currentDeck = [...state.deck];
-      const updatedDealerHand = dealerPlay(currentDeck, state.dealerHand);
+      const updatedDealerHand = dealerPlay(currentDeck, [...state.dealerHand]);
 
       return {
         ...state,
@@ -87,29 +86,8 @@ export const blackjackReducer = (
       };
 
     case 'GAME_END':
-      if (state.status === action.payload || !state.bet) return state;
-
-      let blackjack = 0;
-      let reward = 0;
-      let win = 0;
-
-      if (
-        action.payload === BlackjackStatus.Win ||
-        action.payload === BlackjackStatus.DealerBust
-      ) {
-        reward = state.bet * 2;
-        win += 1;
-      } else if (action.payload === BlackjackStatus.Blackjack) {
-        blackjack += 1;
-        reward = state.bet + Math.round(state.bet * 1.5);
-        win += 1;
-      } else if (action.payload === BlackjackStatus.Push) {
-        reward = state.bet;
-      }
-
       return {
         ...state,
-        // @todo: add the reward to the user points
         status: action.payload,
       };
 

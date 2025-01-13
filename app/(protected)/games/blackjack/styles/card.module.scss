@@ -1,0 +1,38 @@
+.card {
+  background-color: var(--white-light);
+  border: 1.5px solid var(--black);
+  border-radius: 7px;
+  margin-right: 7px;
+  padding: 12px 12px 17px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  p {
+    font-size: 20px;
+    margin: 0 0 5px;
+    text-align: left;
+  }
+
+  svg {
+    height: 72px;
+    width: 72px;
+  }
+}
+
+.small {
+  svg {
+    width: 56px;
+  }
+}
+
+.clubs,
+.spades {
+  color: var(--black);
+}
+
+.diamonds,
+.hearts {
+  color: var(--red-casino);
+}

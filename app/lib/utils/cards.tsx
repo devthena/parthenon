@@ -1,4 +1,5 @@
 import { CARD_RANKS, CARD_SUITS } from '@/constants/cards';
+import { BlackjackStatus } from '@/enums/games';
 import { CardSuit, PlayCard } from '@/interfaces/games';
 
 import {
@@ -52,6 +53,25 @@ export const getHandValue = (hand: PlayCard[]) => {
   }
 
   return total;
+};
+
+export const getBlackjackResult = (result: BlackjackStatus): string => {
+  switch (result) {
+    case BlackjackStatus.Blackjack:
+      return 'BLACKJACK';
+    case BlackjackStatus.Bust:
+      return 'BUST';
+    case BlackjackStatus.DealerBust:
+      return 'DEALER BUST';
+    case BlackjackStatus.Lose:
+      return 'YOU LOSE';
+    case BlackjackStatus.Win:
+      return 'YOU WIN';
+    case BlackjackStatus.Push:
+      return 'PUSH';
+    default:
+      return '';
+  }
 };
 
 export const getSuitSVG = (suit: CardSuit) => {

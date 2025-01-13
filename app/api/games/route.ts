@@ -42,10 +42,11 @@ const updateGame = async (
 
   let discordId = null;
 
-  if (method !== 'discord') {
-    const user = await usersCollection.findOne({ [`${method}_id`]: id });
+  let user = await usersCollection.findOne({ [`${method}_id`]: id });
+  if (!user) return null;
 
-    if (user?.discord_id) discordId = user.discord_id;
+  if (method !== 'discord') {
+    if (user.discord_id) discordId = user.discord_id;
   } else {
     discordId = id;
   }
@@ -62,13 +63,31 @@ const updateGame = async (
   };
 
   const createGame = async () => {
+    if (!payload.data.sessionKey) return {};
+
     let gameData = {};
     const newKey = uuidv4();
 
+    // save the initial game data for Wordle
     if (payload.code === GameCode.Wordle) {
       gameData = {
         answer: decrypt(payload.data.sessionKey),
         guesses: [],
+      };
+    }
+
+    // update the user cash for playing Blackjack
+    else if (payload.code === GameCode.Blackjack) {
+      const betString = decrypt(payload.data.sessionKey);
+      const bet = parseInt(betString, 10);
+
+      await usersCollection.updateOne(
+        { discord_id: discordId },
+        { $set: { cash: user.cash - bet } }
+      );
+
+      gameData = {
+        bet: bet,
       };
     }
 

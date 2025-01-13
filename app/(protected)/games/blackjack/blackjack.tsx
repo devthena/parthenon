@@ -8,12 +8,12 @@ import { useParthenonState } from '@/context';
 import { useApi, useBlackjack } from '@/hooks';
 
 import { ApiDataType, ApiUrl } from '@/enums/api';
-import { GameCode, GamePage } from '@/enums/games';
+import { BlackjackStatus, GameCode, GamePage } from '@/enums/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils/encryption';
 
-import { Balance, Rules, Stats } from './components';
+import { Balance, GameTable, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
 
 const Blackjack = () => {
@@ -38,11 +38,18 @@ const Blackjack = () => {
     fetchPostData,
   } = useApi();
 
-  const { bet, onBetChange, onPlay, onReset } = useBlackjack();
+  const {
+    bet,
+    dealerHand,
+    deck,
+    playerHand,
+    status,
+    onBetChange,
+    onPlay,
+    onReset,
+  } = useBlackjack();
 
-  const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
-
   const gameKeyRef = useRef(games[GameCode.Blackjack]);
 
   const getStats = useCallback(async () => {
@@ -54,11 +61,16 @@ const Blackjack = () => {
   const getGame = useCallback(async () => {
     await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
       code: GameCode.Blackjack,
+      data: {
+        sessionKey: encrypt('' + bet),
+      },
     });
   }, [fetchPostData]);
 
-  const updateGame = async (status: string) => {
+  const updateGame = async (status: BlackjackStatus, isDouble: boolean) => {
     if (!gameKeyRef.current) return;
+
+    const codeString = isDouble ? status + '-double' : status;
 
     await fetchPostData(
       ApiUrl.Games,
@@ -67,7 +79,7 @@ const Blackjack = () => {
         key: gameKeyRef.current,
         code: GameCode.Blackjack,
         data: {
-          sessionCode: encrypt(status),
+          sessionCode: encrypt(codeString),
         },
       },
       true
@@ -190,6 +202,12 @@ const Blackjack = () => {
                   if (bet) {
                     onPlay(bet);
                     setPage(GamePage.Playing);
+
+                    onSetUser({
+                      ...user,
+                      cash: user.cash - bet,
+                    });
+
                     getGame();
                   }
                 }}>
@@ -206,8 +224,18 @@ const Blackjack = () => {
       )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
-          {(isLoading || !games[GameCode.Blackjack]) && <Loading />}
-          {!isLoading && games[GameCode.Blackjack] && <p>Hello World</p>}
+          {(isLoading || !user || !games[GameCode.Blackjack]) && <Loading />}
+          {!isLoading && user && games[GameCode.Blackjack] && (
+            <GameTable
+              bet={bet}
+              cash={user.cash}
+              deckSize={deck.length}
+              dealerHand={dealerHand}
+              playerHand={playerHand}
+              status={status}
+              updateGame={updateGame}
+            />
+          )}
         </div>
       )}
     </div>
