@@ -45,8 +45,11 @@ const Blackjack = () => {
     playerHand,
     status,
     onBetChange,
+    onDouble,
+    onHit,
     onPlay,
     onReset,
+    onStand,
   } = useBlackjack();
 
   const [page, setPage] = useState(GamePage.Overview);
@@ -234,6 +237,11 @@ const Blackjack = () => {
               playerHand={playerHand}
               status={status}
               updateGame={updateGame}
+              onBetChange={onBetChange}
+              onDouble={onDouble}
+              onHit={onHit}
+              onPlay={onPlay}
+              onStand={onStand}
             />
           )}
         </div>

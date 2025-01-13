@@ -11,6 +11,7 @@ import { UserAuthMethod, UserDocument } from '@/interfaces/user';
 import { dbClientPromise } from '@/lib/db';
 import { decrypt } from '@/lib/utils/encryption';
 
+import { updateBlackjack } from './updateBlackjack';
 import { updateWordle } from './updateWordle';
 
 const mongodbName = process.env.MONGODB_NAME;
@@ -134,6 +135,14 @@ const updateGame = async (
 
     // handle submission for Blackjack game
     else if (payload.code === GameCode.Blackjack) {
+      updateBlackjack(
+        discordId,
+        payload.data.sessionCode,
+        game,
+        statsCollection,
+        usersCollection,
+        deleteGame
+      );
     }
   } else {
     data = await createGame();

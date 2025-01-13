@@ -16,6 +16,32 @@ const dealerPlay = (deck: PlayCard[], hand: PlayCard[]) => {
   return dealerHand;
 };
 
+const checkStatus = (
+  playerHand: PlayCard[],
+  dealerHand: PlayCard[]
+): BlackjackStatus => {
+  let status = BlackjackStatus.Playing;
+
+  const playerHandValue = getHandValue(playerHand);
+  const dealerHandValue = getHandValue(dealerHand);
+
+  if (playerHandValue > 21) {
+    status = BlackjackStatus.Bust;
+  } else if (dealerHandValue > 21) {
+    status = BlackjackStatus.DealerBust;
+  } else if (playerHandValue === 21) {
+    status = BlackjackStatus.Blackjack;
+  } else if (dealerHandValue >= 17 && dealerHandValue > playerHandValue) {
+    status = BlackjackStatus.Lose;
+  } else if (dealerHandValue >= 17 && playerHandValue > dealerHandValue) {
+    status = BlackjackStatus.Win;
+  } else if (dealerHandValue >= 17 && dealerHandValue === playerHandValue) {
+    status = BlackjackStatus.Push;
+  }
+
+  return status;
+};
+
 export const blackjackReducer = (
   state: BlackjackState,
   action: BlackjackAction
@@ -39,7 +65,7 @@ export const blackjackReducer = (
         deck: deck,
         playerHand: playerHand,
         dealerHand: dealerHand,
-        status: BlackjackStatus.Playing,
+        status: checkStatus(playerHand, dealerHand),
       };
 
     case 'DOUBLE':
@@ -61,6 +87,7 @@ export const blackjackReducer = (
         deck: copyDeck,
         dealerHand: newDealerHand,
         playerHand: newPlayerHand,
+        status: checkStatus(newPlayerHand, newDealerHand),
       };
 
     case 'HIT':
@@ -73,6 +100,7 @@ export const blackjackReducer = (
         ...state,
         deck: updatedDeck,
         playerHand: updatedPlayerHand,
+        status: checkStatus(updatedPlayerHand, [...state.dealerHand]),
       };
 
     case 'STAND':
@@ -83,12 +111,7 @@ export const blackjackReducer = (
         ...state,
         deck: currentDeck,
         dealerHand: updatedDealerHand,
-      };
-
-    case 'GAME_END':
-      return {
-        ...state,
-        status: action.payload,
+        status: checkStatus([...state.playerHand], updatedDealerHand),
       };
 
     case 'GAME_RESET':

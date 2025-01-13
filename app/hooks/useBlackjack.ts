@@ -42,28 +42,8 @@ export const useBlackjack = () => {
     dispatch({ type: 'STAND' });
   }, [dispatch]);
 
-  const isGameOver = useCallback(() => {
-    const playerHandValue = getHandValue(state.playerHand);
-    const dealerHandValue = getHandValue(state.dealerHand);
-
-    if (playerHandValue > 21) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.Bust });
-    } else if (dealerHandValue > 21) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.DealerBust });
-    } else if (playerHandValue === 21) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.Blackjack });
-    } else if (dealerHandValue >= 17 && dealerHandValue > playerHandValue) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.Lose });
-    } else if (dealerHandValue >= 17 && playerHandValue > dealerHandValue) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.Win });
-    } else if (dealerHandValue >= 17 && dealerHandValue === playerHandValue) {
-      dispatch({ type: 'GAME_END', payload: BlackjackStatus.Push });
-    }
-  }, [dispatch, state.dealerHand, state.playerHand]);
-
   return {
     ...state,
-    isGameOver,
     onBetChange,
     onDouble,
     onHit,

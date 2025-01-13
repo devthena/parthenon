@@ -4,14 +4,13 @@ import { useParthenonState } from '@/context';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { BlackjackStatus, GameCode } from '@/enums/games';
-import { useBlackjack } from '@/hooks';
+import { PlayCard } from '@/interfaces/games';
 import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
 
 import { Balance } from './balance';
 import { CardBox } from './card';
 
 import styles from '../styles/game.module.scss';
-import { PlayCard } from '@/interfaces/games';
 
 export const GameTable = ({
   bet,
@@ -21,6 +20,11 @@ export const GameTable = ({
   playerHand,
   status,
   updateGame,
+  onBetChange,
+  onDouble,
+  onHit,
+  onPlay,
+  onStand,
 }: {
   bet: number | null;
   cash: number;
@@ -29,14 +33,15 @@ export const GameTable = ({
   playerHand: PlayCard[];
   status: BlackjackStatus;
   updateGame: (status: BlackjackStatus, isDouble: boolean) => Promise<void>;
+  onBetChange: (bet: number | null) => void;
+  onDouble: () => void;
+  onHit: () => void;
+  onPlay: (bet: number) => void;
+  onStand: () => void;
 }) => {
   const { user, stats, onSetStats, onSetUser } = useParthenonState();
 
-  const { isGameOver, onBetChange, onDouble, onHit, onPlay, onStand } =
-    useBlackjack();
-
   const [isDouble, setIsDouble] = useState(false);
-  const [isStatsUpdated, setIsStatsUpdated] = useState(false);
 
   const handleDouble = useCallback(async () => {
     if (isDouble) return;
@@ -47,13 +52,7 @@ export const GameTable = ({
   const gameOver = GAME_OVER_STATUS_BLK.includes(status);
 
   useEffect(() => {
-    if (
-      !user ||
-      !user.discord_username ||
-      !stats[GameCode.Blackjack] ||
-      !bet ||
-      isStatsUpdated
-    )
+    if (!user || !user.discord_username || !stats[GameCode.Blackjack] || !bet)
       return;
 
     if (GAME_OVER_STATUS_BLK.includes(status)) {
@@ -66,8 +65,6 @@ export const GameTable = ({
       };
 
       if (status === BlackjackStatus.Blackjack) {
-        setIsStatsUpdated(true);
-
         onSetStats({
           [GameCode.Blackjack]: {
             ...newStats,
@@ -86,8 +83,6 @@ export const GameTable = ({
         status === BlackjackStatus.Win ||
         status === BlackjackStatus.DealerBust
       ) {
-        setIsStatsUpdated(true);
-
         onSetStats({
           [GameCode.Blackjack]: {
             ...newStats,
@@ -107,10 +102,8 @@ export const GameTable = ({
           cash: user.cash + bet,
         });
       }
-    } else {
-      isGameOver();
     }
-  }, [isDouble, status]);
+  }, [status]);
 
   return (
     <div className={styles.game}>

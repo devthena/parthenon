@@ -21,5 +21,4 @@ export type BlackjackAction =
   | { type: 'DOUBLE' }
   | { type: 'HIT' }
   | { type: 'STAND' }
-  | { type: 'GAME_END'; payload: BlackjackStatus }
   | { type: 'GAME_RESET' };
