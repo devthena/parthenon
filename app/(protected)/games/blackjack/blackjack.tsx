@@ -1,7 +1,7 @@
 'use client';
 
 import { redirect } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
@@ -11,6 +11,7 @@ import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage } from '@/enums/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
+import { encrypt } from '@/lib/utils/encryption';
 
 import { Balance, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
@@ -37,16 +38,41 @@ const Blackjack = () => {
     fetchPostData,
   } = useApi();
 
-  const { bet, startGame, updateBet } = useBlackjack();
+  const { bet, onBetChange, onPlay, onReset } = useBlackjack();
 
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
+
+  const gameKeyRef = useRef(games[GameCode.Blackjack]);
 
   const getStats = useCallback(async () => {
     await fetchPostData(ApiUrl.Stats, ApiDataType.Stats, {
       code: GameCode.Blackjack,
     });
   }, [fetchPostData]);
+
+  const getGame = useCallback(async () => {
+    await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
+      code: GameCode.Blackjack,
+    });
+  }, [fetchPostData]);
+
+  const updateGame = async (status: string) => {
+    if (!gameKeyRef.current) return;
+
+    await fetchPostData(
+      ApiUrl.Games,
+      ApiDataType.Games,
+      {
+        key: gameKeyRef.current,
+        code: GameCode.Blackjack,
+        data: {
+          sessionCode: encrypt(status),
+        },
+      },
+      true
+    );
+  };
 
   useEffect(() => {
     if (!stats[GameCode.Blackjack]) getStats();
@@ -56,6 +82,15 @@ const Blackjack = () => {
     if (!isApiFetched || !dataStats || stats[GameCode.Blackjack]) return;
     onSetStats(dataStats);
   }, [dataStats, isApiFetched, stats, onSetStats]);
+
+  useEffect(() => {
+    if (!isApiFetched || !dataGame) return;
+    onSetGame(dataGame);
+  }, [dataGame, isApiFetched, onSetGame]);
+
+  useEffect(() => {
+    gameKeyRef.current = games[GameCode.Blackjack];
+  }, [games]);
 
   if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
@@ -68,7 +103,7 @@ const Blackjack = () => {
               <button
                 className={styles.back}
                 onClick={() => {
-                  // onReset();
+                  onReset();
                   setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
@@ -76,7 +111,7 @@ const Blackjack = () => {
               <button
                 className={styles.backDesktop}
                 onClick={() => {
-                  // onReset();
+                  onReset();
                   setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
@@ -147,12 +182,16 @@ const Blackjack = () => {
           {(isLoading || !user) && <Loading />}
           {!isLoading && user && (
             <>
-              <Balance bet={bet} cash={user.cash} onUpdate={updateBet} />
+              <Balance bet={bet} cash={user.cash} onUpdate={onBetChange} />
               <button
                 className={`${styles.play} ${styles.casino}`}
                 disabled={!bet || bet > user.cash || user.cash === 0}
                 onClick={() => {
-                  if (bet) startGame(bet);
+                  if (bet) {
+                    onPlay(bet);
+                    setPage(GamePage.Playing);
+                    getGame();
+                  }
                 }}>
                 PLAY
               </button>
@@ -168,6 +207,7 @@ const Blackjack = () => {
       {page === GamePage.Playing && (
         <div className={styles.playing}>
           {(isLoading || !games[GameCode.Blackjack]) && <Loading />}
+          {!isLoading && games[GameCode.Blackjack] && <p>Hello World</p>}
         </div>
       )}
     </div>

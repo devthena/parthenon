@@ -8,6 +8,21 @@ import {
   SpadesIcon,
 } from '@/images/icons';
 
+export const createCardDeck = (): PlayCard[] => {
+  const deck: PlayCard[] = [];
+
+  CARD_SUITS.forEach(suit => {
+    CARD_RANKS.forEach(rank => {
+      deck.push({
+        suit: suit,
+        rank: rank,
+      });
+    });
+  });
+
+  return deck;
+};
+
 export const drawCard = (deck: PlayCard[]): PlayCard => {
   const card = deck[0];
   deck.splice(0, 1);
@@ -54,20 +69,7 @@ export const getSuitSVG = (suit: CardSuit) => {
   }
 };
 
-export const shuffleDeck = (): PlayCard[] => {
-  const newDeck: PlayCard[] = [];
-
-  CARD_SUITS.forEach(suit => {
-    CARD_RANKS.forEach(rank => {
-      newDeck.push({
-        suit: suit,
-        rank: rank,
-      });
-    });
-  });
-
-  const deck = [...newDeck, ...newDeck];
-
+export const shuffleDeck = (deck: PlayCard[]): PlayCard[] => {
   // Fisher-Yates Shuffle Algorithm
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

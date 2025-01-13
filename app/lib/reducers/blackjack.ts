@@ -35,7 +35,6 @@ export const blackjackReducer = (
 
       return {
         ...state,
-        // @todo: update user points (minus bet)
         bet: action.payload.bet,
         deck: deck,
         playerHand: playerHand,
