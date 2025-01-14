@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { INITIAL_STATS } from '@/constants/stats';
 
-import { ApiDataError, ApiDataType, ApiUrl } from '@/enums/api';
+import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
 import { GamePayload, GameObject } from '@/interfaces/games';
@@ -13,7 +13,6 @@ interface ApiState {
   dataGame: GameObject | null;
   dataUser: UserObject | null;
   dataStats: StatsObject | null;
-  error: ApiDataError | null;
   isFetched: boolean;
   isLoading: boolean;
 }
@@ -24,20 +23,12 @@ const initialState = {
   dataGame: null,
   dataUser: null,
   dataStats: null,
-  error: null,
   isFetched: false,
   isLoading: false,
 };
 
 export const useApi = () => {
   const [data, setData] = useState<ApiState>(initialState);
-
-  const clearError = useCallback(async () => {
-    setData(prev => ({
-      ...prev,
-      error: null,
-    }));
-  }, []);
 
   const fetchGetData = useCallback(async (url: ApiUrl) => {
     setData(prev => ({
@@ -144,7 +135,6 @@ export const useApi = () => {
 
   return {
     ...data,
-    clearError,
     fetchGetData,
     fetchPostData,
   };

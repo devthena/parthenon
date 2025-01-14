@@ -1,7 +1,6 @@
 import { useCallback, useReducer } from 'react';
 
 import { INITIAL_STATE_BLK } from '@/constants/cards';
-import { BlackjackStatus } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 
 import { createCardDeck, getHandValue, shuffleDeck } from '@/lib/utils/cards';
