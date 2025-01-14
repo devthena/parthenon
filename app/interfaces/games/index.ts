@@ -1,6 +1,8 @@
 import { ObjectId } from 'mongodb';
-import { GameCode } from '@/enums/games';
+import { GameCode, GameRequestType } from '@/enums/games';
 
+export * from './blackjack';
+export * from './cards';
 export * from './wordle';
 
 export interface GameDocument {
@@ -12,11 +14,13 @@ export interface GameDocument {
 }
 
 export type GameObject = {
+  [GameCode.Blackjack]?: string;
   [GameCode.Wordle]?: string;
 };
 
 export interface GamePayload {
   key?: string;
   code: GameCode;
+  type: GameRequestType;
   data: { [key: string]: string };
 }

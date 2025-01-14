@@ -1,0 +1,83 @@
+.game {
+  margin: 24px auto 0;
+  max-width: 700px;
+
+  button {
+    font-weight: 600;
+    padding: 10px 15px;
+  }
+}
+
+.board {
+  background-color: var(--green-casino);
+  color: var(--white-light);
+  padding-bottom: 36px;
+}
+
+.deck {
+  margin: 0;
+  padding: 17px 17px 0;
+  text-align: right;
+}
+
+.dealer,
+.player {
+  display: flex;
+  padding: 17px 0;
+
+  & > div {
+    font-weight: 700;
+    width: 150px;
+  }
+}
+
+.name {
+  margin: 0;
+}
+
+.value {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+.actions,
+.result {
+  align-items: center;
+  display: flex;
+  height: 100px;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.actions,
+.result > div {
+  button {
+    background-color: var(--white);
+    border: 1.5px solid var(--black);
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 50px;
+    margin-right: 17px;
+    width: 150px;
+  }
+
+  button:hover:enabled {
+    border: none;
+  }
+
+  button:last-child {
+    margin-right: 0;
+  }
+}
+
+.resultLabel {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.cards {
+  display: flex;
+  flex-grow: 1;
+}

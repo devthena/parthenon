@@ -1,5 +1,6 @@
 export * from './back';
 export * from './backspace';
+export * from './blackjack';
 export * from './close';
 export * from './coin';
 export * from './knucklebones';
@@ -13,4 +14,8 @@ export * from './social-twitch';
 export * from './social-x';
 export * from './star';
 export * from './stats';
+export * from './suit-clubs';
+export * from './suit-diamonds';
+export * from './suit-hearts';
+export * from './suit-spades';
 export * from './wordle';

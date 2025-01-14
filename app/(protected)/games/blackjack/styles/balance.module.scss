@@ -1,0 +1,40 @@
+.balance {
+  margin: 24px auto;
+}
+
+.betBox {
+  span {
+    font-weight: 600;
+    margin-right: 15px;
+  }
+
+  input {
+    font-size: 20px;
+    font-weight: 500;
+    height: 30px;
+    padding: 0 10px;
+    width: 150px;
+  }
+}
+
+.balanceBox {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+
+  span:first-child {
+    font-weight: 600;
+    margin-right: 10px;
+  }
+
+  svg {
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.cash {
+  font-size: 20px;
+  margin-right: 5px;
+}

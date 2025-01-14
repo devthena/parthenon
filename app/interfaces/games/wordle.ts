@@ -25,3 +25,11 @@ export interface WordleObject {
   totalPlayed: number;
   totalWon: number;
 }
+
+export type WordleAction =
+  | { type: 'play' }
+  | { type: 'delete' }
+  | { type: 'enter' }
+  | { type: 'key'; letter: string }
+  | { type: 'reset' }
+  | { type: 'resume' };

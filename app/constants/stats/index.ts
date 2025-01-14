@@ -1,6 +1,12 @@
 import { GameCode } from '@/enums/games';
-import { WordleObject } from '@/interfaces/games';
+import { BlackjackObject, WordleObject } from '@/interfaces/games';
 import { StatsInitObject } from '@/interfaces/statistics';
+
+export const INITIAL_BLACKJACK: BlackjackObject = {
+  totalBlackjack: 0,
+  totalPlayed: 0,
+  totalWon: 0,
+};
 
 export const INITIAL_WORDLE: WordleObject = {
   currentStreak: 0,
@@ -11,7 +17,6 @@ export const INITIAL_WORDLE: WordleObject = {
 };
 
 export const INITIAL_STATS: StatsInitObject = {
-  // @todo: add property once Blackjack is implemented
-  // [GameCode.Blackjack]: INITIAL_BLACKJACK,
+  [GameCode.Blackjack]: INITIAL_BLACKJACK,
   [GameCode.Wordle]: INITIAL_WORDLE,
 };

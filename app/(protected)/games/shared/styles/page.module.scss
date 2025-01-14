@@ -1,0 +1,153 @@
+@import '@/styles/variables';
+
+.header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 700px;
+  padding: 0 20px;
+
+  h1 {
+    flex-grow: 1;
+  }
+
+  button {
+    background-color: var(--white);
+    border: 1px solid var(--black);
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+.leftButtons,
+.rightButtons {
+  width: 80px;
+}
+
+.leftButtons {
+  text-align: left;
+}
+
+.rightButtons {
+  text-align: right;
+
+  button:last-child {
+    margin-left: 8px;
+  }
+}
+
+.overview {
+  margin-top: 35px;
+}
+
+.description {
+  margin-bottom: 35px;
+}
+
+.playing {
+  margin: 20px auto 0;
+  max-width: 660px;
+}
+
+.statsContainer {
+  margin-top: 35px;
+}
+
+button.back {
+  margin-right: 15px;
+  padding: 2px 5px 0 2px;
+
+  & > svg {
+    fill: var(--black);
+    height: 20px;
+    width: 20px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    display: none;
+  }
+}
+
+button.backDesktop {
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  display: none;
+  padding: 3px 11px 3px 3px;
+
+  & > svg {
+    fill: var(--black);
+    height: 20px;
+    width: 20px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    display: flex;
+  }
+}
+
+button.rules,
+button.rulesOverview,
+button.stats {
+  padding: 2px 5px 0;
+
+  & > svg {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+button.rulesOverview {
+  @media screen and (min-width: $tablet-width) {
+    display: none;
+  }
+}
+
+button.rulesDesktop {
+  display: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 3px 11px;
+
+  @media screen and (min-width: $tablet-width) {
+    display: inline-block;
+  }
+}
+
+button.play {
+  background-color: var(--green);
+  border: 2px solid var(--green-dark);
+  border-radius: 30px;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 500;
+  height: 50px;
+  width: 175px;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 24px;
+    height: 62px;
+    width: 235px;
+  }
+
+  &:hover:enabled {
+    background-color: var(--green-hover);
+  }
+
+  &.casino {
+    background-color: var(--green-casino);
+    border: 2px solid var(--green-casino-dark);
+  }
+
+  &.casino:hover:enabled {
+    background-color: var(--green-casino-hover);
+  }
+
+  &:disabled {
+    background-color: var(--grey);
+    border-color: var(--black-lighter);
+    cursor: default;
+  }
+}

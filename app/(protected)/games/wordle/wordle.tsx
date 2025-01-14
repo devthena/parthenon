@@ -9,17 +9,16 @@ import { useApi, useWordle } from '@/hooks';
 
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
-import { ApiDataError, ApiDataType, ApiUrl } from '@/enums/api';
-import { GameCode, GamePage } from '@/enums/games';
+import { ApiDataType, ApiUrl } from '@/enums/api';
+import { GameCode, GamePage, GameRequestType } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
 import { WordleGuess } from '@/interfaces/games';
-
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils';
 
 import { AnswerGrid, Keyboard, Notice, Rules, Stats } from './components';
-import styles from './page.module.scss';
+import styles from '../shared/styles/page.module.scss';
 
 const Wordle = () => {
   const {
@@ -37,9 +36,7 @@ const Wordle = () => {
   const {
     dataGame,
     dataStats,
-    error,
     isFetched: isApiFetched,
-    clearError,
     fetchPostData,
   } = useApi();
 
@@ -75,6 +72,7 @@ const Wordle = () => {
   const getGame = useCallback(async () => {
     await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
       code: GameCode.Wordle,
+      type: GameRequestType.Create,
       data: {
         sessionKey: encrypt(answerRef.current),
       },
@@ -90,6 +88,7 @@ const Wordle = () => {
       {
         key: gameKeyRef.current,
         code: GameCode.Wordle,
+        type: GameRequestType.Update,
         data: {
           sessionCode: encrypt(guess),
         },
@@ -165,29 +164,6 @@ const Wordle = () => {
   }, [dataGame, isApiFetched, onSetGame]);
 
   useEffect(() => {
-    if (!isApiFetched || !error) return;
-
-    // @todo: Create a separate component for errors
-    if (error === ApiDataError.HoneyCake) {
-      onSetModal({
-        isOpen: true,
-        content: (
-          <div>
-            <h3>Rewards Not Added</h3>
-            <p>
-              Earning coins has been halted until Cerberus has returned. You can
-              revive him with Honey Cake or wait for his natural resurrection.
-              Check the Discord server for more details.
-            </p>
-          </div>
-        ),
-      });
-
-      clearError();
-    }
-  }, [error, isApiFetched, clearError, onSetModal]);
-
-  useEffect(() => {
     if (!isApiFetched || !dataStats || stats[GameCode.Wordle]) return;
     onSetStats(dataStats);
   }, [dataStats, isApiFetched, stats, onSetStats]);
@@ -237,16 +213,7 @@ const Wordle = () => {
         },
       });
     }
-  }, [
-    guesses.length,
-    isStatsUpdated,
-    reward,
-    stats,
-    status,
-    user,
-    onSetStats,
-    onSetUser,
-  ]);
+  }, [status]);
 
   useEffect(() => {
     if (status === WordleStatus.Playing && isStatsUpdated) {
