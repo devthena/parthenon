@@ -4,10 +4,6 @@ export enum ApiDataType {
   Users,
 }
 
-export enum ApiDataError {
-  HoneyCake = '011',
-}
-
 export enum ApiUrl {
   Games = '/api/games',
   Stats = '/api/stats',
