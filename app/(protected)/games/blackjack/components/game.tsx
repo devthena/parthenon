@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParthenonState } from '@/context';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
+import { INITIAL_STATS } from '@/constants/stats';
+
 import { BlackjackStatus, GameCode } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
@@ -52,17 +54,15 @@ export const GameTable = ({
   const gameOver = GAME_OVER_STATUS_BLK.includes(status);
 
   useEffect(() => {
-    if (!user || !user.discord_username || !stats[GameCode.Blackjack] || !bet)
-      return;
+    if (!user || !user.discord_username || !bet) return;
 
     if (GAME_OVER_STATUS_BLK.includes(status)) {
       updateGame(status, isDouble);
 
-      const newStats = {
-        totalBlackjack: stats[GameCode.Blackjack].totalBlackjack,
-        totalPlayed: stats[GameCode.Blackjack].totalPlayed + 1,
-        totalWon: stats[GameCode.Blackjack].totalWon,
-      };
+      const newStats =
+        stats[GameCode.Blackjack] ?? INITIAL_STATS[GameCode.Blackjack];
+
+      newStats.totalPlayed += 1;
 
       if (status === BlackjackStatus.Blackjack) {
         onSetStats({
@@ -73,7 +73,7 @@ export const GameTable = ({
           },
         });
 
-        const reward = bet + Math.round(bet * 1.5);
+        const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
         onSetUser({
           ...user,
@@ -90,7 +90,7 @@ export const GameTable = ({
           },
         });
 
-        const reward = bet * 2;
+        const reward = isDouble ? bet + bet * 2 : bet * 2;
 
         onSetUser({
           ...user,
@@ -101,6 +101,13 @@ export const GameTable = ({
           ...user,
           cash: user.cash + bet,
         });
+      } else {
+        if (isDouble) {
+          onSetUser({
+            ...user,
+            cash: user.cash - bet,
+          });
+        }
       }
     }
   }, [status]);
@@ -137,11 +144,17 @@ export const GameTable = ({
         {gameOver && (
           <div className={styles.result}>
             <div>
-              <p>RESULT: {getBlackjackResult(status)}</p>
+              <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
               <button
                 disabled={!bet || bet > cash}
                 onClick={() => {
-                  if (bet) onPlay(bet);
+                  if (user && bet) {
+                    onPlay(bet);
+                    onSetUser({
+                      ...user,
+                      cash: user.cash - bet,
+                    });
+                  }
                 }}>
                 PLAY AGAIN
               </button>

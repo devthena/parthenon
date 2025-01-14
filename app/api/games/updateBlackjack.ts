@@ -32,13 +32,10 @@ export const updateBlackjack = async (
     stats = statsDoc[GameCode.Blackjack];
   }
 
-  const savedBet = parseInt(game.data.bet as string, 10);
-  const bet = isDouble ? savedBet * 2 : savedBet;
+  const bet = parseInt(game.data.bet as string, 10);
 
   if (status === BlackjackStatus.Blackjack) {
-    const reward = isDouble
-      ? bet + Math.round(bet * 1.5) - bet / 2
-      : bet + Math.round(bet * 1.5);
+    const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
     await usersCollection.updateOne(
       { discord_id: discordId },
@@ -64,7 +61,7 @@ export const updateBlackjack = async (
     status === BlackjackStatus.Win ||
     status === BlackjackStatus.DealerBust
   ) {
-    const reward = isDouble ? bet * 2 - bet / 2 : bet * 2;
+    const reward = isDouble ? bet + bet * 2 : bet * 2;
 
     await usersCollection.updateOne(
       { discord_id: discordId },
@@ -89,7 +86,7 @@ export const updateBlackjack = async (
   } else if (status === BlackjackStatus.Push) {
     await usersCollection.updateOne(
       { discord_id: discordId },
-      { $inc: { cash: savedBet } }
+      { $inc: { cash: bet } }
     );
 
     await statsCollection.updateOne(
@@ -107,6 +104,13 @@ export const updateBlackjack = async (
 
     await deleteGame(game.key);
   } else {
+    if (isDouble) {
+      await usersCollection.updateOne(
+        { discord_id: discordId },
+        { $inc: { cash: -bet } }
+      );
+    }
+
     await statsCollection.updateOne(
       { discord_id: discordId },
       {

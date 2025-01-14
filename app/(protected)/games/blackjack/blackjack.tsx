@@ -8,7 +8,13 @@ import { useParthenonState } from '@/context';
 import { useApi, useBlackjack } from '@/hooks';
 
 import { ApiDataType, ApiUrl } from '@/enums/api';
-import { BlackjackStatus, GameCode, GamePage } from '@/enums/games';
+
+import {
+  BlackjackStatus,
+  GameCode,
+  GamePage,
+  GameRequestType,
+} from '@/enums/games';
 
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils/encryption';
@@ -32,9 +38,7 @@ const Blackjack = () => {
   const {
     dataGame,
     dataStats,
-    error,
     isFetched: isApiFetched,
-    clearError,
     fetchPostData,
   } = useApi();
 
@@ -53,6 +57,8 @@ const Blackjack = () => {
   } = useBlackjack();
 
   const [page, setPage] = useState(GamePage.Overview);
+
+  const betRef = useRef(bet);
   const gameKeyRef = useRef(games[GameCode.Blackjack]);
 
   const getStats = useCallback(async () => {
@@ -64,8 +70,9 @@ const Blackjack = () => {
   const getGame = useCallback(async () => {
     await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
       code: GameCode.Blackjack,
+      type: GameRequestType.Create,
       data: {
-        sessionKey: encrypt('' + bet),
+        sessionKey: encrypt('' + betRef.current),
       },
     });
   }, [fetchPostData]);
@@ -81,6 +88,7 @@ const Blackjack = () => {
       {
         key: gameKeyRef.current,
         code: GameCode.Blackjack,
+        type: GameRequestType.Update,
         data: {
           sessionCode: encrypt(codeString),
         },
@@ -104,8 +112,16 @@ const Blackjack = () => {
   }, [dataGame, isApiFetched, onSetGame]);
 
   useEffect(() => {
+    betRef.current = bet;
+  }, [bet]);
+
+  useEffect(() => {
     gameKeyRef.current = games[GameCode.Blackjack];
   }, [games]);
+
+  useEffect(() => {
+    if (status === BlackjackStatus.Playing) getGame();
+  }, [status]);
 
   if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
@@ -203,15 +219,12 @@ const Blackjack = () => {
                 disabled={!bet || bet > user.cash || user.cash === 0}
                 onClick={() => {
                   if (bet) {
-                    onPlay(bet);
                     setPage(GamePage.Playing);
-
+                    onPlay(bet);
                     onSetUser({
                       ...user,
                       cash: user.cash - bet,
                     });
-
-                    getGame();
                   }
                 }}>
                 PLAY

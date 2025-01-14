@@ -10,7 +10,7 @@ import { useApi, useWordle } from '@/hooks';
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
 import { ApiDataError, ApiDataType, ApiUrl } from '@/enums/api';
-import { GameCode, GamePage } from '@/enums/games';
+import { GameCode, GamePage, GameRequestType } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
 import { WordleGuess } from '@/interfaces/games';
@@ -74,6 +74,7 @@ const Wordle = () => {
   const getGame = useCallback(async () => {
     await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
       code: GameCode.Wordle,
+      type: GameRequestType.Create,
       data: {
         sessionKey: encrypt(answerRef.current),
       },
@@ -89,6 +90,7 @@ const Wordle = () => {
       {
         key: gameKeyRef.current,
         code: GameCode.Wordle,
+        type: GameRequestType.Update,
         data: {
           sessionCode: encrypt(guess),
         },

@@ -1,16 +1,15 @@
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 
-import { GameCode } from '@/enums/games';
+import { GameCode, GameRequestType } from '@/enums/games';
 
 import { GameDocument, GamePayload } from '@/interfaces/games';
 import { StatsDocument } from '@/interfaces/statistics';
 import { UserAuthMethod, UserDocument } from '@/interfaces/user';
 
 import { dbClientPromise } from '@/lib/db';
-import { decrypt } from '@/lib/utils/encryption';
 
+import { handleCreateGame } from './handleCreate';
 import { updateBlackjack } from './updateBlackjack';
 import { updateWordle } from './updateWordle';
 
@@ -29,7 +28,22 @@ if (
   throw new Error('Missing necessary environment variables');
 }
 
-const updateGame = async (
+const getCollections = async () => {
+  const client = await dbClientPromise;
+  const botDB = await client.db(mongodbName);
+
+  const gamesCollection = botDB.collection<GameDocument>(gamesCollectionName);
+  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
+  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
+
+  return {
+    games: gamesCollection,
+    stats: statsCollection,
+    users: usersCollection,
+  };
+};
+
+const handleUpdateGame = async (
   method: UserAuthMethod,
   id: string,
   payload: GamePayload
@@ -41,6 +55,7 @@ const updateGame = async (
   const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
   const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
 
+  let data = null;
   let discordId = null;
 
   let user = await usersCollection.findOne({ [`${method}_id`]: id });
@@ -54,7 +69,15 @@ const updateGame = async (
 
   if (!discordId) return null;
 
-  let data = null;
+  const game = await gamesCollection.findOne({
+    discord_id: discordId,
+    code: payload.code,
+  });
+
+  if (!game) return null;
+
+  // make sure that the game key and payload key matches
+  if (game.key !== payload.key) return null;
 
   const deleteGame = async (key: string) => {
     await gamesCollection.deleteOne({
@@ -63,89 +86,29 @@ const updateGame = async (
     });
   };
 
-  const createGame = async () => {
-    if (!payload.data.sessionKey) return {};
+  // handle submission for Wordle game
+  if (payload.code === GameCode.Wordle) {
+    data = updateWordle(
+      discordId,
+      payload.data.sessionCode,
+      game,
+      gamesCollection,
+      statsCollection,
+      usersCollection,
+      deleteGame
+    );
+  }
 
-    let gameData = {};
-    const newKey = uuidv4();
-
-    // save the initial game data for Wordle
-    if (payload.code === GameCode.Wordle) {
-      gameData = {
-        answer: decrypt(payload.data.sessionKey),
-        guesses: [],
-      };
-    }
-
-    // update the user cash for playing Blackjack
-    else if (payload.code === GameCode.Blackjack) {
-      const betString = decrypt(payload.data.sessionKey);
-      const bet = parseInt(betString, 10);
-
-      await usersCollection.updateOne(
-        { discord_id: discordId },
-        { $set: { cash: user.cash - bet } }
-      );
-
-      gameData = {
-        bet: bet,
-      };
-    }
-
-    await gamesCollection.insertOne({
-      discord_id: discordId,
-      key: newKey,
-      code: payload.code,
-      data: { ...gameData },
-    });
-
-    return {
-      key: newKey,
-    };
-  };
-
-  const game = await gamesCollection.findOne({
-    discord_id: discordId,
-    code: payload.code,
-  });
-
-  if (game) {
-    if (!payload.key) {
-      await deleteGame(game.key);
-      data = await createGame();
-
-      return data;
-    }
-
-    // make sure that the game key and payload key matches
-    if (game.key !== payload.key) return null;
-
-    // handle submission for Wordle game
-    if (payload.code === GameCode.Wordle) {
-      updateWordle(
-        discordId,
-        payload.data.sessionCode,
-        game,
-        gamesCollection,
-        statsCollection,
-        usersCollection,
-        deleteGame
-      );
-    }
-
-    // handle submission for Blackjack game
-    else if (payload.code === GameCode.Blackjack) {
-      updateBlackjack(
-        discordId,
-        payload.data.sessionCode,
-        game,
-        statsCollection,
-        usersCollection,
-        deleteGame
-      );
-    }
-  } else {
-    data = await createGame();
+  // handle submission for Blackjack game
+  else if (payload.code === GameCode.Blackjack) {
+    data = updateBlackjack(
+      discordId,
+      payload.data.sessionCode,
+      game,
+      statsCollection,
+      usersCollection,
+      deleteGame
+    );
   }
 
   return data;
@@ -169,7 +132,13 @@ export const POST = withApiAuthRequired(async (request: NextRequest) => {
   const payload = await request.json();
 
   try {
-    responseData = await updateGame(method, id, payload);
+    const collections = await getCollections();
+
+    if (payload.type === GameRequestType.Create) {
+      responseData = await handleCreateGame(method, id, payload, collections);
+    } else if (payload.type === GameRequestType.Update) {
+      responseData = await handleUpdateGame(method, id, payload);
+    }
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

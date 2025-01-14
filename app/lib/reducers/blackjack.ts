@@ -79,11 +79,10 @@ export const blackjackReducer = (
       const newDealerHand =
         playerHandValue < 21
           ? dealerPlay(copyDeck, [...state.dealerHand])
-          : state.dealerHand;
+          : [...state.dealerHand];
 
       return {
         ...state,
-        bet: state.bet * 2,
         deck: copyDeck,
         dealerHand: newDealerHand,
         playerHand: newPlayerHand,

@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { GameCode } from '@/enums/games';
+import { GameCode, GameRequestType } from '@/enums/games';
 
 export * from './blackjack';
 export * from './cards';
@@ -21,5 +21,6 @@ export type GameObject = {
 export interface GamePayload {
   key?: string;
   code: GameCode;
+  type: GameRequestType;
   data: { [key: string]: string };
 }
