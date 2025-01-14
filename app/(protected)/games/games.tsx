@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
-import { WordleIcon } from '@/images/icons';
+import { BlackjackIcon, WordleIcon } from '@/images/icons';
 
 import styles from './page.module.scss';
 
@@ -25,6 +25,10 @@ const Games = () => {
           Earn coins by playing some games here!
         </p>
         <div className={styles.grid}>
+          <Link className={styles.gridItem} href="/games/blackjack">
+            <BlackjackIcon />
+            <span>Blackjack</span>
+          </Link>
           <Link className={styles.gridItem} href="/games/wordle">
             <WordleIcon />
             <span>Wordle</span>

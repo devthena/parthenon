@@ -23,10 +23,9 @@ export const Rules = () => {
       <h3>GAME RULES</h3>
       <div className={styles.list}>
         <ul>
-          <li>Blackjack (Ace + 10-value) is an automatic win</li>
-          <li>Push (dealer has same value as you) is a tie</li>
-          <li>Bust (going over 21) means a loss</li>
-          <li>If both player and dealer bust, the dealer wins</li>
+          <li>Blackjack (exactly 21) is automatic win</li>
+          <li>Push (Dealer has same value as you) is a tie</li>
+          <li>Bust or Dealer Bust (over 21) means a loss</li>
         </ul>
       </div>
     </div>

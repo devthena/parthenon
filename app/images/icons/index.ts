@@ -1,5 +1,6 @@
 export * from './back';
 export * from './backspace';
+export * from './blackjack';
 export * from './close';
 export * from './coin';
 export * from './knucklebones';
