@@ -1,10 +1,10 @@
 import { CardSize } from '@/enums/games';
-import { PlayCard } from '@/interfaces/games';
+import { CardBoxProps } from '@/interfaces/games';
 import { getSuitSVG } from '@/lib/utils/cards';
 
 import styles from '../styles/card.module.scss';
 
-export const CardBox = ({ rank, size, suit }: PlayCard) => {
+export const CardBox = ({ animate, rank, size, suit }: CardBoxProps) => {
   const suitSVG = getSuitSVG(suit);
 
   let sizeClass = styles.large;
@@ -12,8 +12,11 @@ export const CardBox = ({ rank, size, suit }: PlayCard) => {
   else if (size === CardSize.Small) sizeClass = styles.small;
   else if (size === CardSize.XSmall) sizeClass = styles.xsmall;
 
+  const animateClass = animate ? styles.animate : null;
+
   return (
-    <div className={`${styles.card} ${styles[suit]} ${sizeClass}`}>
+    <div
+      className={`${styles.card} ${styles[suit]} ${sizeClass} ${animateClass}`}>
       <p>{rank}</p>
       {suitSVG}
     </div>

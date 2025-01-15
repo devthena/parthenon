@@ -23,4 +23,8 @@ export interface PlayCard {
   suit: CardSuit;
 }
 
+export interface CardBoxProps extends PlayCard {
+  animate: boolean;
+}
+
 export type CardDeck = PlayCard[];

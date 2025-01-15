@@ -5,8 +5,16 @@ import { useParthenonState } from '@/context';
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { INITIAL_STATS } from '@/constants/stats';
 
-import { BlackjackStatus, CardSize, GameCode } from '@/enums/games';
+import {
+  BlackjackStatus,
+  BlackjackTurn,
+  CardSize,
+  GameCode,
+} from '@/enums/games';
+
 import { PlayCard } from '@/interfaces/games';
+
+import { delay } from '@/lib/utils';
 import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
 
 import { Balance } from './balance';
@@ -18,9 +26,13 @@ export const GameTable = ({
   bet,
   cash,
   deckSize,
+  dealerLastHand,
   dealerHand,
+  playerLastHand,
   playerHand,
   status,
+  setDealerLastHand,
+  setPlayerLastHand,
   updateGame,
   onBetChange,
   onDouble,
@@ -31,9 +43,13 @@ export const GameTable = ({
   bet: number | null;
   cash: number;
   deckSize: number;
+  dealerLastHand: PlayCard[];
   dealerHand: PlayCard[];
+  playerLastHand: PlayCard[];
   playerHand: PlayCard[];
   status: BlackjackStatus;
+  setDealerLastHand: Function;
+  setPlayerLastHand: Function;
   updateGame: (status: BlackjackStatus, isDouble: boolean) => Promise<void>;
   onBetChange: (bet: number | null) => void;
   onDouble: () => void;
@@ -44,6 +60,9 @@ export const GameTable = ({
   const { user, stats, onSetStats, onSetUser } = useParthenonState();
 
   const [isDouble, setIsDouble] = useState(false);
+  const [dealerTotal, setDealerTotal] = useState(0);
+  const [playerTotal, setPlayerTotal] = useState(0);
+  const [turn, setTurn] = useState(BlackjackTurn.Standby);
 
   const handleDouble = useCallback(async () => {
     if (isDouble) return;
@@ -51,7 +70,35 @@ export const GameTable = ({
     onDouble();
   }, [onDouble]);
 
-  const gameOver = GAME_OVER_STATUS_BLK.includes(status);
+  const handleReset = useCallback(() => {
+    if (user && bet) {
+      setTurn(BlackjackTurn.Standby);
+      setDealerTotal(0);
+      setPlayerTotal(0);
+      setDealerLastHand([]);
+      setPlayerLastHand([]);
+      onPlay(bet);
+      onSetUser({
+        ...user,
+        cash: user.cash - bet,
+      });
+    }
+  }, []);
+
+  const animateCards = async (hand: string, cards: PlayCard[]) => {
+    let currentHand = [...playerLastHand];
+    if (hand === 'dealer') currentHand = [...dealerLastHand];
+
+    for await (const card of cards) {
+      await delay(500);
+
+      currentHand.push(card);
+      const updatedTotal = getHandValue(currentHand);
+
+      if (hand === 'dealer') setDealerTotal(updatedTotal);
+      else setPlayerTotal(updatedTotal);
+    }
+  };
 
   useEffect(() => {
     if (!user || !user.discord_username || !bet) return;
@@ -112,6 +159,25 @@ export const GameTable = ({
     }
   }, [status]);
 
+  useEffect(() => {
+    const dealCards = async () => {
+      if (dealerHand.length !== dealerLastHand.length) {
+        await animateCards('dealer', dealerHand.slice(dealerLastHand.length));
+        setDealerLastHand(dealerHand);
+      }
+
+      if (playerHand.length !== playerLastHand.length) {
+        await animateCards('player', playerHand.slice(playerLastHand.length));
+        setPlayerLastHand(playerHand);
+      }
+
+      if (GAME_OVER_STATUS_BLK.includes(status)) setTurn(BlackjackTurn.Over);
+      else setTurn(BlackjackTurn.Player);
+    };
+
+    dealCards();
+  }, [dealerHand, playerHand]);
+
   return (
     <div className={styles.game}>
       <div className={styles.board}>
@@ -119,7 +185,7 @@ export const GameTable = ({
         <div className={styles.dealer}>
           <div>
             <p className={styles.name}>Dealer</p>
-            <p className={styles.value}>{getHandValue(dealerHand)}</p>
+            <p className={styles.value}>{dealerTotal}</p>
           </div>
           <div className={styles.cards}>
             {dealerHand.map((card, i) => {
@@ -129,9 +195,12 @@ export const GameTable = ({
               else if (dealerHand.length === 6) size = CardSize.Small;
               else if (dealerHand.length > 6) size = CardSize.XSmall;
 
+              const animateCard = !dealerLastHand[i];
+
               return (
                 <CardBox
                   key={i}
+                  animate={animateCard}
                   size={size}
                   suit={card.suit}
                   rank={card.rank}
@@ -140,41 +209,34 @@ export const GameTable = ({
             })}
           </div>
         </div>
-        {!gameOver && (
-          <div className={styles.actions}>
-            <button disabled={!bet || bet > cash} onClick={handleDouble}>
-              DOUBLE
-            </button>
-            <button onClick={onHit}>HIT</button>
-            <button onClick={onStand}>STAND</button>
-          </div>
-        )}
-        {gameOver && (
-          <div className={styles.result}>
+        <div
+          className={
+            turn === BlackjackTurn.Over ? styles.result : styles.actions
+          }>
+          {turn !== BlackjackTurn.Over && turn !== BlackjackTurn.Standby && (
+            <>
+              <button disabled={!bet || bet > cash} onClick={handleDouble}>
+                DOUBLE
+              </button>
+              <button onClick={onHit}>HIT</button>
+              <button onClick={onStand}>STAND</button>
+            </>
+          )}
+          {turn === BlackjackTurn.Over && (
             <div>
               <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
-              <button
-                disabled={!bet || bet > cash}
-                onClick={() => {
-                  if (user && bet) {
-                    onPlay(bet);
-                    onSetUser({
-                      ...user,
-                      cash: user.cash - bet,
-                    });
-                  }
-                }}>
+              <button disabled={!bet || bet > cash} onClick={handleReset}>
                 PLAY AGAIN
               </button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
         <div className={styles.player}>
           <div>
             <p className={styles.name}>
               {user?.discord_name || user?.twitch_username || 'Player'}
             </p>
-            <p className={styles.value}>{getHandValue(playerHand)}</p>
+            <p className={styles.value}>{playerTotal}</p>
           </div>
           <div className={styles.cards}>
             {playerHand.map((card, i) => {
@@ -184,9 +246,12 @@ export const GameTable = ({
               else if (playerHand.length === 6) size = CardSize.Small;
               else if (playerHand.length > 6) size = CardSize.XSmall;
 
+              const animateCard = !playerLastHand[i];
+
               return (
                 <CardBox
                   key={i}
+                  animate={animateCard}
                   size={size}
                   suit={card.suit}
                   rank={card.rank}
@@ -199,7 +264,7 @@ export const GameTable = ({
       <Balance
         bet={bet}
         cash={cash}
-        disabled={!gameOver}
+        disabled={turn !== BlackjackTurn.Over}
         onUpdate={onBetChange}
       />
     </div>
