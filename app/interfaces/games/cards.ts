@@ -1,3 +1,5 @@
+import { CardSize } from '@/enums/games';
+
 export type CardSuit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
 
 export type CardRank =
@@ -16,9 +18,9 @@ export type CardRank =
   | 'A';
 
 export interface PlayCard {
-  small?: boolean;
-  suit: CardSuit;
   rank: CardRank;
+  size: CardSize;
+  suit: CardSuit;
 }
 
 export type CardDeck = PlayCard[];

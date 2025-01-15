@@ -1,5 +1,5 @@
 import { CARD_RANKS, CARD_SUITS } from '@/constants/cards';
-import { BlackjackStatus } from '@/enums/games';
+import { BlackjackStatus, CardSize } from '@/enums/games';
 import { CardSuit, PlayCard } from '@/interfaces/games';
 
 import {
@@ -15,8 +15,9 @@ export const createCardDeck = (): PlayCard[] => {
   CARD_SUITS.forEach(suit => {
     CARD_RANKS.forEach(rank => {
       deck.push({
-        suit: suit,
         rank: rank,
+        size: CardSize.Large,
+        suit: suit,
       });
     });
   });

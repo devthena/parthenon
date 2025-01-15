@@ -5,7 +5,7 @@ import { useParthenonState } from '@/context';
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { INITIAL_STATS } from '@/constants/stats';
 
-import { BlackjackStatus, GameCode } from '@/enums/games';
+import { BlackjackStatus, CardSize, GameCode } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
 
@@ -122,14 +122,22 @@ export const GameTable = ({
             <p className={styles.value}>{getHandValue(dealerHand)}</p>
           </div>
           <div className={styles.cards}>
-            {dealerHand.map((card, i) => (
-              <CardBox
-                key={i}
-                small={dealerHand.length > 5}
-                suit={card.suit}
-                rank={card.rank}
-              />
-            ))}
+            {dealerHand.map((card, i) => {
+              let size = card.size;
+
+              if (dealerHand.length === 5) size = CardSize.Medium;
+              else if (dealerHand.length === 6) size = CardSize.Small;
+              else if (dealerHand.length > 6) size = CardSize.XSmall;
+
+              return (
+                <CardBox
+                  key={i}
+                  size={size}
+                  suit={card.suit}
+                  rank={card.rank}
+                />
+              );
+            })}
           </div>
         </div>
         {!gameOver && (
@@ -169,14 +177,22 @@ export const GameTable = ({
             <p className={styles.value}>{getHandValue(playerHand)}</p>
           </div>
           <div className={styles.cards}>
-            {playerHand.map((card, i) => (
-              <CardBox
-                key={i}
-                small={playerHand.length > 5}
-                suit={card.suit}
-                rank={card.rank}
-              />
-            ))}
+            {playerHand.map((card, i) => {
+              let size = card.size;
+
+              if (playerHand.length === 5) size = CardSize.Medium;
+              else if (playerHand.length === 6) size = CardSize.Small;
+              else if (playerHand.length > 6) size = CardSize.XSmall;
+
+              return (
+                <CardBox
+                  key={i}
+                  size={size}
+                  suit={card.suit}
+                  rank={card.rank}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
