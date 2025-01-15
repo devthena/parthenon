@@ -57,6 +57,8 @@ const Blackjack = () => {
   } = useBlackjack();
 
   const [page, setPage] = useState(GamePage.Overview);
+  const [dealerLastHand, setDealerLastHand] = useState([]);
+  const [playerLastHand, setPlayerLastHand] = useState([]);
 
   const betRef = useRef(bet);
   const gameKeyRef = useRef(games[GameCode.Blackjack]);
@@ -135,6 +137,8 @@ const Blackjack = () => {
                 className={styles.back}
                 onClick={() => {
                   onReset();
+                  setDealerLastHand([]);
+                  setPlayerLastHand([]);
                   setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
@@ -143,6 +147,8 @@ const Blackjack = () => {
                 className={styles.backDesktop}
                 onClick={() => {
                   onReset();
+                  setDealerLastHand([]);
+                  setPlayerLastHand([]);
                   setPage(GamePage.Overview);
                 }}>
                 <BackIcon />
@@ -246,9 +252,13 @@ const Blackjack = () => {
               bet={bet}
               cash={user.cash}
               deckSize={deck.length}
+              dealerLastHand={dealerLastHand}
               dealerHand={dealerHand}
+              playerLastHand={playerLastHand}
               playerHand={playerHand}
               status={status}
+              setDealerLastHand={setDealerLastHand}
+              setPlayerLastHand={setPlayerLastHand}
               updateGame={updateGame}
               onBetChange={onBetChange}
               onDouble={onDouble}

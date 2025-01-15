@@ -22,7 +22,9 @@
 
 .dealer,
 .player {
+  align-items: center;
   display: flex;
+  height: 172px;
   padding: 17px 0;
 
   & > div {
