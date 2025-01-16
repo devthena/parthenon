@@ -94,7 +94,9 @@ export const POST = withApiAuthRequired(async (request: NextRequest) => {
   try {
     const collections = await initDatabase();
 
-    if (payload.type === GameRequestType.Create) {
+    if (!collections) {
+      responseError = 'No database collections found.';
+    } else if (payload.type === GameRequestType.Create) {
       responseData = await handleCreateGame(method, id, payload, collections);
     } else if (payload.type === GameRequestType.Update) {
       responseData = await handleUpdateGame(method, id, payload, collections);

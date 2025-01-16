@@ -4,6 +4,7 @@ import { BlackjackState } from '@/interfaces/games';
 export const INITIAL_STATE_BLK: BlackjackState = {
   bet: 100,
   deck: [],
+  double: false,
   playerHand: [],
   dealerHand: [],
   status: BlackjackStatus.Standby,

@@ -7,6 +7,9 @@ import { Loading } from '@/components';
 import { useParthenonState } from '@/context';
 import { useApi, useBlackjack } from '@/hooks';
 
+import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
+import { INITIAL_STATS } from '@/constants/stats';
+
 import { ApiDataType, ApiUrl } from '@/enums/api';
 
 import {
@@ -46,6 +49,7 @@ const Blackjack = () => {
     bet,
     dealerHand,
     deck,
+    double,
     playerHand,
     status,
     onBetChange,
@@ -57,6 +61,8 @@ const Blackjack = () => {
   } = useBlackjack();
 
   const [page, setPage] = useState(GamePage.Overview);
+  const [isDataUpdated, setIsDataUpdated] = useState(true);
+
   const [dealerLastHand, setDealerLastHand] = useState([]);
   const [playerLastHand, setPlayerLastHand] = useState([]);
 
@@ -79,10 +85,10 @@ const Blackjack = () => {
     });
   }, [fetchPostData]);
 
-  const updateGame = async (status: BlackjackStatus, isDouble: boolean) => {
+  const updateGame = useCallback(async () => {
     if (!gameKeyRef.current) return;
 
-    const codeString = isDouble ? status + '-double' : status;
+    const codeString = double ? status + '-double' : status;
 
     await fetchPostData(
       ApiUrl.Games,
@@ -97,7 +103,7 @@ const Blackjack = () => {
       },
       true
     );
-  };
+  }, [double, status, fetchPostData]);
 
   useEffect(() => {
     if (!stats[GameCode.Blackjack]) getStats();
@@ -122,8 +128,80 @@ const Blackjack = () => {
   }, [games]);
 
   useEffect(() => {
-    if (status === BlackjackStatus.Playing) getGame();
-  }, [status]);
+    if (!user || !user.discord_username || !bet || isDataUpdated) return;
+
+    if (GAME_OVER_STATUS_BLK.includes(status)) {
+      setIsDataUpdated(true);
+      updateGame();
+
+      const newStats =
+        stats[GameCode.Blackjack] ?? INITIAL_STATS[GameCode.Blackjack];
+
+      newStats.totalPlayed += 1;
+
+      if (status === BlackjackStatus.Blackjack) {
+        onSetStats({
+          [GameCode.Blackjack]: {
+            ...newStats,
+            totalBlackjack: newStats.totalBlackjack + 1,
+            totalWon: newStats.totalWon + 1,
+          },
+        });
+
+        const reward = double ? bet + bet * 2 : bet + Math.round(bet * 1.5);
+
+        onSetUser({
+          ...user,
+          cash: user.cash + reward,
+        });
+      } else if (
+        status === BlackjackStatus.Win ||
+        status === BlackjackStatus.DealerBust
+      ) {
+        onSetStats({
+          [GameCode.Blackjack]: {
+            ...newStats,
+            totalWon: newStats.totalWon + 1,
+          },
+        });
+
+        const reward = double ? bet + bet * 2 : bet * 2;
+
+        onSetUser({
+          ...user,
+          cash: user.cash + reward,
+        });
+      } else if (status === BlackjackStatus.Push) {
+        onSetUser({
+          ...user,
+          cash: user.cash + bet,
+        });
+      } else {
+        if (double) {
+          onSetUser({
+            ...user,
+            cash: user.cash - bet,
+          });
+        }
+      }
+    }
+  }, [
+    bet,
+    double,
+    isDataUpdated,
+    onSetStats,
+    onSetUser,
+    stats,
+    status,
+    updateGame,
+    user,
+  ]);
+
+  useEffect(() => {
+    if (status === BlackjackStatus.Playing && isDataUpdated) {
+      setIsDataUpdated(false);
+    }
+  }, [status, isDataUpdated]);
 
   if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
 
@@ -226,6 +304,7 @@ const Blackjack = () => {
                 onClick={() => {
                   if (bet) {
                     setPage(GamePage.Playing);
+                    getGame();
                     onPlay(bet);
                     onSetUser({
                       ...user,
@@ -254,12 +333,13 @@ const Blackjack = () => {
               deckSize={deck.length}
               dealerLastHand={dealerLastHand}
               dealerHand={dealerHand}
+              double={double}
+              getGame={getGame}
               playerLastHand={playerLastHand}
               playerHand={playerHand}
               status={status}
               setDealerLastHand={setDealerLastHand}
               setPlayerLastHand={setPlayerLastHand}
-              updateGame={updateGame}
               onBetChange={onBetChange}
               onDouble={onDouble}
               onHit={onHit}

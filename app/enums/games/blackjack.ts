@@ -9,12 +9,6 @@ export enum BlackjackStatus {
   Lose = 'Lose', // player lost by having less than dealer
 }
 
-export enum BlackjackTurn {
-  Standby,
-  Player,
-  Over,
-}
-
 export enum CardSize {
   Large, // regular
   Medium, // size to fit 5 cards

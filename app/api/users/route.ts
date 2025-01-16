@@ -40,7 +40,8 @@ export const GET = async (request: NextRequest) => {
 
   try {
     const collections = await initDatabase();
-    responseData = await getUser(method, id, collections);
+    if (!collections) responseError = 'No database collections found.';
+    else responseData = await getUser(method, id, collections);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

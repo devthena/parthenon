@@ -3,6 +3,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import { GameDocument } from '@/interfaces/games';
 import { StatsDocument } from '@/interfaces/statistics';
 import { UserDocument } from '@/interfaces/user';
+import { DatabaseCollections } from '@/interfaces/db';
 
 const mongodbName = process.env.MONGODB_NAME;
 const mongodbURI = process.env.MONGODB_URI;
@@ -30,6 +31,8 @@ const client = new MongoClient(mongodbURI, {
 });
 
 export const initDatabase = async () => {
+  let collections: DatabaseCollections | null = null;
+
   if (!globalThis._collectionsMongoDB) {
     await client.connect();
 
@@ -38,12 +41,16 @@ export const initDatabase = async () => {
     const statsCollection = db.collection<StatsDocument>(statsCollectionName);
     const usersCollection = db.collection<UserDocument>(usersCollectionName);
 
-    globalThis._collectionsMongoDB = {
+    collections = {
       games: gamesCollection,
       stats: statsCollection,
       users: usersCollection,
     };
+
+    globalThis._collectionsMongoDB = collections;
+  } else {
+    collections = globalThis._collectionsMongoDB;
   }
 
-  return globalThis._collectionsMongoDB;
+  return collections;
 };
