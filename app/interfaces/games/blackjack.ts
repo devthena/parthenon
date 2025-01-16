@@ -10,6 +10,7 @@ export interface BlackjackObject {
 export interface BlackjackState {
   bet: number | null;
   deck: CardDeck;
+  double: boolean;
   playerHand: PlayCard[];
   dealerHand: PlayCard[];
   status: BlackjackStatus;

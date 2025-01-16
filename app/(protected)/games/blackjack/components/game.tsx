@@ -1,17 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-
 import { useParthenonState } from '@/context';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
-import { INITIAL_STATS } from '@/constants/stats';
-
-import {
-  BlackjackStatus,
-  BlackjackTurn,
-  CardSize,
-  GameCode,
-} from '@/enums/games';
-
+import { BlackjackStatus, CardSize } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 
 import { delay } from '@/lib/utils';
@@ -28,12 +19,13 @@ export const GameTable = ({
   deckSize,
   dealerLastHand,
   dealerHand,
+  double,
+  getGame,
   playerLastHand,
   playerHand,
   status,
   setDealerLastHand,
   setPlayerLastHand,
-  updateGame,
   onBetChange,
   onDouble,
   onHit,
@@ -45,145 +37,141 @@ export const GameTable = ({
   deckSize: number;
   dealerLastHand: PlayCard[];
   dealerHand: PlayCard[];
+  double: boolean;
+  getGame: Function;
   playerLastHand: PlayCard[];
   playerHand: PlayCard[];
   status: BlackjackStatus;
   setDealerLastHand: Function;
   setPlayerLastHand: Function;
-  updateGame: (status: BlackjackStatus, isDouble: boolean) => Promise<void>;
   onBetChange: (bet: number | null) => void;
   onDouble: () => void;
   onHit: () => void;
   onPlay: (bet: number) => void;
   onStand: () => void;
 }) => {
-  const { user, stats, onSetStats, onSetUser } = useParthenonState();
+  const { user, onSetUser } = useParthenonState();
 
-  const [isDouble, setIsDouble] = useState(false);
   const [dealerTotal, setDealerTotal] = useState(0);
   const [playerTotal, setPlayerTotal] = useState(0);
-  const [turn, setTurn] = useState(BlackjackTurn.Standby);
 
-  const handleDouble = useCallback(async () => {
-    if (isDouble) return;
-    await setIsDouble(true);
-    onDouble();
-  }, [onDouble]);
+  const [isDealing, setIsDealing] = useState(false);
 
   const handleReset = useCallback(() => {
-    if (user && bet) {
-      setTurn(BlackjackTurn.Standby);
+    if (user && bet && GAME_OVER_STATUS_BLK.includes(status)) {
+      setIsDealing(false);
       setDealerTotal(0);
       setPlayerTotal(0);
       setDealerLastHand([]);
       setPlayerLastHand([]);
+      getGame();
       onPlay(bet);
       onSetUser({
         ...user,
         cash: user.cash - bet,
       });
     }
-  }, []);
+  }, [
+    bet,
+    getGame,
+    onPlay,
+    onSetUser,
+    setDealerLastHand,
+    setPlayerLastHand,
+    status,
+    user,
+  ]);
 
-  const animateCards = async (hand: string, cards: PlayCard[]) => {
-    let currentHand = [...playerLastHand];
-    if (hand === 'dealer') currentHand = [...dealerLastHand];
+  const animateCards = useCallback(
+    async (hand: string, cards: PlayCard[]) => {
+      let currentHand = [...playerLastHand];
+      if (hand === 'dealer') currentHand = [...dealerLastHand];
 
-    for await (const card of cards) {
-      await delay(500);
+      for await (const card of cards) {
+        await delay(500);
 
-      currentHand.push(card);
-      const updatedTotal = getHandValue(currentHand);
+        currentHand.push(card);
+        const updatedTotal = getHandValue(currentHand);
 
-      if (hand === 'dealer') setDealerTotal(updatedTotal);
-      else setPlayerTotal(updatedTotal);
-    }
-  };
+        if (hand === 'dealer') setDealerTotal(updatedTotal);
+        else setPlayerTotal(updatedTotal);
+      }
+    },
+    [dealerLastHand, playerLastHand]
+  );
 
   useEffect(() => {
-    if (!user || !user.discord_username || !bet) return;
+    const dealerDelta = dealerHand.length !== dealerLastHand.length;
+    const playerDelta = playerHand.length !== playerLastHand.length;
 
-    if (GAME_OVER_STATUS_BLK.includes(status)) {
-      updateGame(status, isDouble);
+    if (isDealing) return;
+    if (!dealerDelta && !playerDelta) return;
 
-      const newStats =
-        stats[GameCode.Blackjack] ?? INITIAL_STATS[GameCode.Blackjack];
+    const dealCards = async () => {
+      if (double) {
+        await animateCards('player', playerHand.slice(playerLastHand.length));
+        await animateCards('dealer', dealerHand.slice(dealerLastHand.length));
 
-      newStats.totalPlayed += 1;
-
-      if (status === BlackjackStatus.Blackjack) {
-        onSetStats({
-          [GameCode.Blackjack]: {
-            ...newStats,
-            totalBlackjack: newStats.totalBlackjack + 1,
-            totalWon: newStats.totalWon + 1,
-          },
-        });
-
-        const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
-
-        onSetUser({
-          ...user,
-          cash: user.cash + reward,
-        });
-      } else if (
-        status === BlackjackStatus.Win ||
-        status === BlackjackStatus.DealerBust
-      ) {
-        onSetStats({
-          [GameCode.Blackjack]: {
-            ...newStats,
-            totalWon: newStats.totalWon + 1,
-          },
-        });
-
-        const reward = isDouble ? bet + bet * 2 : bet * 2;
-
-        onSetUser({
-          ...user,
-          cash: user.cash + reward,
-        });
-      } else if (status === BlackjackStatus.Push) {
-        onSetUser({
-          ...user,
-          cash: user.cash + bet,
-        });
+        setPlayerLastHand(playerHand);
+        setDealerLastHand(dealerHand);
       } else {
-        if (isDouble) {
-          onSetUser({
-            ...user,
-            cash: user.cash - bet,
-          });
+        if (dealerDelta) {
+          await animateCards('dealer', dealerHand.slice(dealerLastHand.length));
+
+          if (playerDelta) {
+            await animateCards(
+              'player',
+              playerHand.slice(playerLastHand.length)
+            );
+            setPlayerLastHand(playerHand);
+          }
+
+          setDealerLastHand(dealerHand);
+        } else if (playerDelta) {
+          await animateCards('player', playerHand.slice(playerLastHand.length));
+          setPlayerLastHand(playerHand);
         }
       }
-    }
-  }, [status]);
 
-  useEffect(() => {
-    const dealCards = async () => {
-      if (dealerHand.length !== dealerLastHand.length) {
-        await animateCards('dealer', dealerHand.slice(dealerLastHand.length));
-        setDealerLastHand(dealerHand);
-      }
-
-      if (playerHand.length !== playerLastHand.length) {
-        await animateCards('player', playerHand.slice(playerLastHand.length));
-        setPlayerLastHand(playerHand);
-      }
-
-      if (GAME_OVER_STATUS_BLK.includes(status)) setTurn(BlackjackTurn.Over);
-      else setTurn(BlackjackTurn.Player);
+      setIsDealing(false);
     };
 
+    setIsDealing(true);
     dealCards();
-  }, [dealerHand, playerHand]);
+  }, [
+    animateCards,
+    dealerHand,
+    dealerLastHand.length,
+    double,
+    playerHand,
+    playerLastHand.length,
+    setDealerLastHand,
+    setPlayerLastHand,
+    isDealing,
+  ]);
+
+  const isGameOver = GAME_OVER_STATUS_BLK.includes(status);
+
+  const toAnimateDealer: number[] = [];
+  const toAnimatePlayer: number[] = [];
+
+  dealerHand.forEach((_card, i) => {
+    if (!dealerLastHand[i]) toAnimateDealer.push(i);
+  });
+
+  playerHand.forEach((_card, i) => {
+    if (!playerLastHand[i]) toAnimatePlayer.push(i);
+  });
+
+  const initialDeal =
+    toAnimateDealer.length > 0 && toAnimatePlayer.length > 0 && !double;
 
   return (
     <div className={styles.game}>
       <div className={styles.board}>
         <p className={styles.deck}>Deck: {deckSize}</p>
         <div className={styles.dealer}>
-          <div>
+          <div className={styles.info}>
             <p className={styles.name}>Dealer</p>
             <p className={styles.value}>{dealerTotal}</p>
           </div>
@@ -195,12 +183,11 @@ export const GameTable = ({
               else if (dealerHand.length === 6) size = CardSize.Small;
               else if (dealerHand.length > 6) size = CardSize.XSmall;
 
-              const animateCard = !dealerLastHand[i];
-
               return (
                 <CardBox
                   key={i}
-                  animate={animateCard}
+                  order={toAnimateDealer.indexOf(i)}
+                  animate="down"
                   size={size}
                   suit={card.suit}
                   rank={card.rank}
@@ -209,20 +196,17 @@ export const GameTable = ({
             })}
           </div>
         </div>
-        <div
-          className={
-            turn === BlackjackTurn.Over ? styles.result : styles.actions
-          }>
-          {turn !== BlackjackTurn.Over && turn !== BlackjackTurn.Standby && (
+        <div className={isGameOver ? styles.result : styles.actions}>
+          {!isGameOver && !isDealing && (
             <>
-              <button disabled={!bet || bet > cash} onClick={handleDouble}>
+              <button disabled={!bet || bet > cash} onClick={onDouble}>
                 DOUBLE
               </button>
               <button onClick={onHit}>HIT</button>
               <button onClick={onStand}>STAND</button>
             </>
           )}
-          {turn === BlackjackTurn.Over && (
+          {isGameOver && !isDealing && (
             <div>
               <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
               <button disabled={!bet || bet > cash} onClick={handleReset}>
@@ -232,7 +216,7 @@ export const GameTable = ({
           )}
         </div>
         <div className={styles.player}>
-          <div>
+          <div className={styles.info}>
             <p className={styles.name}>
               {user?.discord_name || user?.twitch_username || 'Player'}
             </p>
@@ -246,12 +230,15 @@ export const GameTable = ({
               else if (playerHand.length === 6) size = CardSize.Small;
               else if (playerHand.length > 6) size = CardSize.XSmall;
 
-              const animateCard = !playerLastHand[i];
+              const order = toAnimatePlayer.indexOf(i);
+              const updatedOrder =
+                order > -1 && initialDeal ? order + 1 : order;
 
               return (
                 <CardBox
                   key={i}
-                  animate={animateCard}
+                  order={updatedOrder}
+                  animate="up"
                   size={size}
                   suit={card.suit}
                   rank={card.rank}
@@ -264,7 +251,7 @@ export const GameTable = ({
       <Balance
         bet={bet}
         cash={cash}
-        disabled={turn !== BlackjackTurn.Over}
+        disabled={!isGameOver}
         onUpdate={onBetChange}
       />
     </div>

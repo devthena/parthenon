@@ -44,7 +44,8 @@ export const POST = withApiAuthRequired(async (request: NextRequest) => {
 
   try {
     const collections = await initDatabase();
-    responseData = await getStats(method, id, payload.code, collections);
+    if (!collections) responseError = 'No database collections found.';
+    else responseData = await getStats(method, id, payload.code, collections);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

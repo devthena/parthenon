@@ -2,10 +2,11 @@
   background-color: var(--white-light);
   border: 1.5px solid var(--black);
   border-radius: 7px;
-  margin-right: 7px;
+  font-weight: 700;
+  opacity: 0;
 
-  &:last-child {
-    margin-right: 0;
+  &.active {
+    opacity: 1;
   }
 
   p {
@@ -71,6 +72,52 @@
   color: var(--red-casino);
 }
 
-.animate {
-  background-color: var(--owl-blue);
+.animateDown {
+  animation: dealerCardAnimate 0.5s forwards;
+}
+
+.animateUp {
+  animation: playerCardAnimate 0.5s forwards;
+}
+
+.order-1 {
+  animation-delay: 0.5s;
+}
+
+.order-2 {
+  animation-delay: 1s;
+}
+
+.order-3 {
+  animation-delay: 1.5s;
+}
+
+.order-4 {
+  animation-delay: 2s;
+}
+
+.order-5 {
+  animation-delay: 2.5s;
+}
+
+@keyframes dealerCardAnimate {
+  0% {
+    transform: translateY(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes playerCardAnimate {
+  0% {
+    transform: translateY(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

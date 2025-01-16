@@ -63,6 +63,7 @@ export const blackjackReducer = (
         ...state,
         bet: action.payload.bet,
         deck: deck,
+        double: false,
         playerHand: playerHand,
         dealerHand: dealerHand,
         status: checkStatus(playerHand, dealerHand),
@@ -84,6 +85,7 @@ export const blackjackReducer = (
       return {
         ...state,
         deck: copyDeck,
+        double: true,
         dealerHand: newDealerHand,
         playerHand: newPlayerHand,
         status: checkStatus(newPlayerHand, newDealerHand),
