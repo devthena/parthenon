@@ -1,22 +1,17 @@
-import { Collection } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GameCode } from '@/enums/games';
-import { GameDocument, GamePayload } from '@/interfaces/games';
-import { StatsDocument } from '@/interfaces/statistics';
-import { UserAuthMethod, UserDocument } from '@/interfaces/user';
-
 import { decrypt } from '@/lib/utils/encryption';
+
+import { DatabaseCollections } from '@/interfaces/db';
+import { GamePayload } from '@/interfaces/games';
+import { UserAuthMethod } from '@/interfaces/user';
 
 export const handleCreateGame = async (
   method: UserAuthMethod,
   id: string,
   payload: GamePayload,
-  collections: {
-    games: Collection<GameDocument>;
-    stats: Collection<StatsDocument>;
-    users: Collection<UserDocument>;
-  }
+  collections: DatabaseCollections
 ) => {
   let discordId = null;
 

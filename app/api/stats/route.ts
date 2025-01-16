@@ -2,31 +2,22 @@ import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GameCode } from '@/enums/games';
-import { StatsDocument } from '@/interfaces/statistics';
-import { UserAuthMethod, UserDocument } from '@/interfaces/user';
-import { dbClientPromise } from '@/lib/db';
+import { DatabaseCollections } from '@/interfaces/db';
+import { UserAuthMethod } from '@/interfaces/user';
+import { initDatabase } from '@/lib/db';
 
-const mongodbName = process.env.MONGODB_NAME;
-const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
-const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
-
-if (!mongodbName || !statsCollectionName || !usersCollectionName) {
-  throw new Error('Missing necessary environment variables');
-}
-
-const getStats = async (method: UserAuthMethod, id: string, code: GameCode) => {
-  const client = await dbClientPromise;
-  const botDB = await client.db(mongodbName);
-
-  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
-  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
-
-  const user = await usersCollection.findOne({ [`${method}_id`]: id });
-
+const getStats = async (
+  method: UserAuthMethod,
+  id: string,
+  code: GameCode,
+  collections: DatabaseCollections
+) => {
   let stats = null;
 
+  const user = await collections.users.findOne({ [`${method}_id`]: id });
+
   if (user?.discord_id) {
-    stats = await statsCollection.findOne({ discord_id: user.discord_id });
+    stats = await collections.stats.findOne({ discord_id: user.discord_id });
   }
 
   if (!stats) return null;
@@ -52,7 +43,8 @@ export const POST = withApiAuthRequired(async (request: NextRequest) => {
   const payload = await request.json();
 
   try {
-    responseData = await getStats(method, id, payload.code);
+    const collections = await initDatabase();
+    responseData = await getStats(method, id, payload.code, collections);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

@@ -1,22 +1,16 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { UserAuthMethod, UserDocument } from '@/interfaces/user';
-import { dbClientPromise } from '@/lib/db';
+import { UserAuthMethod } from '@/interfaces/user';
+import { DatabaseCollections } from '@/interfaces/db';
+import { initDatabase } from '@/lib/db';
 
-const mongodbName = process.env.MONGODB_NAME;
-const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
-
-if (!mongodbName || !usersCollectionName) {
-  throw new Error('Missing necessary environment variables');
-}
-
-const getUser = async (method: UserAuthMethod, id: string) => {
-  const client = await dbClientPromise;
-  const botDB = await client.db(mongodbName);
-
-  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
-  const user = await usersCollection.findOne({ [`${method}_id`]: id });
+const getUser = async (
+  method: UserAuthMethod,
+  id: string,
+  collections: DatabaseCollections
+) => {
+  const user = await collections.users.findOne({ [`${method}_id`]: id });
 
   return user
     ? {
@@ -45,7 +39,8 @@ export const GET = async (request: NextRequest) => {
   let responseError = null;
 
   try {
-    responseData = await getUser(method, id);
+    const collections = await initDatabase();
+    responseData = await getUser(method, id, collections);
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {

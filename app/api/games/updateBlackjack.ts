@@ -1,21 +1,17 @@
-import { Collection } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 
 import { INITIAL_STATS } from '@/constants/stats';
-
-import { GameDocument } from '@/interfaces/games';
-import { StatsDocument } from '@/interfaces/statistics';
-import { UserDocument } from '@/interfaces/user';
-
 import { BlackjackStatus, GameCode } from '@/enums/games';
 import { decrypt } from '@/lib/utils/encryption';
+
+import { DatabaseCollections } from '@/interfaces/db';
+import { GameDocument } from '@/interfaces/games';
 
 export const updateBlackjack = async (
   discordId: string,
   sessionCode: string,
   game: GameDocument,
-  statsCollection: Collection<StatsDocument>,
-  usersCollection: Collection<UserDocument>,
+  collections: DatabaseCollections,
   deleteGame: (key: string) => void
 ) => {
   let stats = INITIAL_STATS[GameCode.Blackjack];
@@ -24,7 +20,7 @@ export const updateBlackjack = async (
   const status = statusString.split('-')[0];
   const isDouble = statusString.split('-')[1] === 'double';
 
-  const statsDoc = await statsCollection.findOne({
+  const statsDoc = await collections.stats.findOne({
     discord_id: discordId,
   });
 
@@ -37,12 +33,12 @@ export const updateBlackjack = async (
   if (status === BlackjackStatus.Blackjack) {
     const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
-    await usersCollection.updateOne(
+    await collections.users.updateOne(
       { discord_id: discordId },
       { $inc: { cash: reward } }
     );
 
-    await statsCollection.updateOne(
+    await collections.stats.updateOne(
       { discord_id: discordId },
       {
         $set: {
@@ -63,12 +59,12 @@ export const updateBlackjack = async (
   ) {
     const reward = isDouble ? bet + bet * 2 : bet * 2;
 
-    await usersCollection.updateOne(
+    await collections.users.updateOne(
       { discord_id: discordId },
       { $inc: { cash: reward } }
     );
 
-    await statsCollection.updateOne(
+    await collections.stats.updateOne(
       { discord_id: discordId },
       {
         $set: {
@@ -84,12 +80,12 @@ export const updateBlackjack = async (
 
     await deleteGame(game.key);
   } else if (status === BlackjackStatus.Push) {
-    await usersCollection.updateOne(
+    await collections.users.updateOne(
       { discord_id: discordId },
       { $inc: { cash: bet } }
     );
 
-    await statsCollection.updateOne(
+    await collections.stats.updateOne(
       { discord_id: discordId },
       {
         $set: {
@@ -105,13 +101,13 @@ export const updateBlackjack = async (
     await deleteGame(game.key);
   } else {
     if (isDouble) {
-      await usersCollection.updateOne(
+      await collections.users.updateOne(
         { discord_id: discordId },
         { $inc: { cash: -bet } }
       );
     }
 
-    await statsCollection.updateOne(
+    await collections.stats.updateOne(
       { discord_id: discordId },
       {
         $set: {
