@@ -1,64 +1,27 @@
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { DatabaseCollections } from '@/interfaces/db';
+import { GamePayload } from '@/interfaces/games';
+import { UserAuthMethod } from '@/interfaces/user';
+
 import { GameCode, GameRequestType } from '@/enums/games';
-
-import { GameDocument, GamePayload } from '@/interfaces/games';
-import { StatsDocument } from '@/interfaces/statistics';
-import { UserAuthMethod, UserDocument } from '@/interfaces/user';
-
-import { dbClientPromise } from '@/lib/db';
+import { initDatabase } from '@/lib/db';
 
 import { handleCreateGame } from './handleCreate';
 import { updateBlackjack } from './updateBlackjack';
 import { updateWordle } from './updateWordle';
 
-const mongodbName = process.env.MONGODB_NAME;
-
-const gamesCollectionName = process.env.MONGODB_COLLECTION_GAMES;
-const statsCollectionName = process.env.MONGODB_COLLECTION_STATS;
-const usersCollectionName = process.env.MONGODB_COLLECTION_USERS;
-
-if (
-  !mongodbName ||
-  !gamesCollectionName ||
-  !statsCollectionName ||
-  !usersCollectionName
-) {
-  throw new Error('Missing necessary environment variables');
-}
-
-const getCollections = async () => {
-  const client = await dbClientPromise;
-  const botDB = await client.db(mongodbName);
-
-  const gamesCollection = botDB.collection<GameDocument>(gamesCollectionName);
-  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
-  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
-
-  return {
-    games: gamesCollection,
-    stats: statsCollection,
-    users: usersCollection,
-  };
-};
-
 const handleUpdateGame = async (
   method: UserAuthMethod,
   id: string,
-  payload: GamePayload
+  payload: GamePayload,
+  collections: DatabaseCollections
 ) => {
-  const client = await dbClientPromise;
-  const botDB = await client.db(mongodbName);
-
-  const gamesCollection = botDB.collection<GameDocument>(gamesCollectionName);
-  const statsCollection = botDB.collection<StatsDocument>(statsCollectionName);
-  const usersCollection = botDB.collection<UserDocument>(usersCollectionName);
-
   let data = null;
   let discordId = null;
 
-  let user = await usersCollection.findOne({ [`${method}_id`]: id });
+  let user = await collections.users.findOne({ [`${method}_id`]: id });
   if (!user) return null;
 
   if (method !== 'discord') {
@@ -69,7 +32,7 @@ const handleUpdateGame = async (
 
   if (!discordId) return null;
 
-  const game = await gamesCollection.findOne({
+  const game = await collections.games.findOne({
     discord_id: discordId,
     code: payload.code,
   });
@@ -80,7 +43,7 @@ const handleUpdateGame = async (
   if (game.key !== payload.key) return null;
 
   const deleteGame = async (key: string) => {
-    await gamesCollection.deleteOne({
+    await collections.games.deleteOne({
       discord_id: discordId,
       key: key,
     });
@@ -92,9 +55,7 @@ const handleUpdateGame = async (
       discordId,
       payload.data.sessionCode,
       game,
-      gamesCollection,
-      statsCollection,
-      usersCollection,
+      collections,
       deleteGame
     );
   }
@@ -105,8 +66,7 @@ const handleUpdateGame = async (
       discordId,
       payload.data.sessionCode,
       game,
-      statsCollection,
-      usersCollection,
+      collections,
       deleteGame
     );
   }
@@ -132,12 +92,12 @@ export const POST = withApiAuthRequired(async (request: NextRequest) => {
   const payload = await request.json();
 
   try {
-    const collections = await getCollections();
+    const collections = await initDatabase();
 
     if (payload.type === GameRequestType.Create) {
       responseData = await handleCreateGame(method, id, payload, collections);
     } else if (payload.type === GameRequestType.Update) {
-      responseData = await handleUpdateGame(method, id, payload);
+      responseData = await handleUpdateGame(method, id, payload, collections);
     }
   } catch (error) {
     responseError = JSON.stringify(error);
