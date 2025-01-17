@@ -1,7 +1,10 @@
+import Image from 'next/image';
+
 import { CardSize } from '@/enums/games';
 import { CardBoxProps } from '@/interfaces/games';
 import { getSuitSVG } from '@/lib/utils/cards';
 
+import owl from '@/images/owl.png';
 import styles from '../styles/card.module.scss';
 
 export const CardBox = ({ order, animate, rank, size, suit }: CardBoxProps) => {
@@ -30,8 +33,15 @@ export const CardBox = ({ order, animate, rank, size, suit }: CardBoxProps) => {
   return (
     <div
       className={`${styles.card} ${styles[suit]} ${sizeClass} ${animateClass}`}>
-      <p>{rank}</p>
-      {suitSVG}
+      <div className={styles.cardFront}>
+        <p>{rank}</p>
+        {suitSVG}
+      </div>
+      <div className={styles.cardBack}>
+        <figure className={styles.avatar}>
+          <Image alt="Little Owl Card" height={48} src={owl} width={48} />
+        </figure>
+      </div>
     </div>
   );
 };

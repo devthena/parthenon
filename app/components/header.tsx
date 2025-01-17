@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { HEADER_PATHS } from '@/constants/navigation';
 import { useParthenonState } from '@/context';
 import { MenuCloseIcon, MenuIcon } from '@/images/icons';
+
+import owl from '@/images/owl.png';
 import styles from '@/styles/header.module.scss';
 
 import { Login } from './login';
@@ -63,7 +65,7 @@ export const Header = () => {
               alt="Little Owl"
               className={styles.logoImg}
               height={30}
-              src="/owl.png"
+              src={owl}
               width={30}
             />
             <h1>
