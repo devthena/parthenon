@@ -1,13 +1,11 @@
+@import '@/styles/variables';
+
 .card {
-  background-color: var(--white-light);
-  border: 1.5px solid var(--black);
-  border-radius: 7px;
+  backface-visibility: hidden;
+  display: grid;
   font-weight: 700;
   opacity: 0;
-
-  &.active {
-    opacity: 1;
-  }
+  transform-style: preserve-3d;
 
   p {
     margin: 0 0 5px;
@@ -15,50 +13,263 @@
   }
 }
 
-.large {
-  padding: 12px 12px 17px;
+.cardFront,
+.cardBack {
+  backface-visibility: hidden;
+  grid-area: 1 / 1;
+  transition: transform 0.5s ease;
+}
 
-  p {
-    font-size: 20px;
+.cardFront {
+  background-color: var(--white-light);
+  border: 1.5px solid var(--black);
+  border-radius: 7px;
+  transform: rotateY(180deg);
+}
+
+.cardBack {
+  align-items: center;
+  background-color: var(--owl-blue);
+  border: 1.5px solid var(--white);
+  border-radius: 7px;
+  display: flex;
+  justify-content: center;
+  transform: rotateY(0deg);
+}
+
+.card.active {
+  opacity: 1;
+
+  .cardFront {
+    transform: rotateY(0deg);
   }
 
-  svg {
-    height: 72px;
-    width: 72px;
+  .cardBack {
+    transform: rotateY(180deg);
   }
 }
 
-.medium {
-  padding: 10px 12px 15px;
+.animateDown {
+  animation: slideDown 0.5s ease forwards;
 
-  p {
-    font-size: 18px;
+  .cardFront {
+    animation: flipFront 0.5s ease forwards;
   }
 
-  svg {
-    height: 60px;
-    width: 60px;
+  .cardBack {
+    animation: flipBack 0.5s ease forwards;
   }
 }
 
-.small,
-.xsmall {
-  padding: 8px 10px 12px;
+.animateUp {
+  animation: slideUp 0.5s ease forwards;
+
+  .cardFront {
+    animation: flipFront 0.5s ease forwards;
+  }
+
+  .cardBack {
+    animation: flipBack 0.5s ease forwards;
+  }
+}
+
+.large .cardFront {
+  padding: 5px 10px 10px;
+
+  @media screen and (min-width: $phablet-width) {
+    padding: 9px 11px 11px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    padding: 12px 12px 17px;
+  }
 
   p {
     font-size: 16px;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 20px;
+    }
   }
 
   svg {
-    height: 50px;
-    width: 50px;
+    height: 30px;
+    width: 30px;
+
+    @media screen and (min-width: $phablet-width) {
+      height: 38px;
+      width: 38px;
+    }
+
+    @media screen and (min-width: $tablet-width) {
+      height: 72px;
+      width: 72px;
+    }
   }
 }
 
-.xsmall {
+.large .cardBack img {
+  height: 36px;
+  width: 36px;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 42px;
+    width: 42px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    height: 58px;
+    width: 58px;
+  }
+}
+
+.medium .cardFront {
+  padding: 5px 8px 8px;
+
+  @media screen and (min-width: $phablet-width) {
+    padding: 7px 9px 9px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    padding: 10px 12px 15px;
+  }
+
+  p {
+    font-size: 14px;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 18px;
+    }
+  }
+
   svg {
-    height: 40px;
-    width: 40px;
+    height: 24px;
+    width: 24px;
+
+    @media screen and (min-width: $phablet-width) {
+      height: 30px;
+      width: 30px;
+    }
+
+    @media screen and (min-width: $tablet-width) {
+      height: 60px;
+      width: 60px;
+    }
+  }
+}
+
+.medium .cardBack img {
+  height: 30px;
+  width: 30px;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 36px;
+    width: 36px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    height: 52px;
+    width: 52px;
+  }
+}
+
+.small .cardFront {
+  padding: 3px 6px 5px;
+
+  @media screen and (min-width: $phablet-width) {
+    padding: 5px 7px 7px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    padding: 8px 10px 12px;
+  }
+
+  p {
+    font-size: 12px;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 16px;
+    }
+  }
+
+  svg {
+    height: 20px;
+    width: 20px;
+
+    @media screen and (min-width: $phablet-width) {
+      height: 24px;
+      width: 24px;
+    }
+
+    @media screen and (min-width: $tablet-width) {
+      height: 50px;
+      width: 50px;
+    }
+  }
+}
+
+.small .cardBack img {
+  height: 25px;
+  width: 25px;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 30px;
+    width: 30px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    height: 48px;
+    width: 48px;
+  }
+}
+
+.xsmall .cardFront {
+  padding: 3px 5px 5px;
+
+  @media screen and (min-width: $phablet-width) {
+    padding: 5px 6px 7px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    padding: 8px 10px 12px;
+  }
+
+  p {
+    font-size: 12px;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 16px;
+    }
+  }
+
+  svg {
+    height: 17px;
+    width: 17px;
+
+    @media screen and (min-width: $phablet-width) {
+      height: 20px;
+      width: 20px;
+    }
+
+    @media screen and (min-width: $tablet-width) {
+      height: 40px;
+      width: 40px;
+    }
+  }
+}
+
+.xsmall .cardBack img {
+  height: 20px;
+  width: 20px;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 25px;
+    width: 25px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    height: 42px;
+    width: 42px;
   }
 }
 
@@ -72,37 +283,43 @@
   color: var(--red-casino);
 }
 
-.animateDown {
-  animation: dealerCardAnimate 0.5s forwards;
-}
-
-.animateUp {
-  animation: playerCardAnimate 0.5s forwards;
-}
-
-.order-1 {
+.order-1,
+.order-1 .cardFront,
+.order-1 .cardBack {
   animation-delay: 0.5s;
 }
 
-.order-2 {
+.order-2,
+.order-2 .cardFront,
+.order-2 .cardBack {
   animation-delay: 1s;
 }
 
-.order-3 {
+.order-3,
+.order-3 .cardFront,
+.order-3 .cardBack {
   animation-delay: 1.5s;
 }
 
-.order-4 {
+.order-4,
+.order-4 .cardFront,
+.order-4 .cardBack {
   animation-delay: 2s;
 }
 
-.order-5 {
+.order-5,
+.order-5 .cardFront,
+.order-5 .cardBack {
   animation-delay: 2.5s;
 }
 
-@keyframes dealerCardAnimate {
+@keyframes slideDown {
   0% {
     transform: translateY(-100%);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(0px);
     opacity: 1;
   }
   100% {
@@ -111,13 +328,41 @@
   }
 }
 
-@keyframes playerCardAnimate {
+@keyframes slideUp {
   0% {
     transform: translateY(100%);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(0);
     opacity: 1;
   }
   100% {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes flipFront {
+  0% {
+    transform: rotateY(180deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+@keyframes flipBack {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
   }
 }

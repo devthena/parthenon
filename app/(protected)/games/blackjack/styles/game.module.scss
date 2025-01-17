@@ -1,3 +1,5 @@
+@import '@/styles/variables';
+
 .game {
   margin: 24px auto 0;
   max-width: 700px;
@@ -13,51 +15,99 @@
   color: var(--white-light);
   overflow: hidden;
   padding-bottom: 36px;
+  perspective: 1000px;
 }
 
 .deck {
+  font-size: 12px;
   margin: 0;
-  padding: 17px 17px 0;
+  padding: 17px 17px 5px;
   text-align: right;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 16px;
+  }
 }
 
 .dealer,
 .player {
   align-items: center;
   display: flex;
-  height: 172px;
+  height: 77px;
   padding: 17px 0;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 90px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    height: 172px;
+  }
 }
 
 .info {
   font-weight: 700;
-  width: 150px;
+  min-width: 90px;
+  padding: 0 17px;
+  width: 90px;
+
+  @media screen and (min-width: $tablet-width) {
+    min-width: 150px;
+    width: 150px;
+  }
 }
 
 .name {
+  font-size: 12px;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 16px;
+  }
 }
 
 .value {
-  font-size: 32px;
+  font-size: 22px;
   margin: 10px 0;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 32px;
+  }
 }
 
 .cards {
   align-items: center;
   display: flex;
   flex-grow: 1;
-  gap: 7px;
-  height: 172px;
+  gap: 5px;
+  height: 77px;
+
+  @media screen and (min-width: $phablet-width) {
+    height: 90px;
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    gap: 7px;
+    height: 172px;
+  }
 }
 
 .actions,
 .result {
   align-items: center;
   display: flex;
-  height: 100px;
+  height: 90px;
   justify-content: center;
   margin: 24px 0;
+  padding: 0 17px;
+
+  @media screen and (min-width: $tablet-width) {
+    height: 100px;
+  }
 }
 
 .actions,
@@ -68,9 +118,15 @@
     border-radius: 30px;
     cursor: pointer;
     font-size: 14px;
-    height: 50px;
+    height: 40px;
     margin-right: 17px;
-    width: 150px;
+    width: 125px;
+
+    @media screen and (min-width: $tablet-width) {
+      font-size: 16px;
+      height: 50px;
+      width: 150px;
+    }
   }
 
   button:hover:enabled {
@@ -83,7 +139,12 @@
 }
 
 .resultLabel {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+
+  @media screen and (min-width: $tablet-width) {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
 }
