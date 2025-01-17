@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParthenonState } from '@/context';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
-import { BlackjackStatus, CardSize } from '@/enums/games';
+import { BlackjackAnimation, BlackjackStatus, CardSize } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 
 import { delay } from '@/lib/utils';
@@ -55,11 +55,26 @@ export const GameTable = ({
   const [dealerTotal, setDealerTotal] = useState(0);
   const [playerTotal, setPlayerTotal] = useState(0);
 
-  const [isDealing, setIsDealing] = useState(false);
+  const [animation, setAnimation] = useState(BlackjackAnimation.Done);
 
-  const handleReset = useCallback(() => {
-    if (user && bet && GAME_OVER_STATUS_BLK.includes(status)) {
-      setIsDealing(false);
+  const handleDouble = useCallback(async () => {
+    await setAnimation(BlackjackAnimation.Standby);
+    onDouble();
+  }, []);
+
+  const handleHit = useCallback(async () => {
+    await setAnimation(BlackjackAnimation.Standby);
+    onHit();
+  }, []);
+
+  const handleStand = useCallback(async () => {
+    await setAnimation(BlackjackAnimation.Standby);
+    onStand();
+  }, []);
+
+  const handleReset = useCallback(async () => {
+    if (user && bet) {
+      setAnimation(BlackjackAnimation.Standby);
       setDealerTotal(0);
       setPlayerTotal(0);
       setDealerLastHand([]);
@@ -76,9 +91,9 @@ export const GameTable = ({
     getGame,
     onPlay,
     onSetUser,
+    setAnimation,
     setDealerLastHand,
     setPlayerLastHand,
-    status,
     user,
   ]);
 
@@ -104,7 +119,7 @@ export const GameTable = ({
     const dealerDelta = dealerHand.length !== dealerLastHand.length;
     const playerDelta = playerHand.length !== playerLastHand.length;
 
-    if (isDealing) return;
+    if (animation === BlackjackAnimation.Ongoing) return;
     if (!dealerDelta && !playerDelta) return;
 
     const dealCards = async () => {
@@ -133,21 +148,22 @@ export const GameTable = ({
         }
       }
 
-      setIsDealing(false);
+      setAnimation(BlackjackAnimation.Done);
     };
 
-    setIsDealing(true);
+    setAnimation(BlackjackAnimation.Ongoing);
     dealCards();
   }, [
+    animation,
     animateCards,
     dealerHand,
     dealerLastHand.length,
     double,
     playerHand,
     playerLastHand.length,
+    setAnimation,
     setDealerLastHand,
     setPlayerLastHand,
-    isDealing,
   ]);
 
   const isGameOver = GAME_OVER_STATUS_BLK.includes(status);
@@ -172,7 +188,7 @@ export const GameTable = ({
         <p className={styles.deck}>Deck: {deckSize}</p>
         <div className={styles.dealer}>
           <div className={styles.info}>
-            <p className={styles.name}>Dealer</p>
+            <p className={styles.name}>DEALER</p>
             <p className={styles.value}>{dealerTotal}</p>
           </div>
           <div className={styles.cards}>
@@ -197,16 +213,16 @@ export const GameTable = ({
           </div>
         </div>
         <div className={isGameOver ? styles.result : styles.actions}>
-          {!isGameOver && !isDealing && (
+          {!isGameOver && animation === BlackjackAnimation.Done && (
             <>
-              <button disabled={!bet || bet > cash} onClick={onDouble}>
+              <button disabled={!bet || bet > cash} onClick={handleDouble}>
                 DOUBLE
               </button>
-              <button onClick={onHit}>HIT</button>
-              <button onClick={onStand}>STAND</button>
+              <button onClick={handleHit}>HIT</button>
+              <button onClick={handleStand}>STAND</button>
             </>
           )}
-          {isGameOver && !isDealing && (
+          {isGameOver && animation === BlackjackAnimation.Done && (
             <div>
               <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
               <button disabled={!bet || bet > cash} onClick={handleReset}>
@@ -218,7 +234,7 @@ export const GameTable = ({
         <div className={styles.player}>
           <div className={styles.info}>
             <p className={styles.name}>
-              {user?.discord_name || user?.twitch_username || 'Player'}
+              {user?.discord_name || user?.twitch_username || 'PLAYER'}
             </p>
             <p className={styles.value}>{playerTotal}</p>
           </div>
@@ -251,7 +267,11 @@ export const GameTable = ({
       <Balance
         bet={bet}
         cash={cash}
-        disabled={!isGameOver}
+        disableBet={!isGameOver}
+        showCash={
+          !isGameOver ||
+          (isGameOver && animation !== BlackjackAnimation.Ongoing)
+        }
         onUpdate={onBetChange}
       />
     </div>

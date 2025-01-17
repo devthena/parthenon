@@ -317,6 +317,7 @@ const Blackjack = () => {
             </>
           )}
           <div className={styles.statsContainer}>
+            {(isLoading || !stats[GameCode.Blackjack]) && <Loading />}
             {!isLoading && stats[GameCode.Blackjack] && (
               <Stats data={stats[GameCode.Blackjack]} />
             )}
