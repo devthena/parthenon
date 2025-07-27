@@ -8,7 +8,7 @@ import { useParthenonState } from '@/context';
 import { useApi } from '@/hooks';
 
 import { ApiUrl } from '@/enums/api';
-import { UserObject } from '@/interfaces/user';
+import { UserObject } from '@/interfaces/user-old';
 
 import styles from './layout.module.scss';
 

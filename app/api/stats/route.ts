@@ -3,7 +3,7 @@ import { User } from '@clerk/nextjs/server';
 
 import { GameCode } from '@/enums/games';
 import { DatabaseCollections } from '@/interfaces/db';
-import { UserAuthMethod } from '@/interfaces/user';
+import { UserAuthMethod } from '@/interfaces/user-old';
 
 import { initDatabase } from '@/lib/db';
 import { withApiAuth } from '@/lib/utils';

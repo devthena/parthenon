@@ -5,7 +5,7 @@ import { decrypt } from '@/lib/utils/encryption';
 
 import { DatabaseCollections } from '@/interfaces/db';
 import { GamePayload } from '@/interfaces/games';
-import { UserAuthMethod } from '@/interfaces/user';
+import { UserAuthMethod } from '@/interfaces/user-old';
 
 export const handleCreateGame = async (
   method: UserAuthMethod,

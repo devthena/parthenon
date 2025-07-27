@@ -7,7 +7,7 @@ import { GameCode } from '@/enums/games';
 
 import { GamePayload, GameObject } from '@/interfaces/games';
 import { StatsObject } from '@/interfaces/statistics';
-import { UserObject } from '@/interfaces/user';
+import { UserObject } from '@/interfaces/user-old';
 
 interface ApiState {
   dataGame: GameObject | null;
