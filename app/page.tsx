@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
@@ -13,15 +13,14 @@ import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from '@/images/icons';
 import styles from '@/styles/page.module.scss';
 
 const Home = () => {
-  const { user, error, isLoading } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
 
-  if (error) return <div>{error.message}</div>;
-  if (user) return redirect('/dashboard');
+  if (isSignedIn) return redirect('/dashboard');
 
   return (
     <>
       <Header />
-      {isLoading ? (
+      {!isLoaded ? (
         <Loading />
       ) : (
         <div className={styles.container}>

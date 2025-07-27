@@ -1,9 +1,11 @@
-import { getSession } from '@auth0/nextjs-auth0';
+import { User } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { UserAuthMethod } from '@/interfaces/user';
 import { DatabaseCollections } from '@/interfaces/db';
+
 import { initDatabase } from '@/lib/db';
+import { withApiAuth } from '@/lib/utils';
 
 const getUser = async (
   method: UserAuthMethod,
@@ -25,15 +27,13 @@ const getUser = async (
     : null;
 };
 
-export const GET = async (request: NextRequest) => {
-  const res = new NextResponse();
-  const session = await getSession(request, res);
+export const GET = withApiAuth(async (_request: NextRequest, user: User) => {
+  const method = user.externalAccounts[0].provider.replace(
+    'oauth_',
+    ''
+  ) as UserAuthMethod;
 
-  if (!session) return NextResponse.json({ data: null, error: null }, res);
-
-  const userSub = session.user.sub.split('|');
-  const method = userSub[1];
-  const id = userSub[2];
+  const id = user.externalAccounts[0].externalId;
 
   let responseData = null;
   let responseError = null;
@@ -45,6 +45,6 @@ export const GET = async (request: NextRequest) => {
   } catch (error) {
     responseError = JSON.stringify(error);
   } finally {
-    return NextResponse.json({ data: responseData, error: responseError }, res);
+    return NextResponse.json({ data: responseData, error: responseError });
   }
-};
+});

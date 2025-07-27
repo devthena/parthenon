@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 
 import { Loading } from '@/components';
@@ -11,7 +11,7 @@ import { AccountLinked, Instructions, Register } from './components';
 import styles from './page.module.scss';
 
 const Dashboard = () => {
-  const { user: userAuth0 } = useUser();
+  const { user: userClerk } = useUser();
   const { isFetched, user } = useParthenonState();
 
   let displayName = '';
@@ -52,13 +52,13 @@ const Dashboard = () => {
         <h1>Welcome{displayName}!</h1>
         <div className={styles.bio}>
           <figure className={styles.avatar}>
-            {userAuth0?.picture && (
+            {userClerk && (
               <Image
                 alt="Avatar"
                 height={200}
                 priority
                 quality={100}
-                src={userAuth0.picture}
+                src={userClerk.imageUrl}
                 width={200}
               />
             )}

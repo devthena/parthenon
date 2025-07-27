@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { SignInButton, useUser } from '@clerk/nextjs';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +9,6 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import { HEADER_PATHS } from '@/constants/navigation';
-import { useParthenonState } from '@/context';
 import { MenuCloseIcon, MenuIcon } from '@/images/icons';
 
 import owl from '@/images/owl.png';
@@ -18,9 +17,7 @@ import styles from '@/styles/header.module.scss';
 import { Login } from './login';
 
 export const Header = () => {
-  const { user } = useParthenonState();
-  const { user: userAuth0 } = useUser();
-
+  const { isSignedIn, user } = useUser();
   const pathname = usePathname();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,6 +41,10 @@ export const Header = () => {
     : zIndex
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
+
+  const isDiscordUser = user
+    ? user.externalAccounts[0].provider.replace('oauth_', '') === 'discord'
+    : false;
 
   return (
     <>
@@ -76,19 +77,20 @@ export const Header = () => {
         <nav className={styles.links}>
           {HEADER_PATHS.map(path => {
             const pathValue =
-              path.value === '/' && userAuth0 ? '/dashboard' : path.value;
-            const isRestricted =
-              path.value === '/games' && !user?.discord_username;
+              path.value === '/' && isSignedIn ? '/dashboard' : path.value;
+
+            const isRestricted = path.value === '/games' && !isDiscordUser;
 
             const initialClass =
               path.label === 'Home' ? styles.home : undefined;
+
             const styleClass =
               pathValue === pathname
                 ? `${styles.selected} ${initialClass}`
                 : initialClass;
 
             return (
-              (userAuth0 || !path.protected) &&
+              (isSignedIn || !path.protected) &&
               !isRestricted && (
                 <Link className={styleClass} href={pathValue} key={path.label}>
                   {path.label}
@@ -96,12 +98,16 @@ export const Header = () => {
               )
             );
           })}
-          {userAuth0 ? (
+          {isSignedIn ? (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>
           ) : (
-            <Login />
+            <SignInButton>
+              <button className={`${styles.logButton} ${styles.login}`}>
+                Sign In
+              </button>
+            </SignInButton>
           )}
         </nav>
       </header>
@@ -110,13 +116,12 @@ export const Header = () => {
           <div className={styles.modalLinks}>
             {HEADER_PATHS.map(path => {
               const pathValue =
-                path.value === '/' && userAuth0 ? '/dashboard' : path.value;
+                path.value === '/' && isSignedIn ? '/dashboard' : path.value;
 
-              const isRestricted =
-                path.value === '/games' && !user?.discord_username;
+              const isRestricted = path.value === '/games' && !isDiscordUser;
 
               return (
-                (userAuth0 || !path.protected) &&
+                (isSignedIn || !path.protected) &&
                 !isRestricted && (
                   <Link
                     className={
@@ -131,7 +136,7 @@ export const Header = () => {
               );
             })}
           </div>
-          {userAuth0 && (
+          {isSignedIn && (
             <a className={styles.logButton} href="/api/auth/logout">
               LOGOUT
             </a>

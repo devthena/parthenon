@@ -1,7 +1,7 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 
 import { Header } from '@/components';
 import { useParthenonState } from '@/context';
@@ -19,17 +19,17 @@ const PublicLayout = ({
 }>) => {
   const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
   const { isFetched, user, onInitUser } = useParthenonState();
-  const { user: userAuth0 } = useUser();
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
-    if (!userAuth0 || user || isFetched) return;
+    if (!isSignedIn || user || isFetched) return;
 
     const getUser = async () => {
       await fetchGetData(ApiUrl.Users);
     };
 
     getUser();
-  }, [isFetched, user, userAuth0, fetchGetData]);
+  }, [isFetched, user, isSignedIn, fetchGetData]);
 
   useEffect(() => {
     if (!isApiFetched) return;
