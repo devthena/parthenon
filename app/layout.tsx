@@ -1,4 +1,4 @@
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { ClerkProvider } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 
 import type { Metadata } from 'next';
@@ -39,23 +39,23 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
-      <body
-        className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
-        <UserProvider>
-          <ParthenonProvider>
+    <ClerkProvider>
+      <ParthenonProvider>
+        <html lang="en">
+          <head>
+            <link rel="icon" href="/favicon.ico" sizes="any" />
+          </head>
+          <body
+            className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
             <main className={styles.main}>
               <div className={styles.content}>{children}</div>
               <Footer />
             </main>
-          </ParthenonProvider>
-        </UserProvider>
+          </body>
+        </html>
         <Analytics />
-      </body>
-    </html>
+      </ParthenonProvider>
+    </ClerkProvider>
   );
 };
 

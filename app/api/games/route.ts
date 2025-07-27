@@ -1,5 +1,5 @@
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
+import { User } from '@clerk/nextjs/server';
 
 import { DatabaseCollections } from '@/interfaces/db';
 import { GamePayload } from '@/interfaces/games';
@@ -7,6 +7,7 @@ import { UserAuthMethod } from '@/interfaces/user';
 
 import { GameCode, GameRequestType } from '@/enums/games';
 import { initDatabase } from '@/lib/db';
+import { withApiAuth } from '@/lib/utils';
 
 import { handleCreateGame } from './handleCreate';
 import { updateBlackjack } from './updateBlackjack';
@@ -74,17 +75,13 @@ const handleUpdateGame = async (
   return data;
 };
 
-export const POST = withApiAuthRequired(async (request: NextRequest) => {
-  const res = new NextResponse();
-  const session = await getSession(request, res);
+export const POST = withApiAuth(async (request: NextRequest, user: User) => {
+  const method = user.externalAccounts[0].provider.replace(
+    'oauth_',
+    ''
+  ) as UserAuthMethod;
 
-  if (!session) {
-    return NextResponse.json({ data: null, error: 'Unauthorized' });
-  }
-
-  const userSub = session.user.sub.split('|');
-  const method = userSub[1];
-  const id = userSub[2];
+  const id = user.externalAccounts[0].externalId;
 
   let responseData = null;
   let responseError = null;

@@ -1,6 +1,3 @@
-'use client';
-
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { useEffect } from 'react';
 
 import { Header, Modal } from '@/components';
@@ -9,10 +6,11 @@ import { useApi } from '@/hooks';
 
 import { ApiUrl } from '@/enums/api';
 import { UserObject } from '@/interfaces/user';
+import { withPageAuth } from '@/lib/utils';
 
 import styles from './layout.module.scss';
 
-const ProtectedLayout = ({
+const ProtectedLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -43,13 +41,15 @@ const ProtectedLayout = ({
     }
   }, [dataUser, isApiFetched, onInitUser]);
 
-  return (
-    <>
-      <Header />
-      <div className={styles.container}>{children}</div>
-      {modal.isOpen && <Modal />}
-    </>
-  );
+  return await withPageAuth(children => {
+    return (
+      <>
+        <Header />
+        <div className={styles.container}>{children}</div>
+        {modal.isOpen && <Modal />}
+      </>
+    );
+  }, children);
 };
 
-export default withPageAuthRequired(ProtectedLayout);
+export default ProtectedLayout;
