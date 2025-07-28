@@ -1,12 +1,11 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 
 import { Header, Modal } from '@/components';
-import { useParthenonState } from '@/context';
-import { useApi } from '@/hooks';
-
-import { ApiUrl } from '@/enums/api';
-import { UserObject } from '@/interfaces/user-old';
-import { withPageAuth } from '@/lib/utils';
+import { API_URLS } from '@/constants/api';
+import { useFetch, useParthenon } from '@/hooks';
+import { UserDocument } from '@/interfaces/user';
+import { getAuthMethod, withPageAuth } from '@/lib/utils';
 
 import styles from './layout.module.scss';
 
@@ -15,31 +14,30 @@ const ProtectedLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
-  const { isFetched, modal, user, onInitUser, onSetLoading } =
-    useParthenonState();
+  const { fetchGet } = useFetch();
+  const { modal, setStateUser, user } = useParthenon();
+  const { isSignedIn, user: userClerk } = useUser();
+
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const fetchUser = useCallback(async () => {
+    if (!userClerk) return;
+
+    const method = getAuthMethod(userClerk.externalAccounts[0].provider);
+    const url = `${API_URLS.USERS}/${userClerk.externalId}?method=${method}`;
+    const data = await fetchGet<UserDocument>(url);
+
+    setStateUser(data);
+  }, [fetchGet, setStateUser, userClerk]);
 
   useEffect(() => {
-    if (user || isFetched) return;
+    if (isInitialized) return;
+    setIsInitialized(true);
 
-    onSetLoading();
+    if (user || !isSignedIn) return;
 
-    const getUser = async () => {
-      await fetchGetData(ApiUrl.Users);
-    };
-
-    getUser();
-  }, [isFetched, user, fetchGetData, onSetLoading]);
-
-  useEffect(() => {
-    if (!isApiFetched) return;
-
-    if (dataUser) {
-      onInitUser(dataUser as UserObject);
-    } else {
-      onInitUser(null);
-    }
-  }, [dataUser, isApiFetched, onInitUser]);
+    fetchUser();
+  }, [fetchUser, isInitialized, isSignedIn, user]);
 
   return await withPageAuth(children => {
     return (

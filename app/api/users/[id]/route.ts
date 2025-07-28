@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { User } from '@clerk/nextjs/server';
 
+import { UserAuthMethod } from '@/interfaces/user';
 import { connectDatabase } from '@/lib/database';
 import { withApiAuth } from '@/lib/utils';
 import { getUser } from '@/services/user';
-import { UserAuthMethod } from '@/interfaces/user';
 
 type RequestParams = {
   params: {
@@ -16,17 +16,15 @@ type RequestParams = {
  * GET /api/users/:id
  */
 export const GET = withApiAuth(
-  async (_request: Request, { params }: RequestParams, user: User) => {
+  async (request: Request, { params }: RequestParams) => {
     const { id } = await params;
 
-    const method = user.externalAccounts[0].provider.replace(
-      'oauth_',
-      ''
-    ) as UserAuthMethod;
+    const { searchParams } = new URL(request.url);
+    const method = searchParams.get('method') || 'discord';
 
     try {
       await connectDatabase();
-      const data = await getUser(id, method);
+      const data = await getUser(id, method as UserAuthMethod);
 
       return NextResponse.json(data);
     } catch (error) {

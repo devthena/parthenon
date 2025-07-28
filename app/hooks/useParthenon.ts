@@ -17,14 +17,14 @@ export const useParthenon = () => {
   const { state, dispatch } = context;
 
   const setStateModal = useCallback(
-    (modal: ModalState) => {
+    (modal: Partial<ModalState>) => {
       dispatch({ type: 'SET_MODAL', payload: modal });
     },
     [dispatch]
   );
 
   const setStateUser = useCallback(
-    (user: UserDocument) => {
+    (user: UserDocument | null) => {
       dispatch({ type: 'SET_USER', payload: user });
     },
     [dispatch]

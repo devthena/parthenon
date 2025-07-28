@@ -16,6 +16,7 @@ export const partheonReducer = (
     case 'SET_USER':
       return {
         ...state,
+        isUserFetched: true,
         user: action.payload,
       };
     default:

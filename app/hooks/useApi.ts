@@ -2,16 +2,13 @@ import { useCallback, useState } from 'react';
 
 import { INITIAL_STATS } from '@/constants/stats';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode } from '@/enums/games';
 
 import { GamePayload, GameObject } from '@/interfaces/games';
 import { StatsObject } from '@/interfaces/statistics';
-import { UserObject } from '@/interfaces/user-old';
 
 interface ApiState {
   dataGame: GameObject | null;
-  dataUser: UserObject | null;
   dataStats: StatsObject | null;
   isFetched: boolean;
   isLoading: boolean;
@@ -27,33 +24,11 @@ const initialState = {
   isLoading: false,
 };
 
+/**
+ * @todo: FILE TO BE DELETED
+ */
 export const useApi = () => {
   const [data, setData] = useState<ApiState>(initialState);
-
-  const fetchGetData = useCallback(async (url: ApiUrl) => {
-    setData(prev => ({
-      ...prev,
-      isFetched: false,
-      isLoading: true,
-    }));
-
-    try {
-      const res = await fetch(url);
-
-      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-      const response = await res.json();
-
-      setData(prev => ({
-        ...prev,
-        dataUser: response.data,
-        isFetched: true,
-        isLoading: false,
-      }));
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
 
   const fetchPostData = useCallback(
     async (
@@ -135,7 +110,6 @@ export const useApi = () => {
 
   return {
     ...data,
-    fetchGetData,
     fetchPostData,
   };
 };

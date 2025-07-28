@@ -4,7 +4,7 @@ import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 
 import { Loading } from '@/components';
-import { useParthenonState } from '@/context';
+import { useParthenon } from '@/hooks';
 import { CoinIcon, StarIcon } from '@/images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
@@ -12,23 +12,11 @@ import styles from './page.module.scss';
 
 const Dashboard = () => {
   const { user: userClerk } = useUser();
-  const { isFetched, user } = useParthenonState();
-
-  let displayName = '';
-
-  if (user) {
-    if (user.discord_name) displayName = `, ${user.discord_name}`;
-    else if (user.discord_username) displayName = `, ${user.discord_username}`;
-    else if (user.twitch_username) displayName = `, ${user.twitch_username}`;
-  }
+  const { isUserFetched, user } = useParthenon();
 
   const renderRightSection = () => {
-    if (!isFetched) return <Loading />;
-
-    if (!user) {
-      if (isFetched) return <Register />;
-      return;
-    }
+    if (!isUserFetched) return <Loading />;
+    if (!user) return <Register />;
 
     if (user.discord_username) {
       if (user.twitch_username) {
@@ -42,9 +30,17 @@ const Dashboard = () => {
         return <Instructions />;
       }
     } else {
-      return user.twitch_username && <Instructions code={user.code} />;
+      return user.twitch_username && <Instructions code={user.user_id} />;
     }
   };
+
+  let displayName = '';
+
+  if (user) {
+    if (user.discord_name) displayName = `, ${user.discord_name}`;
+    else if (user.discord_username) displayName = `, ${user.discord_username}`;
+    else if (user.twitch_username) displayName = `, ${user.twitch_username}`;
+  }
 
   return (
     <div className={styles.dashboard}>

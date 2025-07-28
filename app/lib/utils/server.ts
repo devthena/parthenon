@@ -1,14 +1,11 @@
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, currentUser, User } from '@clerk/nextjs/server';
+
+import { auth } from '@clerk/nextjs/server';
 import { RequestParams } from '@/interfaces/api';
 
 export const withApiAuth = (
-  handler: (
-    req: NextRequest,
-    params: RequestParams,
-    user: User
-  ) => Promise<Response>
+  handler: (req: NextRequest, params: RequestParams) => Promise<Response>
 ) => {
   return async (req: NextRequest, params: RequestParams) => {
     const { userId } = await auth();
@@ -20,9 +17,7 @@ export const withApiAuth = (
       );
     }
 
-    const userClerk = await currentUser();
-
-    return handler(req, params, userClerk!);
+    return handler(req, params);
   };
 };
 

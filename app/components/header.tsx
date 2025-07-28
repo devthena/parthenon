@@ -1,20 +1,18 @@
 'use client';
 
-import { SignInButton, useUser } from '@clerk/nextjs';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import { useState } from 'react';
+
+import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 
 import { HEADER_PATHS } from '@/constants/navigation';
 import { MenuCloseIcon, MenuIcon } from '@/images/icons';
-
 import owl from '@/images/owl.png';
-import styles from '@/styles/header.module.scss';
+import { getAuthMethod } from '@/lib/utils';
 
-import { Login } from './login';
+import styles from '@/styles/header.module.scss';
 
 export const Header = () => {
   const { isSignedIn, user } = useUser();
@@ -43,7 +41,7 @@ export const Header = () => {
     : styles.modal;
 
   const isDiscordUser = user
-    ? user.externalAccounts[0].provider.replace('oauth_', '') === 'discord'
+    ? getAuthMethod(user.externalAccounts[0].provider) === 'discord'
     : false;
 
   return (
@@ -99,9 +97,9 @@ export const Header = () => {
             );
           })}
           {isSignedIn ? (
-            <a className={styles.logButton} href="/api/auth/logout">
-              LOGOUT
-            </a>
+            <SignOutButton>
+              <button className={styles.logButton}>Sign Out</button>
+            </SignOutButton>
           ) : (
             <SignInButton>
               <button className={`${styles.logButton} ${styles.login}`}>
@@ -137,9 +135,9 @@ export const Header = () => {
             })}
           </div>
           {isSignedIn && (
-            <a className={styles.logButton} href="/api/auth/logout">
-              LOGOUT
-            </a>
+            <SignOutButton>
+              <button className={styles.logButton}>Sign Out</button>
+            </SignOutButton>
           )}
         </div>
       </div>

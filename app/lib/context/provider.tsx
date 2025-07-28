@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useReducer } from 'react';
 
-import { INITIAL_STATE } from '@/constants/app';
+import { INITIAL_STATE } from '@/constants/context';
 import { ParthenonContextType } from '@/interfaces/context';
 import { partheonReducer } from '@/lib/reducers';
 

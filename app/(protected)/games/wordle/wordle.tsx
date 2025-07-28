@@ -4,12 +4,10 @@ import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Loading } from '@/components';
-import { useParthenonState } from '@/context';
-import { useApi, useWordle } from '@/hooks';
+import { useFetch, useParthenon, useWordle } from '@/hooks';
 
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
 import { GameCode, GamePage, GameRequestType } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
@@ -31,14 +29,14 @@ const Wordle = () => {
     onSetGame,
     onSetStats,
     onSetUser,
-  } = useParthenonState();
+  } = useParthenon();
 
   const {
     dataGame,
     dataStats,
     isFetched: isApiFetched,
     fetchPostData,
-  } = useApi();
+  } = useFetch();
 
   const {
     answer,
@@ -55,6 +53,7 @@ const Wordle = () => {
     onResume,
   } = useWordle();
 
+  const [isInitialized, setIsInitialized] = useState(false);
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
 
@@ -131,6 +130,9 @@ const Wordle = () => {
   };
 
   useEffect(() => {
+    if (isInitialized) return;
+    setIsInitialized(true);
+
     if (!stats[GameCode.Wordle]) getStats();
 
     window.addEventListener('keydown', handleKeyPress);
@@ -138,7 +140,7 @@ const Wordle = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
+  }, [isInitialized]);
 
   useEffect(() => {
     if (answer.length === 0 || answer === answerRef.current) return;
