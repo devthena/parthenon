@@ -34,10 +34,26 @@ export const useFetch = () => {
   }, []);
 
   /**
+   * fetchGetArray
+   */
+  const fetchGetArray = useCallback(async <T>(url: string): Promise<T[]> => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Parthenon: GET Request Failed');
+
+      const data = await response.json();
+      return (data as T[]) ?? [];
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  }, []);
+
+  /**
    * fetchPatch
    */
   const fetchPatch = useCallback(
-    async <T>(url: string, payload: T): Promise<T | null> => {
+    async <T>(url: string, payload: Partial<T>): Promise<T | null> => {
       try {
         const response = await fetch(url, {
           method: 'PATCH',
@@ -81,5 +97,5 @@ export const useFetch = () => {
     []
   );
 
-  return { fetchDelete, fetchGet, fetchPatch, fetchPost };
+  return { fetchDelete, fetchGet, fetchGetArray, fetchPatch, fetchPost };
 };

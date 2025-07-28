@@ -5,7 +5,7 @@ import { auth } from '@clerk/nextjs/server';
 import { RequestParams } from '@/interfaces/api';
 
 export const withApiAuth = (
-  handler: (req: NextRequest, params: RequestParams) => Promise<Response>
+  handler: (req: NextRequest, params: RequestParams) => Promise<NextResponse>
 ) => {
   return async (req: NextRequest, params: RequestParams) => {
     const { userId } = await auth();

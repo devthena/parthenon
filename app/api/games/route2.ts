@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { RequestParams } from '@/interfaces/api';
+import { connectDatabase } from '@/lib/database';
+import { withApiAuth } from '@/lib/utils';
+import { createActiveGame, updateActiveGame } from '@/services/game';
+
+export const PATCH = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
+
+      const payload = await request.json();
+      const game = await updateActiveGame(payload);
+
+      return NextResponse.json(game);
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
+  }
+);
+
+export const POST = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
+
+      const payload = await request.json();
+      const game = await createActiveGame(payload);
+
+      return NextResponse.json(game, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
+  }
+);

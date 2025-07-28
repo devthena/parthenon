@@ -11,7 +11,7 @@ export enum GamePage {
   Playing,
 }
 
-export enum GameRequestType {
-  Create = 'create',
-  Update = 'update',
+export enum GameRequest {
+  Create,
+  Update,
 }

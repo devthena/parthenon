@@ -4,6 +4,7 @@ import { useUser } from '@clerk/nextjs';
 import { Header, Modal } from '@/components';
 import { API_URLS } from '@/constants/api';
 import { useFetch, useParthenon } from '@/hooks';
+import { GameDocument } from '@/interfaces/games';
 import { UserDocument } from '@/interfaces/user';
 import { getAuthMethod, withPageAuth } from '@/lib/utils';
 
@@ -14,11 +15,29 @@ const ProtectedLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { fetchGet } = useFetch();
-  const { modal, setStateUser, user } = useParthenon();
+  const { fetchGet, fetchGetArray } = useFetch();
+  const {
+    activeGames,
+    isActiveGamesFetched,
+    isUserFetched,
+    modal,
+    setStateActiveGames,
+    setStateUser,
+    user,
+  } = useParthenon();
   const { isSignedIn, user: userClerk } = useUser();
 
-  const [isInitialized, setIsInitialized] = useState(false);
+  const fetchGames = useCallback(
+    async (discordId: string | null) => {
+      if (!discordId) return setStateActiveGames([]);
+
+      const url = `${API_URLS.GAMES}/${discordId}`;
+      const games = await fetchGetArray<GameDocument>(url);
+
+      setStateActiveGames(games);
+    },
+    [fetchGetArray]
+  );
 
   const fetchUser = useCallback(async () => {
     if (!userClerk) return;
@@ -31,13 +50,14 @@ const ProtectedLayout = async ({
   }, [fetchGet, setStateUser, userClerk]);
 
   useEffect(() => {
-    if (isInitialized) return;
-    setIsInitialized(true);
+    if (isUserFetched || !isSignedIn) return;
+    if (!user) fetchUser();
+  }, [fetchUser, isSignedIn, isUserFetched, user]);
 
-    if (user || !isSignedIn) return;
-
-    fetchUser();
-  }, [fetchUser, isInitialized, isSignedIn, user]);
+  useEffect(() => {
+    if (!isUserFetched || !user || isActiveGamesFetched) return;
+    if (!activeGames) fetchGames(user.discord_id);
+  }, [activeGames, fetchGames, isActiveGamesFetched, isUserFetched, user]);
 
   return await withPageAuth(children => {
     return (

@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
-import { User } from '@clerk/nextjs/server';
 
+import { RequestParams } from '@/interfaces/api';
 import { UserAuthMethod } from '@/interfaces/user';
+
 import { connectDatabase } from '@/lib/database';
 import { withApiAuth } from '@/lib/utils';
-import { getUser } from '@/services/user';
 
-type RequestParams = {
-  params: {
-    id: string;
-  };
-};
+import { getUser } from '@/services/user';
 
 /**
  * GET /api/users/:id

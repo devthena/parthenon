@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { User } from '@clerk/nextjs/server';
 
-import { DatabaseCollections } from '@/interfaces/db';
 import { GamePayload } from '@/interfaces/games';
-import { UserAuthMethod } from '@/interfaces/user-old';
 
-import { GameCode, GameRequestType } from '@/enums/games';
-import { initDatabase } from '@/lib/db';
+import { GameCode, GameRequest } from '@/enums/games';
 import { withApiAuth } from '@/lib/utils';
 
 import { handleCreateGame } from './handleCreate';
@@ -93,9 +90,9 @@ export const POST = withApiAuth(async (request: NextRequest, user: User) => {
 
     if (!collections) {
       responseError = 'No database collections found.';
-    } else if (payload.type === GameRequestType.Create) {
+    } else if (payload.type === GameRequest.Create) {
       responseData = await handleCreateGame(method, id, payload, collections);
-    } else if (payload.type === GameRequestType.Update) {
+    } else if (payload.type === GameRequest.Update) {
       responseData = await handleUpdateGame(method, id, payload, collections);
     }
   } catch (error) {
