@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { INITIAL_STATS } from '@/constants/stats';
+import { INITIAL_WORDLE } from '@/constants/stats';
 import { MAX_ATTEMPTS, WORDLE_REWARDS } from '@/constants/wordle';
 import { GameCode } from '@/enums/games';
 
@@ -26,7 +26,7 @@ export const updateWordle = async (
   const isAttempt = newGuesses.length < MAX_ATTEMPTS;
 
   if (isWin) {
-    let stats = INITIAL_STATS[GameCode.Wordle];
+    let stats = INITIAL_WORDLE;
 
     const statsDoc = await collections.stats.findOne({
       discord_id: discordId,
@@ -82,7 +82,7 @@ export const updateWordle = async (
     );
   } else {
     // add to total times played for a loss
-    let stats = INITIAL_STATS[GameCode.Wordle];
+    let stats = INITIAL_WORDLE;
 
     const statsDoc = await collections.stats.findOne({
       discord_id: discordId,

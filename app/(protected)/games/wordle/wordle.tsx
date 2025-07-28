@@ -20,23 +20,18 @@ import styles from '../shared/styles/page.module.scss';
 
 const Wordle = () => {
   const {
-    isFetched,
-    isLoading,
-    games,
+    activeGames,
+    isStatsFetched,
+    isUserFetched,
+    setStateActiveGame,
+    setStateModal,
+    setStateStats,
+    setStateUser,
     stats,
     user,
-    onSetModal,
-    onSetGame,
-    onSetStats,
-    onSetUser,
   } = useParthenon();
 
-  const {
-    dataGame,
-    dataStats,
-    isFetched: isApiFetched,
-    fetchPostData,
-  } = useFetch();
+  const { fetchPatch, fetchPost } = useFetch();
 
   const {
     answer,
@@ -59,7 +54,7 @@ const Wordle = () => {
 
   const answerRef = useRef(answer);
   const currentGuessRef = useRef(currentGuess);
-  const gameKeyRef = useRef(games[GameCode.Wordle]);
+  const gameKeyRef = useRef(activeGames[GameCode.Wordle]);
   const gameStatusRef = useRef(status);
 
   const getStats = useCallback(async () => {
@@ -133,8 +128,6 @@ const Wordle = () => {
     if (isInitialized) return;
     setIsInitialized(true);
 
-    if (!stats[GameCode.Wordle]) getStats();
-
     window.addEventListener('keydown', handleKeyPress);
 
     return () => {
@@ -174,6 +167,7 @@ const Wordle = () => {
     if (
       !user ||
       !user.discord_username ||
+      !stats ||
       !stats[GameCode.Wordle] ||
       isStatsUpdated
     )
@@ -223,7 +217,8 @@ const Wordle = () => {
     }
   }, [status, isStatsUpdated]);
 
-  if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
+  if (isUserFetched && (!user || !user?.discord_username))
+    redirect('/dashboard');
 
   const initialGuessResult = Array(WORD_LENGTH).fill(WordleKeyStatus.Default);
 
@@ -323,9 +318,10 @@ const Wordle = () => {
                 onClick={() =>
                   onSetModal({
                     isOpen: true,
-                    content: stats[GameCode.Wordle] ? (
-                      <Stats data={stats[GameCode.Wordle]} />
-                    ) : null,
+                    content:
+                      stats && stats[GameCode.Wordle] ? (
+                        <Stats data={stats[GameCode.Wordle]} />
+                      ) : null,
                   })
                 }>
                 <StatsIcon />

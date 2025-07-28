@@ -5,6 +5,7 @@ import { GameDocument } from '@/interfaces/games';
 import { ModalState } from '@/interfaces/modal';
 import { UserDocument } from '@/interfaces/user';
 import { ParthenonContext } from '@/lib/context';
+import { StatDocument } from '@/interfaces/stat';
 
 export const useParthenon = () => {
   const context = useContext(ParthenonContext);
@@ -44,6 +45,13 @@ export const useParthenon = () => {
     [dispatch]
   );
 
+  const setStateStats = useCallback(
+    (stats: StatDocument | null) => {
+      dispatch({ type: 'SET_STATS', payload: stats });
+    },
+    [dispatch]
+  );
+
   const setStateUser = useCallback(
     (user: UserDocument | null) => {
       dispatch({ type: 'SET_USER', payload: user });
@@ -56,6 +64,7 @@ export const useParthenon = () => {
     setStateActiveGame,
     setStateActiveGames,
     setStateModal,
+    setStateStats,
     setStateUser,
   };
 };

@@ -5,7 +5,7 @@ import { INITIAL_STATS } from '@/constants/stats';
 import { GameCode } from '@/enums/games';
 
 import { GamePayload, GameObject } from '@/interfaces/games';
-import { StatsObject } from '@/interfaces/statistics';
+import { StatsObject } from '@/interfaces/stat';
 
 interface ApiState {
   dataGame: GameObject | null;

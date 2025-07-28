@@ -35,6 +35,12 @@ export const partheonReducer = (
           ...action.payload,
         },
       };
+    case 'SET_STATS':
+      return {
+        ...state,
+        isStatsFetched: true,
+        stats: action.payload,
+      };
     case 'SET_USER':
       return {
         ...state,

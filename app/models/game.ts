@@ -1,8 +1,8 @@
 import { model, Schema } from 'mongoose';
 
 import { GameDocument } from '@/interfaces/games';
-import { getCollectionENV } from '@/lib/database';
 import { GameCode } from '@/enums/games';
+import { getCollectionENV } from '@/lib/database';
 
 const { MONGODB_COLLECTION_GAMES } = getCollectionENV();
 

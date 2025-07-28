@@ -31,9 +31,7 @@ export const updateActiveGame = async (
 ): Promise<GameDocument | null> => {
   return await GameModel.findOneAndUpdate(
     { discord_id: payload.discord_id, code: payload.code },
-    {
-      ...payload,
-    },
+    { ...payload },
     { new: true }
   );
 };

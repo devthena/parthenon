@@ -10,8 +10,3 @@ export enum GamePage {
   Overview,
   Playing,
 }
-
-export enum GameRequest {
-  Create,
-  Update,
-}
