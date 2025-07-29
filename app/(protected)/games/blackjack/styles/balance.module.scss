@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .balance {
   margin: 24px auto;
