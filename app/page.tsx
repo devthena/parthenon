@@ -4,12 +4,11 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { SignInButton, useUser } from '@clerk/nextjs';
 
-import { Header, Loading } from '@/components';
 import { SOCIAL_URLS } from '@/constants/navigation';
-
 import avatar from '@/images/avatar.png';
 import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from '@/images/icons';
 
+import { Header, Loading } from '@/components';
 import styles from '@/styles/page.module.scss';
 
 const Home = () => {

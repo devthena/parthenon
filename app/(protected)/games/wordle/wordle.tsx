@@ -3,7 +3,6 @@
 import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Loading } from '@/components';
 import { useFetch, useParthenon, useWordle } from '@/hooks';
 
 import { API_URLS } from '@/constants/api';
@@ -15,6 +14,7 @@ import { GameObject, WordleGuess } from '@/interfaces/games';
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils';
 
+import { Loading } from '@/components';
 import { AnswerGrid, Keyboard, Notice, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
 
@@ -31,7 +31,7 @@ const Wordle = () => {
     user,
   } = useParthenon();
 
-  const { fetchDelete, fetchPatch, fetchPost } = useFetch();
+  const { fetchPatch, fetchPost } = useFetch();
 
   const {
     answer,

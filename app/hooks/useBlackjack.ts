@@ -4,8 +4,7 @@ import { useCallback, useReducer } from 'react';
 
 import { INITIAL_STATE_BLK } from '@/constants/cards';
 import { PlayCard } from '@/interfaces/games';
-
-import { createCardDeck, getHandValue, shuffleDeck } from '@/lib/utils/cards';
+import { createCardDeck, shuffleDeck } from '@/lib/utils/cards';
 import { blackjackReducer } from '@/lib/reducers';
 
 export const useBlackjack = () => {
