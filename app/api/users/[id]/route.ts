@@ -11,7 +11,7 @@ import { getUser } from '@/services/user';
  * GET /api/users/:id
  */
 export const GET = withApiAuth(
-  async (request: Request, context: { params: { [key: string]: string } }) => {
+  async (request: Request, context: { params: Promise<{ id: string }> }) => {
     const { id } = await context.params;
     const { searchParams } = new URL(request.url);
     const method = searchParams.get('method') || 'discord';

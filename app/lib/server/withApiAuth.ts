@@ -5,12 +5,12 @@ import { auth } from '@clerk/nextjs/server';
 export const withApiAuth = (
   handler: (
     req: NextRequest,
-    context: { params: { [key: string]: string } }
+    context: { params: Promise<{ id: string }> }
   ) => Promise<NextResponse>
 ) => {
   return async (
     req: NextRequest,
-    context: { params: { [key: string]: string } }
+    context: { params: Promise<{ id: string }> }
   ) => {
     const { userId } = await auth();
 

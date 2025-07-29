@@ -8,7 +8,7 @@ import { GameCode } from '@/enums/games';
 export const GET = withApiAuth(
   async (
     _request: NextRequest,
-    context: { params: { [key: string]: string } }
+    context: { params: Promise<{ id: string }> }
   ) => {
     const { id } = await context.params;
 
@@ -26,7 +26,7 @@ export const GET = withApiAuth(
 export const DELETE = withApiAuth(
   async (
     request: NextRequest,
-    context: { params: { [key: string]: string } }
+    context: { params: Promise<{ id: string }> }
   ) => {
     const { id } = await context.params;
 

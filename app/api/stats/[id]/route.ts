@@ -7,7 +7,7 @@ import { getStats } from '@/services/stat';
 export const GET = withApiAuth(
   async (
     _request: NextRequest,
-    context: { params: { [key: string]: string } }
+    context: { params: Promise<{ id: string }> }
   ) => {
     const { id } = await context.params;
 
