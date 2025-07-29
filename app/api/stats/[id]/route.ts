@@ -5,10 +5,7 @@ import { withApiAuth } from '@/lib/server';
 import { getStats } from '@/services/stat';
 
 export const GET = withApiAuth(
-  async (
-    _request: NextRequest,
-    context: { params: { [key: string]: string } }
-  ) => {
+  async (_request: NextRequest, context: { params: { id: string } }) => {
     const { id } = await context.params;
 
     try {

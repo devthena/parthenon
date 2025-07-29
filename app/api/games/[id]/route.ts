@@ -6,10 +6,7 @@ import { deleteActiveGame, getActiveGames } from '@/services/games';
 import { GameCode } from '@/enums/games';
 
 export const GET = withApiAuth(
-  async (
-    _request: NextRequest,
-    context: { params: { [key: string]: string } }
-  ) => {
+  async (_request: NextRequest, context: { params: { id: string } }) => {
     const { id } = await context.params;
 
     try {
@@ -24,10 +21,7 @@ export const GET = withApiAuth(
 );
 
 export const DELETE = withApiAuth(
-  async (
-    request: NextRequest,
-    context: { params: { [key: string]: string } }
-  ) => {
+  async (request: NextRequest, context: { params: { id: string } }) => {
     const { id } = await context.params;
 
     const { searchParams } = new URL(request.url);
