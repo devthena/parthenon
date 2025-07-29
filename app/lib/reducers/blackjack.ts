@@ -18,7 +18,8 @@ const dealerPlay = (deck: PlayCard[], hand: PlayCard[]) => {
 
 const checkStatus = (
   playerHand: PlayCard[],
-  dealerHand: PlayCard[]
+  dealerHand: PlayCard[],
+  isWinPending?: boolean
 ): BlackjackStatus => {
   let status = BlackjackStatus.Playing;
 
@@ -37,7 +38,7 @@ const checkStatus = (
     status = BlackjackStatus.Lose;
   } else if (playerHandValue > 21) {
     status = BlackjackStatus.Bust;
-  } else if (playerHasRegular21) {
+  } else if (playerHasRegular21 && !isWinPending) {
     status = BlackjackStatus.WinPending;
   } else if (dealerHandValue > 21) {
     status = BlackjackStatus.DealerBust;
@@ -122,7 +123,11 @@ export const blackjackReducer = (
         ...state,
         deck: currentDeck,
         dealerHand: updatedDealerHand,
-        status: checkStatus([...state.playerHand], updatedDealerHand),
+        status: checkStatus(
+          [...state.playerHand],
+          updatedDealerHand,
+          state.status === BlackjackStatus.WinPending
+        ),
       };
 
     case 'GAME_RESET':

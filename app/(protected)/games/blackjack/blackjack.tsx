@@ -277,7 +277,6 @@ const Blackjack = () => {
           <p className={styles.description}>
             Adjust your bet then hit PLAY when ready!
           </p>
-          {!isUserFetched && <Loading />}
           {isUserFetched && user && (
             <>
               <Balance bet={bet} cash={user.cash} onUpdate={onBetChange} />
@@ -300,7 +299,7 @@ const Blackjack = () => {
             </>
           )}
           <div className={styles.statsContainer}>
-            {!isStatsFetched && <Loading />}
+            {(!isUserFetched || !isStatsFetched) && <Loading />}
             {isStatsFetched && stats && (
               <Stats data={stats[GameCode.Blackjack]} />
             )}

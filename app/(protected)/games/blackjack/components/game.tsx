@@ -117,7 +117,13 @@ export const GameTable = ({
 
   useEffect(() => {
     if (status !== BlackjackStatus.WinPending) return;
-    handleStand();
+
+    const forceStand = async () => {
+      await delay(1000);
+      handleStand();
+    };
+
+    forceStand();
   }, [status]);
 
   useEffect(() => {
