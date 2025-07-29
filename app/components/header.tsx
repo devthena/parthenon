@@ -59,7 +59,7 @@ export const Header = () => {
               </button>
             )}
           </div>
-          <a href="/">
+          <Link href="/">
             <Image
               alt="Little Owl"
               className={styles.logoImg}
@@ -70,7 +70,7 @@ export const Header = () => {
             <h1>
               LITTLEOWL<span>BOT</span>
             </h1>
-          </a>
+          </Link>
         </div>
         <nav className={styles.links}>
           {HEADER_PATHS.map(path => {

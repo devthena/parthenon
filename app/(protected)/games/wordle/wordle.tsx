@@ -6,12 +6,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Loading } from '@/components';
 import { useFetch, useParthenon, useWordle } from '@/hooks';
 
+import { API_URLS } from '@/constants/api';
 import { MAX_ATTEMPTS, WORD_LENGTH, WORD_LIST } from '@/constants/wordle';
-
-import { GameCode, GamePage, GameRequestType } from '@/enums/games';
+import { GameCode, GamePage } from '@/enums/games';
 import { WordleKeyStatus, WordleStatus } from '@/enums/games';
 
-import { WordleGuess } from '@/interfaces/games';
+import { GameObject, WordleGuess } from '@/interfaces/games';
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils';
 
@@ -21,6 +21,7 @@ import styles from '../shared/styles/page.module.scss';
 const Wordle = () => {
   const {
     activeGames,
+    isActiveGamesFetched,
     isStatsFetched,
     isUserFetched,
     setStateActiveGame,
@@ -54,44 +55,42 @@ const Wordle = () => {
 
   const answerRef = useRef(answer);
   const currentGuessRef = useRef(currentGuess);
-  const gameKeyRef = useRef(activeGames[GameCode.Wordle]);
+  const gameKeyRef = useRef<string | null>(null);
   const gameStatusRef = useRef(status);
 
-  const getStats = useCallback(async () => {
-    await fetchPostData(ApiUrl.Stats, ApiDataType.Stats, {
-      code: GameCode.Wordle,
-    });
-  }, [fetchPostData]);
-
   const getGame = useCallback(async () => {
-    await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
+    if (!user || !user.discord_id) return;
+
+    const game = await fetchPost(API_URLS.GAMES, {
+      discord_id: user.discord_id,
       code: GameCode.Wordle,
-      type: GameRequestType.Create,
       data: {
         sessionKey: encrypt(answerRef.current),
       },
     });
-  }, [fetchPostData]);
 
-  const updateGame = async (guess: string) => {
-    if (!gameKeyRef.current) return;
+    setStateActiveGame(GameCode.Wordle, game);
+  }, [fetchPost, setStateActiveGame, user]);
 
-    await fetchPostData(
-      ApiUrl.Games,
-      ApiDataType.Games,
-      {
+  const updateGame = useCallback(
+    async (guess: string) => {
+      if (!user || !user.discord_id || !gameKeyRef.current) return;
+
+      const game = await fetchPatch<GameObject>(API_URLS.GAMES, {
+        discord_id: user.discord_id,
         key: gameKeyRef.current,
         code: GameCode.Wordle,
-        type: GameRequestType.Update,
         data: {
           sessionCode: encrypt(guess),
         },
-      },
-      true
-    );
-  };
+      });
 
-  const modifiedEnter = async () => {
+      setStateActiveGame(GameCode.Blackjack, game);
+    },
+    [fetchPatch, setStateActiveGame, user]
+  );
+
+  const modifiedEnter = useCallback(async () => {
     if (gameStatusRef.current === WordleStatus.Standby) return;
 
     if (
@@ -108,21 +107,24 @@ const Wordle = () => {
     if (!WORD_LIST.includes(currentGuessRef.current)) return;
 
     updateGame(currentGuessRef.current);
-  };
+  }, [onEnter, onPlay, updateGame]);
 
-  const handleKeyPress = (event: KeyboardEvent) => {
-    event.preventDefault();
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      event.preventDefault();
 
-    const { key } = event;
+      const { key } = event;
 
-    if (key === 'Enter') {
-      modifiedEnter();
-    } else if (key === 'Backspace') {
-      onDelete();
-    } else if (/^[a-zA-Z]$/.test(key)) {
-      onKey(key.toLowerCase());
-    }
-  };
+      if (key === 'Enter') {
+        modifiedEnter();
+      } else if (key === 'Backspace') {
+        onDelete();
+      } else if (/^[a-zA-Z]$/.test(key)) {
+        onKey(key.toLowerCase());
+      }
+    },
+    [modifiedEnter, onDelete, onKey]
+  );
 
   useEffect(() => {
     if (isInitialized) return;
@@ -133,7 +135,7 @@ const Wordle = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [isInitialized]);
+  }, [handleKeyPress, isInitialized]);
 
   useEffect(() => {
     if (answer.length === 0 || answer === answerRef.current) return;
@@ -146,27 +148,21 @@ const Wordle = () => {
   }, [currentGuess]);
 
   useEffect(() => {
-    gameKeyRef.current = games[GameCode.Wordle];
-  }, [games]);
+    if (!isActiveGamesFetched) return;
+    if (!activeGames) return;
+
+    const game = activeGames[GameCode.Wordle];
+    if (game && game.key) gameKeyRef.current = game.key;
+  }, [activeGames, isActiveGamesFetched]);
 
   useEffect(() => {
     gameStatusRef.current = status;
   }, [status]);
 
   useEffect(() => {
-    if (!isApiFetched || !dataGame) return;
-    onSetGame(dataGame);
-  }, [dataGame, isApiFetched, onSetGame]);
-
-  useEffect(() => {
-    if (!isApiFetched || !dataStats || stats[GameCode.Wordle]) return;
-    onSetStats(dataStats);
-  }, [dataStats, isApiFetched, stats, onSetStats]);
-
-  useEffect(() => {
     if (
       !user ||
-      !user.discord_username ||
+      !user.discord_id ||
       !stats ||
       !stats[GameCode.Wordle] ||
       isStatsUpdated
@@ -179,7 +175,8 @@ const Wordle = () => {
       const newDistribution = [...stats[GameCode.Wordle].distribution];
       newDistribution[guesses.length - 1] += 1;
 
-      onSetStats({
+      setStateStats({
+        discord_id: user.discord_id,
         [GameCode.Wordle]: {
           currentStreak: stats[GameCode.Wordle].currentStreak + 1,
           distribution: newDistribution,
@@ -193,7 +190,7 @@ const Wordle = () => {
       });
 
       if (reward) {
-        onSetUser({
+        setStateUser({
           ...user,
           cash: user.cash + reward,
         });
@@ -201,7 +198,8 @@ const Wordle = () => {
     } else if (status === WordleStatus.Completed) {
       setIsStatsUpdated(true);
 
-      onSetStats({
+      setStateStats({
+        discord_id: user.discord_id,
         [GameCode.Wordle]: {
           ...stats[GameCode.Wordle],
           currentStreak: 0,
@@ -209,7 +207,16 @@ const Wordle = () => {
         },
       });
     }
-  }, [status]);
+  }, [
+    guesses.length,
+    isStatsUpdated,
+    reward,
+    setStateStats,
+    setStateUser,
+    stats,
+    status,
+    user,
+  ]);
 
   useEffect(() => {
     if (status === WordleStatus.Playing && isStatsUpdated) {
@@ -217,8 +224,7 @@ const Wordle = () => {
     }
   }, [status, isStatsUpdated]);
 
-  if (isUserFetched && (!user || !user?.discord_username))
-    redirect('/dashboard');
+  if (isUserFetched && (!user || !user?.discord_id)) redirect('/dashboard');
 
   const initialGuessResult = Array(WORD_LENGTH).fill(WordleKeyStatus.Default);
 
@@ -282,7 +288,7 @@ const Wordle = () => {
               <button
                 className={styles.rulesOverview}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -292,7 +298,7 @@ const Wordle = () => {
               <button
                 className={styles.rulesDesktop}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -306,7 +312,7 @@ const Wordle = () => {
               <button
                 className={styles.rules}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -316,12 +322,9 @@ const Wordle = () => {
               <button
                 className={styles.stats}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
-                    content:
-                      stats && stats[GameCode.Wordle] ? (
-                        <Stats data={stats[GameCode.Wordle]} />
-                      ) : null,
+                    content: stats && <Stats data={stats[GameCode.Wordle]} />,
                   })
                 }>
                 <StatsIcon />
@@ -341,17 +344,15 @@ const Wordle = () => {
             PLAY
           </button>
           <div className={styles.statsContainer}>
-            {(isLoading || !stats[GameCode.Wordle]) && <Loading />}
-            {!isLoading && stats[GameCode.Wordle] && (
-              <Stats data={stats[GameCode.Wordle]} />
-            )}
+            {!isStatsFetched && <Loading />}
+            {isStatsFetched && stats && <Stats data={stats[GameCode.Wordle]} />}
           </div>
         </div>
       )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
-          {(isLoading || !games[GameCode.Wordle]) && <Loading />}
-          {!isLoading && games[GameCode.Wordle] && (
+          {!isActiveGamesFetched && <Loading />}
+          {isActiveGamesFetched && (
             <>
               <Notice
                 answer={answer}

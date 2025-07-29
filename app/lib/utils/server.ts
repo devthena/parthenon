@@ -20,14 +20,3 @@ export const withApiAuth = (
     return handler(req, params);
   };
 };
-
-export const withPageAuth = async <T>(
-  handler: (children: React.ReactNode) => T | Promise<T>,
-  children: React.ReactNode
-) => {
-  const { userId } = await auth();
-
-  if (!userId) redirect('/');
-
-  return handler(children);
-};

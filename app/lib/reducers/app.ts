@@ -1,6 +1,6 @@
 import { GameCode } from '@/enums/games';
 import { ParthenonAction, ParthenonState } from '@/interfaces/context';
-import { GameDocument } from '@/interfaces/games';
+import { GameObject } from '@/interfaces/games';
 
 export const partheonReducer = (
   state: ParthenonState,
@@ -16,7 +16,7 @@ export const partheonReducer = (
         },
       };
     case 'SET_ACTIVE_GAMES':
-      const updatedActiveGames: Partial<Record<GameCode, GameDocument>> = {};
+      const updatedActiveGames: Partial<Record<GameCode, GameObject>> = {};
 
       action.payload.forEach(game => {
         updatedActiveGames[game.code] = game;

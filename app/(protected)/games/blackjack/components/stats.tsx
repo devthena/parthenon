@@ -1,7 +1,13 @@
-import { BlackjackObject } from '@/interfaces/games';
+import { INITIAL_BLACKJACK } from '@/constants/stats';
+import { BlackjackStats } from '@/interfaces/games';
+
 import styles from '../styles/stats.module.scss';
 
-export const Stats = ({ data }: { data: BlackjackObject }) => {
+export const Stats = ({
+  data = INITIAL_BLACKJACK,
+}: {
+  data?: BlackjackStats;
+}) => {
   return (
     <div className={styles.stats}>
       <div className={styles.statsBox}>

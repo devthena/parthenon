@@ -1,15 +1,16 @@
 import { GameCode } from '@/enums/games';
-import { StatDocument } from '@/interfaces/stat';
+import { LeanStatDocument, StatObject } from '@/interfaces/stat';
 import { StatModel } from '@/models/stat';
 
 /**
  * createStats
  * This creates a new Game Document
  */
-export const createStats = async (
-  payload: Partial<StatDocument>
-): Promise<StatDocument> => {
-  return await StatModel.create(payload);
+export const createStats = async (payload: StatObject): Promise<StatObject> => {
+  const stats = (await StatModel.create(payload)).toObject();
+  const { _id, ...rest } = stats as LeanStatDocument;
+
+  return rest;
 };
 
 /**
@@ -17,8 +18,15 @@ export const createStats = async (
  * This fetches Stat documents by Discord ID
  * @returns The Stat documents or NULL
  */
-export const getStats = async (id: string): Promise<StatDocument[] | null> => {
-  return await StatModel.findOne({ discord_id: id });
+export const getStats = async (id: string): Promise<StatObject | null> => {
+  const stats = await StatModel.findOne({
+    discord_id: id,
+  }).lean<LeanStatDocument>();
+
+  if (!stats) return null;
+
+  const { _id, ...rest } = stats as LeanStatDocument;
+  return rest;
 };
 
 /**
@@ -27,11 +35,16 @@ export const getStats = async (id: string): Promise<StatDocument[] | null> => {
  */
 export const updateStats = async (
   code: GameCode,
-  payload: Partial<StatDocument>
-): Promise<StatDocument | null> => {
-  return await StatModel.findOneAndUpdate(
+  payload: StatObject
+): Promise<StatObject | null> => {
+  const stats = await StatModel.findOneAndUpdate(
     { discord_id: payload.discord_id, code: code },
     { ...payload },
     { new: true }
-  );
+  ).lean<LeanStatDocument>();
+
+  if (!stats) return null;
+
+  const { _id, ...rest } = stats as LeanStatDocument;
+  return rest;
 };

@@ -1,4 +1,8 @@
-import { UserAuthMethod, UserDocument } from '@/interfaces/user';
+import {
+  LeanUserDocument,
+  UserAuthMethod,
+  UserObject,
+} from '@/interfaces/user';
 import { UserModel } from '@/models/user';
 
 /**
@@ -9,6 +13,13 @@ import { UserModel } from '@/models/user';
 export const getUser = async (
   id: string,
   method: UserAuthMethod
-): Promise<UserDocument | null> => {
-  return await UserModel.findOne({ [`${method}_id`]: id });
+): Promise<UserObject | null> => {
+  const user = await UserModel.findOne({
+    [`${method}_id`]: id,
+  }).lean<LeanUserDocument>();
+
+  if (!user) null;
+
+  const { _id, ...rest } = user as LeanUserDocument;
+  return rest;
 };

@@ -1,11 +1,11 @@
 import { useCallback, useContext } from 'react';
 
 import { GameCode } from '@/enums/games';
-import { GameDocument } from '@/interfaces/games';
+import { GameObject } from '@/interfaces/games';
 import { ModalState } from '@/interfaces/modal';
-import { UserDocument } from '@/interfaces/user';
+import { UserObject } from '@/interfaces/user';
 import { ParthenonContext } from '@/lib/context';
-import { StatDocument } from '@/interfaces/stat';
+import { StatObject } from '@/interfaces/stat';
 
 export const useParthenon = () => {
   const context = useContext(ParthenonContext);
@@ -19,7 +19,7 @@ export const useParthenon = () => {
   const { state, dispatch } = context;
 
   const setStateActiveGame = useCallback(
-    (code: GameCode, game: GameDocument | null) => {
+    (code: GameCode, game: GameObject | null) => {
       dispatch({
         type: 'SET_ACTIVE_GAME',
         payload: { code, data: game },
@@ -29,7 +29,7 @@ export const useParthenon = () => {
   );
 
   const setStateActiveGames = useCallback(
-    (games: GameDocument[]) => {
+    (games: GameObject[]) => {
       dispatch({
         type: 'SET_ACTIVE_GAMES',
         payload: games,
@@ -46,14 +46,14 @@ export const useParthenon = () => {
   );
 
   const setStateStats = useCallback(
-    (stats: StatDocument | null) => {
+    (stats: StatObject | null) => {
       dispatch({ type: 'SET_STATS', payload: stats });
     },
     [dispatch]
   );
 
   const setStateUser = useCallback(
-    (user: UserDocument | null) => {
+    (user: UserObject | null) => {
       dispatch({ type: 'SET_USER', payload: user });
     },
     [dispatch]

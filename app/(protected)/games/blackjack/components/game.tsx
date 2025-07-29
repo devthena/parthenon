@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParthenonState } from '@/context';
+import { useParthenon } from '@/hooks';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { BlackjackAnimation, BlackjackStatus, CardSize } from '@/enums/games';
@@ -50,7 +50,7 @@ export const GameTable = ({
   onPlay: (bet: number) => void;
   onStand: () => void;
 }) => {
-  const { user, onSetUser } = useParthenonState();
+  const { setStateUser, user } = useParthenon();
 
   const [dealerTotal, setDealerTotal] = useState(0);
   const [playerTotal, setPlayerTotal] = useState(0);
@@ -60,17 +60,17 @@ export const GameTable = ({
   const handleDouble = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onDouble();
-  }, []);
+  }, [onDouble]);
 
   const handleHit = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onHit();
-  }, []);
+  }, [onHit]);
 
   const handleStand = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onStand();
-  }, []);
+  }, [onStand]);
 
   const handleReset = useCallback(async () => {
     if (user && bet) {
@@ -81,7 +81,7 @@ export const GameTable = ({
       setPlayerLastHand([]);
       getGame();
       onPlay(bet);
-      onSetUser({
+      setStateUser({
         ...user,
         cash: user.cash - bet,
       });
@@ -90,7 +90,7 @@ export const GameTable = ({
     bet,
     getGame,
     onPlay,
-    onSetUser,
+    setStateUser,
     setAnimation,
     setDealerLastHand,
     setPlayerLastHand,

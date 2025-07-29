@@ -8,3 +8,13 @@ export interface StatDocument extends Document {
   [GameCode.Blackjack]?: BlackjackStats;
   [GameCode.Wordle]?: WordleStats;
 }
+
+export interface StatObject {
+  discord_id: string;
+  [GameCode.Blackjack]?: BlackjackStats;
+  [GameCode.Wordle]?: WordleStats;
+}
+
+export interface LeanStatDocument extends StatObject {
+  _id: string;
+}

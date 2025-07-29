@@ -1,106 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@clerk/nextjs/server';
 
-import { GamePayload } from '@/interfaces/games';
-
-import { GameCode, GameRequest } from '@/enums/games';
+import { RequestParams } from '@/interfaces/api';
+import { connectDatabase } from '@/lib/database';
 import { withApiAuth } from '@/lib/utils';
+import { createActiveGame, updateActiveGame } from '@/services/games';
 
-import { handleCreateGame } from './handleCreate';
-import { updateBlackjack } from './updateBlackjack';
-import { updateWordle } from './updateWordle';
+export const PATCH = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
 
-const handleUpdateGame = async (
-  method: UserAuthMethod,
-  id: string,
-  payload: GamePayload,
-  collections: DatabaseCollections
-) => {
-  let data = null;
-  let discordId = null;
+      const payload = await request.json();
+      const game = await updateActiveGame(payload);
 
-  let user = await collections.users.findOne({ [`${method}_id`]: id });
-  if (!user) return null;
-
-  if (method !== 'discord') {
-    if (user.discord_id) discordId = user.discord_id;
-  } else {
-    discordId = id;
-  }
-
-  if (!discordId) return null;
-
-  const game = await collections.games.findOne({
-    discord_id: discordId,
-    code: payload.code,
-  });
-
-  if (!game) return null;
-
-  // make sure that the game key and payload key matches
-  if (game.key !== payload.key) return null;
-
-  const deleteGame = async (key: string) => {
-    await collections.games.deleteOne({
-      discord_id: discordId,
-      key: key,
-    });
-  };
-
-  // handle submission for Wordle game
-  if (payload.code === GameCode.Wordle) {
-    data = updateWordle(
-      discordId,
-      payload.data.sessionCode,
-      game,
-      collections,
-      deleteGame
-    );
-  }
-
-  // handle submission for Blackjack game
-  else if (payload.code === GameCode.Blackjack) {
-    data = updateBlackjack(
-      discordId,
-      payload.data.sessionCode,
-      game,
-      collections,
-      deleteGame
-    );
-  }
-
-  return data;
-};
-
-export const POST = withApiAuth(async (request: NextRequest, user: User) => {
-  const method = user.externalAccounts[0].provider.replace(
-    'oauth_',
-    ''
-  ) as UserAuthMethod;
-
-  const id = user.externalAccounts[0].externalId;
-
-  let responseData = null;
-  let responseError = null;
-
-  const payload = await request.json();
-
-  try {
-    const collections = await initDatabase();
-
-    if (!collections) {
-      responseError = 'No database collections found.';
-    } else if (payload.type === GameRequest.Create) {
-      responseData = await handleCreateGame(method, id, payload, collections);
-    } else if (payload.type === GameRequest.Update) {
-      responseData = await handleUpdateGame(method, id, payload, collections);
+      return NextResponse.json(game);
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
     }
-  } catch (error) {
-    responseError = JSON.stringify(error);
-  } finally {
-    return NextResponse.json({
-      data: responseData,
-      error: responseError,
-    });
   }
-});
+);
+
+export const POST = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
+
+      const payload = await request.json();
+      const game = await createActiveGame(payload);
+
+      return NextResponse.json(game, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
+  }
+);

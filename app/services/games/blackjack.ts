@@ -1,48 +1,46 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { INITIAL_STATS } from '@/constants/stats';
+import { INITIAL_BLACKJACK } from '@/constants/stats';
 import { BlackjackStatus, GameCode } from '@/enums/games';
-import { decrypt } from '@/lib/utils/encryption';
+import { GameObject } from '@/interfaces/games';
+import { decrypt } from '@/lib/utils';
 
-import { DatabaseCollections } from '@/interfaces/db';
-import { GameDocument } from '@/interfaces/games';
+import { GameModel } from '@/models/game';
+import { StatModel } from '@/models/stat';
+import { UserModel } from '@/models/user';
 
-export const updateBlackjack = async (
-  discordId: string,
-  sessionCode: string,
-  game: GameDocument,
-  collections: DatabaseCollections,
-  deleteGame: (key: string) => void
-) => {
-  let stats = INITIAL_STATS[GameCode.Blackjack];
+export const updateBlackjackGame = async (
+  game: GameObject,
+  payload: GameObject
+): Promise<Partial<GameObject> | null> => {
+  const updatedKey = uuidv4();
+  const sessionCode = payload.data!.sessionCode as string;
 
   const statusString = decrypt(sessionCode);
   const status = statusString.split('-')[0];
   const isDouble = statusString.split('-')[1] === 'double';
+  const bet = parseInt(game.data.bet as string, 10);
 
-  const statsDoc = await collections.stats.findOne({
-    discord_id: discordId,
+  const userStats = await StatModel.findOne({
+    discord_id: payload.discord_id,
   });
 
-  if (statsDoc && statsDoc[GameCode.Blackjack]) {
-    stats = statsDoc[GameCode.Blackjack];
-  }
-
-  const bet = parseInt(game.data.bet as string, 10);
+  const stats = userStats?.[GameCode.Blackjack] ?? INITIAL_BLACKJACK;
 
   if (status === BlackjackStatus.Blackjack) {
     const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
-    await collections.users.updateOne(
-      { discord_id: discordId },
+    await UserModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       { $inc: { cash: reward } }
     );
 
-    await collections.stats.updateOne(
-      { discord_id: discordId },
+    await StatModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       {
         $set: {
           [GameCode.Blackjack]: {
+            ...stats,
             totalBlackjack: stats.totalBlackjack + 1,
             totalPlayed: stats.totalPlayed + 1,
             totalWon: stats.totalWon + 1,
@@ -51,21 +49,19 @@ export const updateBlackjack = async (
       },
       { upsert: true }
     );
-
-    await deleteGame(game.key);
   } else if (
     status === BlackjackStatus.Win ||
     status === BlackjackStatus.DealerBust
   ) {
     const reward = isDouble ? bet + bet * 2 : bet * 2;
 
-    await collections.users.updateOne(
-      { discord_id: discordId },
+    await UserModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       { $inc: { cash: reward } }
     );
 
-    await collections.stats.updateOne(
-      { discord_id: discordId },
+    await StatModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -77,16 +73,14 @@ export const updateBlackjack = async (
       },
       { upsert: true }
     );
-
-    await deleteGame(game.key);
   } else if (status === BlackjackStatus.Push) {
-    await collections.users.updateOne(
-      { discord_id: discordId },
+    await UserModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       { $inc: { cash: bet } }
     );
 
-    await collections.stats.updateOne(
-      { discord_id: discordId },
+    await StatModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -97,18 +91,16 @@ export const updateBlackjack = async (
       },
       { upsert: true }
     );
-
-    await deleteGame(game.key);
   } else {
     if (isDouble) {
-      await collections.users.updateOne(
-        { discord_id: discordId },
+      await UserModel.findOneAndUpdate(
+        { discord_id: payload.discord_id },
         { $inc: { cash: -bet } }
       );
     }
 
-    await collections.stats.updateOne(
-      { discord_id: discordId },
+    await StatModel.findOneAndUpdate(
+      { discord_id: payload.discord_id },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -119,9 +111,12 @@ export const updateBlackjack = async (
       },
       { upsert: true }
     );
-
-    await deleteGame(game.key);
   }
 
-  return { key: uuidv4() };
+  await GameModel.findOneAndDelete({
+    discord_id: payload.discord_id,
+    code: GameCode.Blackjack,
+  });
+
+  return { key: updatedKey };
 };
