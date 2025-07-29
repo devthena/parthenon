@@ -5,7 +5,10 @@ import { withApiAuth } from '@/lib/server';
 import { createStats, updateStats } from '@/services/stat';
 
 export const PATCH = withApiAuth(
-  async (request: NextRequest, _context: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    _context: { params: Promise<{ id: string }> }
+  ) => {
     try {
       await connectDatabase();
 
@@ -20,7 +23,10 @@ export const PATCH = withApiAuth(
 );
 
 export const POST = withApiAuth(
-  async (request: NextRequest, _context: { params: { id: string } }) => {
+  async (
+    request: NextRequest,
+    _context: { params: Promise<{ id: string }> }
+  ) => {
     try {
       await connectDatabase();
 
