@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@clerk/nextjs/server';
-import { RequestParams } from '@/interfaces/api';
 
 export const withApiAuth = (
-  handler: (req: NextRequest, params: RequestParams) => Promise<NextResponse>
+  handler: (
+    req: NextRequest,
+    context: { params: { [key: string]: string } }
+  ) => Promise<NextResponse>
 ) => {
-  return async (req: NextRequest, params: RequestParams) => {
+  return async (
+    req: NextRequest,
+    context: { params: { [key: string]: string } }
+  ) => {
     const { userId } = await auth();
 
     if (!userId) {
@@ -16,6 +21,6 @@ export const withApiAuth = (
       );
     }
 
-    return handler(req, params);
+    return handler(req, context);
   };
 };

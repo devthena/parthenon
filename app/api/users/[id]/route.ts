@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-import { RequestParams } from '@/interfaces/api';
 import { UserAuthMethod } from '@/interfaces/user';
 
 import { connectDatabase } from '@/lib/database';
