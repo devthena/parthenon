@@ -1,22 +1,15 @@
-import { GameCode } from '@/enums/games';
-import { BlackjackObject, WordleObject } from '@/interfaces/games';
-import { StatsInitObject } from '@/interfaces/statistics';
+import { BlackjackStats, WordleStats } from '@/interfaces/games';
 
-export const INITIAL_BLACKJACK: BlackjackObject = {
+export const INITIAL_BLACKJACK: BlackjackStats = {
   totalBlackjack: 0,
   totalPlayed: 0,
   totalWon: 0,
 };
 
-export const INITIAL_WORDLE: WordleObject = {
+export const INITIAL_WORDLE: WordleStats = {
   currentStreak: 0,
   distribution: new Array(6).fill(0),
   maxStreak: 0,
   totalPlayed: 0,
   totalWon: 0,
-};
-
-export const INITIAL_STATS: StatsInitObject = {
-  [GameCode.Blackjack]: INITIAL_BLACKJACK,
-  [GameCode.Wordle]: INITIAL_WORDLE,
 };

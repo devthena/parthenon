@@ -1,57 +1,41 @@
-import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { GameCode } from '@/enums/games';
-import { DatabaseCollections } from '@/interfaces/db';
-import { UserAuthMethod } from '@/interfaces/user';
-import { initDatabase } from '@/lib/db';
+import { connectDatabase } from '@/lib/database';
+import { withApiAuth } from '@/lib/server';
+import { createStats, updateStats } from '@/services/stat';
 
-const getStats = async (
-  method: UserAuthMethod,
-  id: string,
-  code: GameCode,
-  collections: DatabaseCollections
-) => {
-  let stats = null;
+export const PATCH = withApiAuth(
+  async (
+    request: NextRequest,
+    _context: { params: Promise<{ id: string }> }
+  ) => {
+    try {
+      await connectDatabase();
 
-  const user = await collections.users.findOne({ [`${method}_id`]: id });
+      const { code, data } = await request.json();
+      const stats = await updateStats(code, data);
 
-  if (user?.discord_id) {
-    stats = await collections.stats.findOne({ discord_id: user.discord_id });
+      return NextResponse.json(stats);
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
   }
+);
 
-  if (!stats) return null;
+export const POST = withApiAuth(
+  async (
+    request: NextRequest,
+    _context: { params: Promise<{ id: string }> }
+  ) => {
+    try {
+      await connectDatabase();
 
-  return stats[code] ?? null;
-};
+      const payload = await request.json();
+      const stats = await createStats(payload);
 
-export const POST = withApiAuthRequired(async (request: NextRequest) => {
-  const res = new NextResponse();
-  const session = await getSession(request, res);
-
-  if (!session) {
-    return NextResponse.json({ data: null, error: 'Unauthorized' });
+      return NextResponse.json(stats, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
   }
-
-  const userSub = session.user.sub.split('|');
-  const method = userSub[1];
-  const id = userSub[2];
-
-  let responseData = null;
-  let responseError = null;
-
-  const payload = await request.json();
-
-  try {
-    const collections = await initDatabase();
-    if (!collections) responseError = 'No database collections found.';
-    else responseData = await getStats(method, id, payload.code, collections);
-  } catch (error) {
-    responseError = JSON.stringify(error);
-  } finally {
-    return NextResponse.json({
-      data: responseData,
-      error: responseError,
-    });
-  }
-});
+);

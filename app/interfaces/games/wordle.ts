@@ -5,10 +5,6 @@ export interface WordleGuess {
   result: Array<WordleKeyStatus>;
 }
 
-export type WordleGuessesObject = {
-  [key: number]: string[];
-};
-
 export interface WordleState {
   answer: string;
   currentGuess: string;
@@ -18,7 +14,7 @@ export interface WordleState {
   status: WordleStatus;
 }
 
-export interface WordleObject {
+export interface WordleStats {
   currentStreak: number;
   distribution: number[];
   maxStreak: number;

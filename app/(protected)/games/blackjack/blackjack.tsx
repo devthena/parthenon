@@ -3,47 +3,36 @@
 import { redirect } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Loading } from '@/components';
-import { useParthenonState } from '@/context';
-import { useApi, useBlackjack } from '@/hooks';
-
+import { API_URLS } from '@/constants/api';
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
-import { INITIAL_STATS } from '@/constants/stats';
+import { INITIAL_BLACKJACK } from '@/constants/stats';
 
-import { ApiDataType, ApiUrl } from '@/enums/api';
-
-import {
-  BlackjackStatus,
-  GameCode,
-  GamePage,
-  GameRequestType,
-} from '@/enums/games';
-
+import { Loading } from '@/components';
+import { BlackjackStatus, GameCode, GamePage } from '@/enums/games';
+import { useBlackjack, useFetch, useParthenon } from '@/hooks';
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils/encryption';
+
+import { BlackjackStats, GameObject } from '@/interfaces/games';
+import { UserObject } from '@/interfaces/user';
 
 import { Balance, GameTable, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
 
 const Blackjack = () => {
   const {
-    isFetched,
-    isLoading,
-    games,
+    isActiveGamesFetched,
+    isStatsFetched,
+    isUserFetched,
     stats,
     user,
-    onSetModal,
-    onSetGame,
-    onSetStats,
-    onSetUser,
-  } = useParthenonState();
+    setStateActiveGame,
+    setStateModal,
+    setStateStats,
+    setStateUser,
+  } = useParthenon();
 
-  const {
-    dataGame,
-    dataStats,
-    isFetched: isApiFetched,
-    fetchPostData,
-  } = useApi();
+  const { fetchDelete, fetchPatch, fetchPost } = useFetch();
 
   const {
     bet,
@@ -67,65 +56,60 @@ const Blackjack = () => {
   const [playerLastHand, setPlayerLastHand] = useState([]);
 
   const betRef = useRef(bet);
-  const gameKeyRef = useRef(games[GameCode.Blackjack]);
-
-  const getStats = useCallback(async () => {
-    await fetchPostData(ApiUrl.Stats, ApiDataType.Stats, {
-      code: GameCode.Blackjack,
-    });
-  }, [fetchPostData]);
+  const gameKeyRef = useRef<string | undefined>(null);
 
   const getGame = useCallback(async () => {
-    await fetchPostData(ApiUrl.Games, ApiDataType.Games, {
+    const game = await fetchPost<GameObject>(API_URLS.GAMES, {
       code: GameCode.Blackjack,
-      type: GameRequestType.Create,
       data: {
         sessionKey: encrypt('' + betRef.current),
       },
     });
-  }, [fetchPostData]);
+
+    if (game) gameKeyRef.current = game.key;
+    setStateActiveGame(GameCode.Blackjack, game);
+  }, [fetchPost, setStateActiveGame]);
 
   const updateGame = useCallback(async () => {
     if (!gameKeyRef.current) return;
 
     const codeString = double ? status + '-double' : status;
 
-    await fetchPostData(
-      ApiUrl.Games,
-      ApiDataType.Games,
-      {
-        key: gameKeyRef.current,
-        code: GameCode.Blackjack,
-        type: GameRequestType.Update,
-        data: {
-          sessionCode: encrypt(codeString),
-        },
+    const game = await fetchPatch<GameObject>(API_URLS.GAMES, {
+      key: gameKeyRef.current,
+      code: GameCode.Blackjack,
+      data: {
+        sessionCode: encrypt(codeString),
       },
-      true
-    );
-  }, [double, status, fetchPostData]);
+    });
 
-  useEffect(() => {
-    if (!stats[GameCode.Blackjack]) getStats();
-  }, []);
+    if (game) gameKeyRef.current = game.key;
+    setStateActiveGame(GameCode.Blackjack, game);
+  }, [double, fetchPatch, setStateActiveGame, status]);
 
-  useEffect(() => {
-    if (!isApiFetched || !dataStats || stats[GameCode.Blackjack]) return;
-    onSetStats(dataStats);
-  }, [dataStats, isApiFetched, stats, onSetStats]);
+  const updateStats = useCallback(
+    async (payload: BlackjackStats) => {
+      if (!stats) return;
 
-  useEffect(() => {
-    if (!isApiFetched || !dataGame) return;
-    onSetGame(dataGame);
-  }, [dataGame, isApiFetched, onSetGame]);
+      setStateStats({
+        ...stats,
+        [GameCode.Blackjack]: { ...payload },
+      });
+    },
+    [setStateStats, stats]
+  );
+
+  const updateUser = useCallback(
+    async (payload: Partial<UserObject>) => {
+      if (!user) return;
+      setStateUser({ ...user, ...payload });
+    },
+    [setStateUser, user]
+  );
 
   useEffect(() => {
     betRef.current = bet;
   }, [bet]);
-
-  useEffect(() => {
-    gameKeyRef.current = games[GameCode.Blackjack];
-  }, [games]);
 
   useEffect(() => {
     if (!user || !user.discord_username || !bet || isDataUpdated) return;
@@ -135,22 +119,22 @@ const Blackjack = () => {
       updateGame();
 
       const newStats =
-        stats[GameCode.Blackjack] ?? INITIAL_STATS[GameCode.Blackjack];
+        stats && stats[GameCode.Blackjack]
+          ? stats[GameCode.Blackjack]
+          : INITIAL_BLACKJACK;
 
       newStats.totalPlayed += 1;
 
       if (status === BlackjackStatus.Blackjack) {
-        onSetStats({
-          [GameCode.Blackjack]: {
-            ...newStats,
-            totalBlackjack: newStats.totalBlackjack + 1,
-            totalWon: newStats.totalWon + 1,
-          },
+        updateStats({
+          ...newStats,
+          totalBlackjack: newStats.totalBlackjack + 1,
+          totalWon: newStats.totalWon + 1,
         });
 
         const reward = double ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
-        onSetUser({
+        updateUser({
           ...user,
           cash: user.cash + reward,
         });
@@ -158,27 +142,25 @@ const Blackjack = () => {
         status === BlackjackStatus.Win ||
         status === BlackjackStatus.DealerBust
       ) {
-        onSetStats({
-          [GameCode.Blackjack]: {
-            ...newStats,
-            totalWon: newStats.totalWon + 1,
-          },
+        updateStats({
+          ...newStats,
+          totalWon: newStats.totalWon + 1,
         });
 
         const reward = double ? bet + bet * 2 : bet * 2;
 
-        onSetUser({
+        updateUser({
           ...user,
           cash: user.cash + reward,
         });
       } else if (status === BlackjackStatus.Push) {
-        onSetUser({
+        updateUser({
           ...user,
           cash: user.cash + bet,
         });
       } else {
         if (double) {
-          onSetUser({
+          updateUser({
             ...user,
             cash: user.cash - bet,
           });
@@ -189,11 +171,11 @@ const Blackjack = () => {
     bet,
     double,
     isDataUpdated,
-    onSetStats,
-    onSetUser,
     stats,
     status,
     updateGame,
+    updateStats,
+    updateUser,
     user,
   ]);
 
@@ -203,7 +185,8 @@ const Blackjack = () => {
     }
   }, [status, isDataUpdated]);
 
-  if (isFetched && (!user || !user?.discord_username)) redirect('/dashboard');
+  if (isUserFetched && (!user || !user?.discord_username))
+    redirect('/dashboard');
 
   return (
     <div className={styles.blackjack}>
@@ -242,7 +225,7 @@ const Blackjack = () => {
               <button
                 className={styles.rulesOverview}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -252,7 +235,7 @@ const Blackjack = () => {
               <button
                 className={styles.rulesDesktop}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -266,7 +249,7 @@ const Blackjack = () => {
               <button
                 className={styles.rules}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
                     content: <Rules />,
                   })
@@ -276,11 +259,11 @@ const Blackjack = () => {
               <button
                 className={styles.stats}
                 onClick={() =>
-                  onSetModal({
+                  setStateModal({
                     isOpen: true,
-                    content: stats[GameCode.Blackjack] ? (
+                    content: stats && (
                       <Stats data={stats[GameCode.Blackjack]} />
-                    ) : null,
+                    ),
                   })
                 }>
                 <StatsIcon />
@@ -294,8 +277,8 @@ const Blackjack = () => {
           <p className={styles.description}>
             Adjust your bet then hit PLAY when ready!
           </p>
-          {(isLoading || !user) && <Loading />}
-          {!isLoading && user && (
+          {!isUserFetched && <Loading />}
+          {isUserFetched && user && (
             <>
               <Balance bet={bet} cash={user.cash} onUpdate={onBetChange} />
               <button
@@ -306,7 +289,7 @@ const Blackjack = () => {
                     setPage(GamePage.Playing);
                     getGame();
                     onPlay(bet);
-                    onSetUser({
+                    updateUser({
                       ...user,
                       cash: user.cash - bet,
                     });
@@ -317,8 +300,8 @@ const Blackjack = () => {
             </>
           )}
           <div className={styles.statsContainer}>
-            {(isLoading || !stats[GameCode.Blackjack]) && <Loading />}
-            {!isLoading && stats[GameCode.Blackjack] && (
+            {!isStatsFetched && <Loading />}
+            {isStatsFetched && stats && (
               <Stats data={stats[GameCode.Blackjack]} />
             )}
           </div>
@@ -326,8 +309,8 @@ const Blackjack = () => {
       )}
       {page === GamePage.Playing && (
         <div className={styles.playing}>
-          {(isLoading || !user || !games[GameCode.Blackjack]) && <Loading />}
-          {!isLoading && user && games[GameCode.Blackjack] && (
+          {(!isUserFetched || !isActiveGamesFetched) && <Loading />}
+          {isUserFetched && user && isActiveGamesFetched && (
             <GameTable
               bet={bet}
               cash={user.cash}

@@ -1,10 +1,10 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import { SignInButton, useUser } from '@clerk/nextjs';
 
-import { Header, Loading, Login } from '@/components';
+import { Header, Loading } from '@/components';
 import { SOCIAL_URLS } from '@/constants/navigation';
 
 import avatar from '@/images/avatar.png';
@@ -13,15 +13,14 @@ import { GithubIcon, InstagramIcon, TwitchIcon, XIcon } from '@/images/icons';
 import styles from '@/styles/page.module.scss';
 
 const Home = () => {
-  const { user, error, isLoading } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
 
-  if (error) return <div>{error.message}</div>;
-  if (user) return redirect('/dashboard');
+  if (isSignedIn) return redirect('/dashboard');
 
   return (
     <>
       <Header />
-      {isLoading ? (
+      {!isLoaded ? (
         <Loading />
       ) : (
         <div className={styles.container}>
@@ -39,9 +38,9 @@ const Home = () => {
             <h1>Welcome to the Parthenon!</h1>
             <p>The official website of the AthenaUS community</p>
           </div>
-          <div className={styles.login}>
-            <Login />
-          </div>
+          <SignInButton>
+            <button className={styles.login}>Sign In</button>
+          </SignInButton>
           <div className={styles.social}>
             <p>Connect with me!</p>
             <div className={styles.socialIcons}>
