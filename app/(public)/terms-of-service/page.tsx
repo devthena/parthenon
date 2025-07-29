@@ -10,7 +10,7 @@ const Terms = () => {
     <div className={styles.terms}>
       <div className={styles.headline}>
         <h1>TERMS OF SERVICE</h1>
-        <p>Effective Date: July 10, 2024</p>
+        <p>Effective Date: August 1, 2025</p>
       </div>
       <ul className={styles.sections}>
         <li>
@@ -34,9 +34,13 @@ const Terms = () => {
           <h2>USER LOGIN</h2>
           <p>
             To access certain features of the Site and Bot, you need to log in
-            using Auth0 via Discord or Twitch. You are responsible for
-            maintaining the confidentiality of your login information and are
-            fully responsible for all activities that occur under your account.
+            using{' '}
+            <a href="https://clerk.com/" target="_blank">
+              Clerk
+            </a>{' '}
+            via Discord or Twitch. You are responsible for maintaining the
+            confidentiality of your login information and are fully responsible
+            for all activities that occur under your account.
           </p>
         </li>
 
