@@ -20,7 +20,11 @@ export const updateBlackjackGame = async (
   const statusString = decrypt(sessionCode);
   const status = statusString.split('-')[0];
   const isDouble = statusString.split('-')[1] === 'double';
-  const bet = parseInt(game.data.bet as string, 10);
+
+  const gameData =
+    typeof game.data === 'string' ? JSON.parse(game.data) : game.data;
+
+  const bet = parseInt(gameData.bet as string, 10);
 
   const userStats = await StatModel.findOne({
     discord_id: discordId,
