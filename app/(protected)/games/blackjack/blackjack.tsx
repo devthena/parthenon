@@ -21,7 +21,6 @@ import styles from '../shared/styles/page.module.scss';
 
 const Blackjack = () => {
   const {
-    activeGames,
     isActiveGamesFetched,
     isStatsFetched,
     isUserFetched,
@@ -33,7 +32,7 @@ const Blackjack = () => {
     setStateUser,
   } = useParthenon();
 
-  const { fetchPatch, fetchPost } = useFetch();
+  const { fetchDelete, fetchPatch, fetchPost } = useFetch();
 
   const {
     bet,
@@ -57,21 +56,24 @@ const Blackjack = () => {
   const [playerLastHand, setPlayerLastHand] = useState([]);
 
   const betRef = useRef(bet);
-  const gameKeyRef = useRef<string | null>(null);
+  const gameKeyRef = useRef<string | undefined>(null);
 
   const getGame = useCallback(async () => {
     if (!user || !user.discord_id) return;
 
-    const game = await fetchPost(API_URLS.GAMES, {
-      discord_id: user.discord_id,
+    const deleteUrl = `${API_URLS.GAMES}/${user.discord_id}?code=${GameCode.Blackjack}`;
+    await fetchDelete<GameObject>(deleteUrl);
+
+    const game = await fetchPost<GameObject>(API_URLS.GAMES, {
       code: GameCode.Blackjack,
       data: {
         sessionKey: encrypt('' + betRef.current),
       },
     });
 
+    if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Blackjack, game);
-  }, [fetchPost, setStateActiveGame, user]);
+  }, [fetchPost, setStateActiveGame]);
 
   const updateGame = useCallback(async () => {
     if (!user || !user.discord_id || !gameKeyRef.current) return;
@@ -87,6 +89,7 @@ const Blackjack = () => {
       },
     });
 
+    if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Blackjack, game);
   }, [double, fetchPatch, setStateActiveGame, status, user]);
 
@@ -113,14 +116,6 @@ const Blackjack = () => {
   useEffect(() => {
     betRef.current = bet;
   }, [bet]);
-
-  useEffect(() => {
-    if (!isActiveGamesFetched) return;
-    if (!activeGames) return;
-
-    const game = activeGames[GameCode.Blackjack];
-    if (game && game.key) gameKeyRef.current = game.key;
-  }, [activeGames, isActiveGamesFetched]);
 
   useEffect(() => {
     if (!user || !user.discord_username || !bet || isDataUpdated) return;

@@ -20,7 +20,6 @@ import styles from '../shared/styles/page.module.scss';
 
 const Wordle = () => {
   const {
-    activeGames,
     isActiveGamesFetched,
     isStatsFetched,
     isUserFetched,
@@ -32,7 +31,7 @@ const Wordle = () => {
     user,
   } = useParthenon();
 
-  const { fetchPatch, fetchPost } = useFetch();
+  const { fetchDelete, fetchPatch, fetchPost } = useFetch();
 
   const {
     answer,
@@ -49,35 +48,36 @@ const Wordle = () => {
     onResume,
   } = useWordle();
 
-  const [isInitialized, setIsInitialized] = useState(false);
   const [isStatsUpdated, setIsStatsUpdated] = useState(false);
   const [page, setPage] = useState(GamePage.Overview);
 
   const answerRef = useRef(answer);
   const currentGuessRef = useRef(currentGuess);
-  const gameKeyRef = useRef<string | null>(null);
+  const gameKeyRef = useRef<string | undefined>(null);
   const gameStatusRef = useRef(status);
 
   const getGame = useCallback(async () => {
     if (!user || !user.discord_id) return;
 
-    const game = await fetchPost(API_URLS.GAMES, {
-      discord_id: user.discord_id,
+    const deleteUrl = `${API_URLS.GAMES}/${user.discord_id}?code=${GameCode.Wordle}`;
+    await fetchDelete<GameObject>(deleteUrl);
+
+    const game = await fetchPost<GameObject>(API_URLS.GAMES, {
       code: GameCode.Wordle,
       data: {
         sessionKey: encrypt(answerRef.current),
       },
     });
 
+    if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Wordle, game);
-  }, [fetchPost, setStateActiveGame, user]);
+  }, [fetchDelete, fetchPost, setStateActiveGame, user]);
 
   const updateGame = useCallback(
     async (guess: string) => {
-      if (!user || !user.discord_id || !gameKeyRef.current) return;
+      if (!gameKeyRef.current) return;
 
       const game = await fetchPatch<GameObject>(API_URLS.GAMES, {
-        discord_id: user.discord_id,
         key: gameKeyRef.current,
         code: GameCode.Wordle,
         data: {
@@ -85,6 +85,7 @@ const Wordle = () => {
         },
       });
 
+      if (game) gameKeyRef.current = game.key;
       setStateActiveGame(GameCode.Blackjack, game);
     },
     [fetchPatch, setStateActiveGame, user]
@@ -109,33 +110,27 @@ const Wordle = () => {
     updateGame(currentGuessRef.current);
   }, [onEnter, onPlay, updateGame]);
 
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      event.preventDefault();
+  const handleKeyPress = (event: KeyboardEvent) => {
+    event.preventDefault();
 
-      const { key } = event;
+    const { key } = event;
 
-      if (key === 'Enter') {
-        modifiedEnter();
-      } else if (key === 'Backspace') {
-        onDelete();
-      } else if (/^[a-zA-Z]$/.test(key)) {
-        onKey(key.toLowerCase());
-      }
-    },
-    [modifiedEnter, onDelete, onKey]
-  );
+    if (key === 'Enter') {
+      modifiedEnter();
+    } else if (key === 'Backspace') {
+      onDelete();
+    } else if (/^[a-zA-Z]$/.test(key)) {
+      onKey(key.toLowerCase());
+    }
+  };
 
   useEffect(() => {
-    if (isInitialized) return;
-    setIsInitialized(true);
-
     window.addEventListener('keydown', handleKeyPress);
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [handleKeyPress, isInitialized]);
+  }, []);
 
   useEffect(() => {
     if (answer.length === 0 || answer === answerRef.current) return;
@@ -146,14 +141,6 @@ const Wordle = () => {
   useEffect(() => {
     currentGuessRef.current = currentGuess;
   }, [currentGuess]);
-
-  useEffect(() => {
-    if (!isActiveGamesFetched) return;
-    if (!activeGames) return;
-
-    const game = activeGames[GameCode.Wordle];
-    if (game && game.key) gameKeyRef.current = game.key;
-  }, [activeGames, isActiveGamesFetched]);
 
   useEffect(() => {
     gameStatusRef.current = status;

@@ -3,6 +3,7 @@ import {
   UserAuthMethod,
   UserObject,
 } from '@/interfaces/user';
+
 import { UserModel } from '@/models/user';
 
 /**
@@ -18,7 +19,7 @@ export const getUser = async (
     [`${method}_id`]: id,
   }).lean<LeanUserDocument>();
 
-  if (!user) null;
+  if (!user) return null;
 
   const { _id, ...rest } = user as LeanUserDocument;
   return rest;

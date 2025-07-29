@@ -13,19 +13,23 @@ import { UserModel } from '@/models/user';
 
 export const updateWordleGame = async (
   game: GameObject,
+  discordId: string,
   payload: GameObject
 ): Promise<Partial<GameObject> | null> => {
   const updatedKey = uuidv4();
   const sessionCode = payload.data!.sessionCode as string;
-
   const guess = decrypt(sessionCode);
-  const newGuesses: string[] = [...(game.data.guesses as string[]), guess];
 
-  const isWin = guess === game.data.answer;
+  const gameData =
+    typeof game.data === 'string' ? JSON.parse(game.data) : game.data;
+
+  const newGuesses: string[] = [...(gameData.guesses as string[]), guess];
+
+  const isWin = guess === gameData.answer;
   const isAttempt = newGuesses.length < MAX_ATTEMPTS;
 
   const userStats = await StatModel.findOne({
-    discord_id: payload.discord_id,
+    discord_id: discordId,
   });
 
   const stats = userStats?.[GameCode.Wordle] ?? INITIAL_WORDLE;
@@ -35,12 +39,12 @@ export const updateWordleGame = async (
     newDistribution[newGuesses.length - 1] += 1;
 
     await UserModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       { $inc: { cash: WORDLE_REWARDS[newGuesses.length - 1] } }
     );
 
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Wordle]: {
@@ -56,24 +60,24 @@ export const updateWordleGame = async (
     );
 
     await GameModel.findOneAndDelete({
-      discord_id: payload.discord_id,
-      code: GameCode.Wordle,
+      discord_id: discordId,
+      key: game.key,
     });
   } else if (isAttempt) {
     await GameModel.findOneAndUpdate(
-      { discord_id: payload.discord_id, code: GameCode.Wordle },
+      { discord_id: discordId, code: GameCode.Wordle },
       {
         ...payload,
         key: updatedKey,
         data: {
-          ...game.data,
+          ...gameData,
           guesses: newGuesses,
         },
       }
     );
   } else {
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Wordle]: {
@@ -87,8 +91,8 @@ export const updateWordleGame = async (
     );
 
     await GameModel.findOneAndDelete({
-      discord_id: payload.discord_id,
-      code: GameCode.Wordle,
+      discord_id: discordId,
+      key: game.key,
     });
   }
 

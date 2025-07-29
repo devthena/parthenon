@@ -4,7 +4,7 @@ import { RequestParams } from '@/interfaces/api';
 import { UserAuthMethod } from '@/interfaces/user';
 
 import { connectDatabase } from '@/lib/database';
-import { withApiAuth } from '@/lib/utils';
+import { withApiAuth } from '@/lib/server';
 
 import { getUser } from '@/services/user';
 
@@ -14,7 +14,6 @@ import { getUser } from '@/services/user';
 export const GET = withApiAuth(
   async (request: Request, { params }: RequestParams) => {
     const { id } = await params;
-
     const { searchParams } = new URL(request.url);
     const method = searchParams.get('method') || 'discord';
 

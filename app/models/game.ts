@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 
 import { GameDocument } from '@/interfaces/games';
 import { GameCode } from '@/enums/games';
@@ -27,4 +27,4 @@ const gameSchema = new Schema<GameDocument>(
   { collection: MONGODB_COLLECTION_GAMES, versionKey: false }
 );
 
-export const GameModel = model<GameDocument>('Game', gameSchema);
+export const GameModel = models.Game || model<GameDocument>('Game', gameSchema);

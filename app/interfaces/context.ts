@@ -17,7 +17,7 @@ export interface ParthenonState {
 export type ParthenonAction =
   | {
       type: 'SET_ACTIVE_GAME';
-      payload: { code: GameCode; data: GameObject | null };
+      payload: { code: GameCode; data: Partial<GameObject> | null };
     }
   | { type: 'SET_ACTIVE_GAMES'; payload: GameObject[] }
   | { type: 'SET_MODAL'; payload: Partial<ModalState> }

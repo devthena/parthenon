@@ -9,9 +9,8 @@ import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 
 import { HEADER_PATHS } from '@/constants/navigation';
 import { MenuCloseIcon, MenuIcon } from '@/images/icons';
-import owl from '@/images/owl.png';
-import { getAuthMethod } from '@/lib/utils';
 
+import owl from '@/images/owl.png';
 import styles from '@/styles/header.module.scss';
 
 export const Header = () => {
@@ -40,9 +39,7 @@ export const Header = () => {
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
 
-  const isDiscordUser = user
-    ? getAuthMethod(user.externalAccounts[0].provider) === 'discord'
-    : false;
+  const isDiscordUser = user?.externalAccounts[0].provider === 'discord';
 
   return (
     <>

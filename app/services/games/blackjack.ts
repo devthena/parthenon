@@ -11,6 +11,7 @@ import { UserModel } from '@/models/user';
 
 export const updateBlackjackGame = async (
   game: GameObject,
+  discordId: string,
   payload: GameObject
 ): Promise<Partial<GameObject> | null> => {
   const updatedKey = uuidv4();
@@ -22,7 +23,7 @@ export const updateBlackjackGame = async (
   const bet = parseInt(game.data.bet as string, 10);
 
   const userStats = await StatModel.findOne({
-    discord_id: payload.discord_id,
+    discord_id: discordId,
   });
 
   const stats = userStats?.[GameCode.Blackjack] ?? INITIAL_BLACKJACK;
@@ -31,12 +32,12 @@ export const updateBlackjackGame = async (
     const reward = isDouble ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
     await UserModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       { $inc: { cash: reward } }
     );
 
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -56,12 +57,12 @@ export const updateBlackjackGame = async (
     const reward = isDouble ? bet + bet * 2 : bet * 2;
 
     await UserModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       { $inc: { cash: reward } }
     );
 
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -75,12 +76,12 @@ export const updateBlackjackGame = async (
     );
   } else if (status === BlackjackStatus.Push) {
     await UserModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       { $inc: { cash: bet } }
     );
 
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -94,13 +95,13 @@ export const updateBlackjackGame = async (
   } else {
     if (isDouble) {
       await UserModel.findOneAndUpdate(
-        { discord_id: payload.discord_id },
+        { discord_id: discordId },
         { $inc: { cash: -bet } }
       );
     }
 
     await StatModel.findOneAndUpdate(
-      { discord_id: payload.discord_id },
+      { discord_id: discordId },
       {
         $set: {
           [GameCode.Blackjack]: {
@@ -114,8 +115,8 @@ export const updateBlackjackGame = async (
   }
 
   await GameModel.findOneAndDelete({
-    discord_id: payload.discord_id,
-    code: GameCode.Blackjack,
+    discord_id: discordId,
+    key: game.key,
   });
 
   return { key: updatedKey };

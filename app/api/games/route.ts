@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { RequestParams } from '@/interfaces/api';
 import { connectDatabase } from '@/lib/database';
-import { withApiAuth } from '@/lib/utils';
+import { withApiAuth } from '@/lib/server';
 import { createActiveGame, updateActiveGame } from '@/services/games';
 
 export const PATCH = withApiAuth(

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { currentUser } from '@clerk/nextjs/server';
 
 import { GameCode } from '@/enums/games';
 import { GameObject, LeanGameDocument } from '@/interfaces/games';
@@ -13,29 +14,29 @@ import { updateWordleGame } from './wordle';
  * This creates a new Game Document
  */
 export const createActiveGame = async (
-  payload: GameObject
-): Promise<GameObject> => {
+  payload: Partial<GameObject>
+): Promise<Partial<GameObject> | null> => {
+  const user = await currentUser();
+  const discordId = user?.externalAccounts?.[0].externalId;
+
+  if (!discordId) return null;
+
   const updatedKey = uuidv4();
   const sessionKey = payload.data!.sessionKey as string;
 
-  let updatedPayload: GameObject = {
-    ...payload,
-    key: updatedKey,
-  };
+  let gameData: Partial<GameObject> = {};
 
   if (payload.code === GameCode.Blackjack) {
     const betString = decrypt(sessionKey);
     const bet = parseInt(betString, 10);
 
-    updatedPayload = {
-      ...updatedPayload,
+    gameData = {
       data: {
         bet,
       },
     };
   } else if (payload.code === GameCode.Wordle) {
-    updatedPayload = {
-      ...updatedPayload,
+    gameData = {
       data: {
         answer: decrypt(sessionKey),
         guesses: [],
@@ -43,10 +44,14 @@ export const createActiveGame = async (
     };
   }
 
-  const game = (await GameModel.create(updatedPayload)).toObject();
-  const { _id, ...rest } = game as LeanGameDocument;
+  await GameModel.create({
+    discord_id: discordId,
+    key: updatedKey,
+    code: payload.code,
+    ...gameData,
+  });
 
-  return rest;
+  return { key: updatedKey };
 };
 
 /**
@@ -57,14 +62,14 @@ export const createActiveGame = async (
 export const deleteActiveGame = async (
   id: string,
   code: GameCode
-): Promise<GameObject | null> => {
+): Promise<Partial<GameObject> | null> => {
   const game = await GameModel.findOneAndDelete({
     discord_id: id,
     code,
   }).lean<LeanGameDocument>();
 
   const { _id, ...rest } = game as LeanGameDocument;
-  return rest;
+  return { key: rest.key };
 };
 
 /**
@@ -94,8 +99,13 @@ export const getActiveGames = async (
 export const updateActiveGame = async (
   payload: GameObject
 ): Promise<Partial<GameObject> | null> => {
+  const user = await currentUser();
+  const discordId = user?.externalAccounts?.[0].externalId;
+
+  if (!discordId) return null;
+
   const game = await GameModel.findOne({
-    discord_id: payload.discord_id,
+    discord_id: discordId,
     code: payload.code,
   }).lean<LeanGameDocument>();
 
@@ -105,9 +115,9 @@ export const updateActiveGame = async (
   const { _id, ...rest } = game as LeanGameDocument;
 
   if (payload.code === GameCode.Blackjack) {
-    return updateBlackjackGame(rest, payload);
+    return updateBlackjackGame(rest, discordId, payload);
   } else if (payload.code === GameCode.Wordle) {
-    return updateWordleGame(rest, payload);
+    return updateWordleGame(rest, discordId, payload);
   } else {
     return null;
   }

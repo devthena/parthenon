@@ -1,3 +1,5 @@
+'use client';
+
 import { redirect } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 
@@ -10,8 +12,6 @@ import { useFetch, useParthenon } from '@/hooks';
 import { GameObject } from '@/interfaces/games';
 import { StatObject } from '@/interfaces/stat';
 import { UserObject } from '@/interfaces/user';
-
-import { getAuthMethod } from '@/lib/utils';
 
 import styles from './layout.module.scss';
 import { GameCode } from '@/enums/games';
@@ -71,8 +71,9 @@ const ProtectedLayout = ({
   const fetchUser = useCallback(async () => {
     if (!userClerk) return;
 
-    const method = getAuthMethod(userClerk.externalAccounts[0].provider);
-    const url = `${API_URLS.USERS}/${userClerk.externalId}?method=${method}`;
+    const userAccount = userClerk.externalAccounts[0];
+
+    const url = `${API_URLS.USERS}/${userAccount.providerUserId}?method=${userAccount.provider}`;
     const data = await fetchGet<UserObject>(url);
 
     setStateUser(data);

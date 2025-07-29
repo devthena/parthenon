@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, models, Schema } from 'mongoose';
 import { GameCode } from '@/enums/games';
 import { StatDocument } from '@/interfaces/stat';
 import { getCollectionENV } from '@/lib/database';
@@ -24,4 +24,4 @@ const statSchema = new Schema<StatDocument>(
   { collection: MONGODB_COLLECTION_STATS, versionKey: false }
 );
 
-export const StatModel = model<StatDocument>('Stat', statSchema);
+export const StatModel = models.Stat || model<StatDocument>('Stat', statSchema);

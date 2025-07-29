@@ -4,7 +4,7 @@ import { StatModel } from '@/models/stat';
 
 /**
  * createStats
- * This creates a new Game Document
+ * This creates a new Stat Document
  */
 export const createStats = async (payload: StatObject): Promise<StatObject> => {
   const stats = (await StatModel.create(payload)).toObject();

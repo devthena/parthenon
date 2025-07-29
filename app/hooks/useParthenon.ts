@@ -19,7 +19,7 @@ export const useParthenon = () => {
   const { state, dispatch } = context;
 
   const setStateActiveGame = useCallback(
-    (code: GameCode, game: GameObject | null) => {
+    (code: GameCode, game: Partial<GameObject> | null) => {
       dispatch({
         type: 'SET_ACTIVE_GAME',
         payload: { code, data: game },
