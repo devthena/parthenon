@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { RequestParams } from '@/interfaces/api';
 import { connectDatabase } from '@/lib/database';
 import { withApiAuth } from '@/lib/server';
 import { deleteActiveGame, getActiveGames } from '@/services/games';
