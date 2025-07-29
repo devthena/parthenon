@@ -59,11 +59,6 @@ const Blackjack = () => {
   const gameKeyRef = useRef<string | undefined>(null);
 
   const getGame = useCallback(async () => {
-    if (!user || !user.discord_id) return;
-
-    const deleteUrl = `${API_URLS.GAMES}/${user.discord_id}?code=${GameCode.Blackjack}`;
-    await fetchDelete<GameObject>(deleteUrl);
-
     const game = await fetchPost<GameObject>(API_URLS.GAMES, {
       code: GameCode.Blackjack,
       data: {
@@ -76,12 +71,11 @@ const Blackjack = () => {
   }, [fetchPost, setStateActiveGame]);
 
   const updateGame = useCallback(async () => {
-    if (!user || !user.discord_id || !gameKeyRef.current) return;
+    if (!gameKeyRef.current) return;
 
     const codeString = double ? status + '-double' : status;
 
     const game = await fetchPatch<GameObject>(API_URLS.GAMES, {
-      discord_id: user.discord_id,
       key: gameKeyRef.current,
       code: GameCode.Blackjack,
       data: {
@@ -91,7 +85,7 @@ const Blackjack = () => {
 
     if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Blackjack, game);
-  }, [double, fetchPatch, setStateActiveGame, status, user]);
+  }, [double, fetchPatch, setStateActiveGame, status]);
 
   const updateStats = useCallback(
     async (payload: BlackjackStats) => {

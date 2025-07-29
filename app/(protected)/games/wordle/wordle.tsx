@@ -57,11 +57,6 @@ const Wordle = () => {
   const gameStatusRef = useRef(status);
 
   const getGame = useCallback(async () => {
-    if (!user || !user.discord_id) return;
-
-    const deleteUrl = `${API_URLS.GAMES}/${user.discord_id}?code=${GameCode.Wordle}`;
-    await fetchDelete<GameObject>(deleteUrl);
-
     const game = await fetchPost<GameObject>(API_URLS.GAMES, {
       code: GameCode.Wordle,
       data: {
@@ -71,7 +66,7 @@ const Wordle = () => {
 
     if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Wordle, game);
-  }, [fetchDelete, fetchPost, setStateActiveGame, user]);
+  }, [fetchPost, setStateActiveGame]);
 
   const updateGame = useCallback(
     async (guess: string) => {
@@ -88,7 +83,7 @@ const Wordle = () => {
       if (game) gameKeyRef.current = game.key;
       setStateActiveGame(GameCode.Blackjack, game);
     },
-    [fetchPatch, setStateActiveGame, user]
+    [fetchPatch, setStateActiveGame]
   );
 
   const modifiedEnter = useCallback(async () => {

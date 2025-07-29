@@ -21,6 +21,11 @@ export const createActiveGame = async (
 
   if (!discordId) return null;
 
+  await GameModel.findOneAndDelete({
+    discord_id: discordId,
+    code: payload.code,
+  });
+
   const updatedKey = uuidv4();
   const sessionKey = payload.data!.sessionKey as string;
 
