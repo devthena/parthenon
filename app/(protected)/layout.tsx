@@ -1,55 +1,109 @@
-import { useEffect } from 'react';
+'use client';
+
+import { redirect } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
+
+import { useUser } from '@clerk/nextjs';
 
 import { Header, Modal } from '@/components';
-import { useParthenonState } from '@/context';
-import { useApi } from '@/hooks';
+import { API_URLS } from '@/constants/api';
+import { useFetch, useParthenon } from '@/hooks';
 
-import { ApiUrl } from '@/enums/api';
+import { GameObject } from '@/interfaces/games';
+import { StatObject } from '@/interfaces/stat';
 import { UserObject } from '@/interfaces/user';
-import { withPageAuth } from '@/lib/utils';
 
 import styles from './layout.module.scss';
+import { GameCode } from '@/enums/games';
+import { INITIAL_BLACKJACK, INITIAL_WORDLE } from '@/constants/stats';
 
-const ProtectedLayout = async ({
+const ProtectedLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const { dataUser, isFetched: isApiFetched, fetchGetData } = useApi();
-  const { isFetched, modal, user, onInitUser, onSetLoading } =
-    useParthenonState();
+  const { isLoaded, isSignedIn, user: userClerk } = useUser();
+  const { fetchGet, fetchGetArray } = useFetch();
+
+  const {
+    activeGames,
+    isActiveGamesFetched,
+    isStatsFetched,
+    isUserFetched,
+    modal,
+    setStateActiveGames,
+    setStateStats,
+    setStateUser,
+    stats,
+    user,
+  } = useParthenon();
+
+  const fetchGames = useCallback(
+    async (discordId: string | null) => {
+      if (!discordId) return setStateActiveGames([]);
+
+      const url = `${API_URLS.GAMES}/${discordId}`;
+      const games = await fetchGetArray<GameObject>(url);
+
+      setStateActiveGames(games);
+    },
+    [fetchGetArray, setStateActiveGames]
+  );
+
+  const fetchStats = useCallback(
+    async (discordId: string | null) => {
+      if (!discordId) return;
+
+      const url = `${API_URLS.STATS}/${discordId}`;
+      const stats = await fetchGet<StatObject>(url);
+
+      setStateStats(
+        stats ?? {
+          discord_id: discordId,
+          [GameCode.Blackjack]: INITIAL_BLACKJACK,
+          [GameCode.Wordle]: INITIAL_WORDLE,
+        }
+      );
+    },
+    [fetchGet, setStateStats]
+  );
+
+  const fetchUser = useCallback(async () => {
+    if (!userClerk) return;
+
+    const userAccount = userClerk.externalAccounts[0];
+
+    const url = `${API_URLS.USERS}/${userAccount.providerUserId}?method=${userAccount.provider}`;
+    const data = await fetchGet<UserObject>(url);
+
+    setStateUser(data);
+  }, [fetchGet, setStateUser, userClerk]);
 
   useEffect(() => {
-    if (user || isFetched) return;
-
-    onSetLoading();
-
-    const getUser = async () => {
-      await fetchGetData(ApiUrl.Users);
-    };
-
-    getUser();
-  }, [isFetched, user, fetchGetData, onSetLoading]);
+    if (isUserFetched || !isSignedIn) return;
+    if (!user) fetchUser();
+  }, [fetchUser, isSignedIn, isUserFetched, user]);
 
   useEffect(() => {
-    if (!isApiFetched) return;
+    if (!isUserFetched || !user || isStatsFetched) return;
+    if (!stats) fetchStats(user.discord_id);
+  }, [fetchStats, isStatsFetched, isUserFetched, stats, user]);
 
-    if (dataUser) {
-      onInitUser(dataUser as UserObject);
-    } else {
-      onInitUser(null);
-    }
-  }, [dataUser, isApiFetched, onInitUser]);
+  useEffect(() => {
+    if (!isUserFetched || !user || isActiveGamesFetched) return;
+    if (!activeGames) fetchGames(user.discord_id);
+  }, [activeGames, fetchGames, isActiveGamesFetched, isUserFetched, user]);
 
-  return await withPageAuth(children => {
-    return (
-      <>
-        <Header />
-        <div className={styles.container}>{children}</div>
-        {modal.isOpen && <Modal />}
-      </>
-    );
-  }, children);
+  if (!isLoaded) return <div>Loading...</div>;
+  if (!isSignedIn) return redirect('/');
+
+  return (
+    <>
+      <Header />
+      <div className={styles.container}>{children}</div>
+      {modal.isOpen && <Modal />}
+    </>
+  );
 };
 
 export default ProtectedLayout;

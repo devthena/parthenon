@@ -1,20 +1,17 @@
 'use client';
 
-import { SignInButton, useUser } from '@clerk/nextjs';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import { useState } from 'react';
+
+import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 
 import { HEADER_PATHS } from '@/constants/navigation';
 import { MenuCloseIcon, MenuIcon } from '@/images/icons';
 
 import owl from '@/images/owl.png';
 import styles from '@/styles/header.module.scss';
-
-import { Login } from './login';
 
 export const Header = () => {
   const { isSignedIn, user } = useUser();
@@ -42,9 +39,7 @@ export const Header = () => {
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
 
-  const isDiscordUser = user
-    ? user.externalAccounts[0].provider.replace('oauth_', '') === 'discord'
-    : false;
+  const isDiscordUser = user?.externalAccounts[0].provider === 'discord';
 
   return (
     <>
@@ -61,7 +56,7 @@ export const Header = () => {
               </button>
             )}
           </div>
-          <a href="/">
+          <Link href="/">
             <Image
               alt="Little Owl"
               className={styles.logoImg}
@@ -72,7 +67,7 @@ export const Header = () => {
             <h1>
               LITTLEOWL<span>BOT</span>
             </h1>
-          </a>
+          </Link>
         </div>
         <nav className={styles.links}>
           {HEADER_PATHS.map(path => {
@@ -99,9 +94,9 @@ export const Header = () => {
             );
           })}
           {isSignedIn ? (
-            <a className={styles.logButton} href="/api/auth/logout">
-              LOGOUT
-            </a>
+            <SignOutButton>
+              <button className={styles.logButton}>Sign Out</button>
+            </SignOutButton>
           ) : (
             <SignInButton>
               <button className={`${styles.logButton} ${styles.login}`}>
@@ -137,9 +132,9 @@ export const Header = () => {
             })}
           </div>
           {isSignedIn && (
-            <a className={styles.logButton} href="/api/auth/logout">
-              LOGOUT
-            </a>
+            <SignOutButton>
+              <button className={styles.logButton}>Sign Out</button>
+            </SignOutButton>
           )}
         </div>
       </div>

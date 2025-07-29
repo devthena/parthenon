@@ -14,6 +14,11 @@ const nextConfig = {
         port: '',
         pathname: '/jtv_user_pictures/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+        pathname: '**',
+      },
     ],
   },
   reactStrictMode: false,

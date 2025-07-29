@@ -1,55 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@clerk/nextjs/server';
 
-import { GameCode } from '@/enums/games';
-import { DatabaseCollections } from '@/interfaces/db';
-import { UserAuthMethod } from '@/interfaces/user';
+import { RequestParams } from '@/interfaces/api';
+import { connectDatabase } from '@/lib/database';
+import { withApiAuth } from '@/lib/server';
+import { createStats, updateStats } from '@/services/stat';
 
-import { initDatabase } from '@/lib/db';
-import { withApiAuth } from '@/lib/utils';
+export const PATCH = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
 
-const getStats = async (
-  method: UserAuthMethod,
-  id: string,
-  code: GameCode,
-  collections: DatabaseCollections
-) => {
-  let stats = null;
+      const { code, data } = await request.json();
+      const stats = await updateStats(code, data);
 
-  const user = await collections.users.findOne({ [`${method}_id`]: id });
-
-  if (user?.discord_id) {
-    stats = await collections.stats.findOne({ discord_id: user.discord_id });
+      return NextResponse.json(stats);
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
   }
+);
 
-  if (!stats) return null;
+export const POST = withApiAuth(
+  async (request: NextRequest, _params: RequestParams) => {
+    try {
+      await connectDatabase();
 
-  return stats[code] ?? null;
-};
+      const payload = await request.json();
+      const stats = await createStats(payload);
 
-export const POST = withApiAuth(async (request: NextRequest, user: User) => {
-  const method = user.externalAccounts[0].provider.replace(
-    'oauth_',
-    ''
-  ) as UserAuthMethod;
-
-  const id = user.externalAccounts[0].externalId;
-
-  let responseData = null;
-  let responseError = null;
-
-  const payload = await request.json();
-
-  try {
-    const collections = await initDatabase();
-    if (!collections) responseError = 'No database collections found.';
-    else responseData = await getStats(method, id, payload.code, collections);
-  } catch (error) {
-    responseError = JSON.stringify(error);
-  } finally {
-    return NextResponse.json({
-      data: responseData,
-      error: responseError,
-    });
+      return NextResponse.json(stats, { status: 201 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
+    }
   }
-});
+);
