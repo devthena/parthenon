@@ -27,6 +27,7 @@ const checkStatus = (
 
   const playerHasBlackjack = playerHandValue === 21 && playerHand.length === 2;
   const dealerHasBlackjack = dealerHandValue === 21 && dealerHand.length === 2;
+  const playerHasRegular21 = playerHandValue === 21 && playerHand.length > 2;
 
   if (playerHasBlackjack && dealerHasBlackjack) {
     status = BlackjackStatus.Push;
@@ -36,6 +37,8 @@ const checkStatus = (
     status = BlackjackStatus.Lose;
   } else if (playerHandValue > 21) {
     status = BlackjackStatus.Bust;
+  } else if (playerHasRegular21) {
+    status = BlackjackStatus.WinPending;
   } else if (dealerHandValue > 21) {
     status = BlackjackStatus.DealerBust;
   } else if (dealerHandValue >= 17 && dealerHandValue > playerHandValue) {

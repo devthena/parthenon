@@ -6,7 +6,7 @@ import { BlackjackAnimation, BlackjackStatus, CardSize } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 
 import { delay } from '@/lib/utils';
-import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
+import { getHandValue } from '@/lib/utils/cards';
 
 import { Balance } from './balance';
 import { CardBox } from './card';
@@ -116,6 +116,11 @@ export const GameTable = ({
   );
 
   useEffect(() => {
+    if (status !== BlackjackStatus.WinPending) return;
+    handleStand();
+  }, [status]);
+
+  useEffect(() => {
     const dealerDelta = dealerHand.length !== dealerLastHand.length;
     const playerDelta = playerHand.length !== playerLastHand.length;
 
@@ -213,18 +218,20 @@ export const GameTable = ({
           </div>
         </div>
         <div className={isGameOver ? styles.result : styles.actions}>
-          {!isGameOver && animation === BlackjackAnimation.Done && (
-            <>
-              <button disabled={!bet || bet > cash} onClick={handleDouble}>
-                DOUBLE
-              </button>
-              <button onClick={handleHit}>HIT</button>
-              <button onClick={handleStand}>STAND</button>
-            </>
-          )}
+          {!isGameOver &&
+            animation === BlackjackAnimation.Done &&
+            status !== BlackjackStatus.WinPending && (
+              <>
+                <button disabled={!bet || bet > cash} onClick={handleDouble}>
+                  DOUBLE
+                </button>
+                <button onClick={handleHit}>HIT</button>
+                <button onClick={handleStand}>STAND</button>
+              </>
+            )}
           {isGameOver && animation === BlackjackAnimation.Done && (
             <div>
-              <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
+              <p className={styles.resultLabel}>{status}</p>
               <button disabled={!bet || bet > cash} onClick={handleReset}>
                 PLAY AGAIN
               </button>

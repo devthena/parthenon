@@ -93,8 +93,7 @@ const ProtectedLayout = ({
     if (!activeGames) fetchGames(user.discord_id);
   }, [activeGames, fetchGames, isActiveGamesFetched, isUserFetched, user]);
 
-  if (!isLoaded) return <div>Loading...</div>;
-  if (!isSignedIn) return redirect('/');
+  if (isLoaded && !isSignedIn) return redirect('/');
 
   return (
     <>
