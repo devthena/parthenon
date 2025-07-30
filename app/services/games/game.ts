@@ -8,6 +8,7 @@ import { GameModel } from '@/models/game';
 
 import { updateBlackjackGame } from './blackjack';
 import { updateWordleGame } from './wordle';
+import { UserModel } from '@/models/user';
 
 /**
  * createActiveGame
@@ -40,6 +41,11 @@ export const createActiveGame = async (
         bet,
       },
     };
+
+    await UserModel.findOneAndUpdate(
+      { discord_id: discordId },
+      { $inc: { cash: -bet } }
+    );
   } else if (payload.code === GameCode.Wordle) {
     gameData = {
       data: {
