@@ -6,9 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { API_URLS } from '@/constants/api';
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { INITIAL_BLACKJACK } from '@/constants/stats';
-
-import { Loading } from '@/components';
 import { BlackjackStatus, GameCode, GamePage } from '@/enums/games';
+
 import { useBlackjack, useFetch, useParthenon } from '@/hooks';
 import { BackIcon, RulesIcon, StatsIcon } from '@/images/icons';
 import { encrypt } from '@/lib/utils/encryption';
@@ -16,6 +15,7 @@ import { encrypt } from '@/lib/utils/encryption';
 import { BlackjackStats, GameObject } from '@/interfaces/games';
 import { UserObject } from '@/interfaces/user';
 
+import { Loading } from '@/components';
 import { Balance, GameTable, Rules, Stats } from './components';
 import styles from '../shared/styles/page.module.scss';
 
@@ -32,7 +32,7 @@ const Blackjack = () => {
     setStateUser,
   } = useParthenon();
 
-  const { fetchDelete, fetchPatch, fetchPost } = useFetch();
+  const { fetchPatch, fetchPost } = useFetch();
 
   const {
     bet,
@@ -277,7 +277,6 @@ const Blackjack = () => {
           <p className={styles.description}>
             Adjust your bet then hit PLAY when ready!
           </p>
-          {!isUserFetched && <Loading />}
           {isUserFetched && user && (
             <>
               <Balance bet={bet} cash={user.cash} onUpdate={onBetChange} />
@@ -300,7 +299,7 @@ const Blackjack = () => {
             </>
           )}
           <div className={styles.statsContainer}>
-            {!isStatsFetched && <Loading />}
+            {(!isUserFetched || !isStatsFetched) && <Loading />}
             {isStatsFetched && stats && (
               <Stats data={stats[GameCode.Blackjack]} />
             )}

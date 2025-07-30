@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Figtree, Nunito, Source_Code_Pro } from 'next/font/google';
-
 import { ClerkProvider } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 

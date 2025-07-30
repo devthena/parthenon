@@ -152,9 +152,10 @@
   border-radius: 19.5rem;
   color: var(--dark-blue);
   cursor: pointer;
+  font-size: 16px;
   font-weight: 700;
   margin-left: 30px;
-  padding: 7px 28px 8px 29px;
+  padding: 7px 20px 8px 21px;
   transition: all 0.1s ease;
 
   &:hover {
@@ -164,7 +165,6 @@
 }
 
 .login {
-  font-size: 16px;
   padding: 5px 35px;
 
   @media screen and (min-width: $tablet-width) {
