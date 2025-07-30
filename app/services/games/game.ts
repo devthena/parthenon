@@ -10,6 +10,16 @@ import { updateBlackjackGame } from './blackjack';
 import { updateWordleGame } from './wordle';
 import { UserModel } from '@/models/user';
 
+const getDiscordId = async () => {
+  const user = await currentUser();
+
+  const discordAccount = user?.externalAccounts.find(
+    account => account.provider === 'oauth_discord'
+  );
+
+  return discordAccount?.externalId;
+};
+
 /**
  * createActiveGame
  * This creates a new Game Document
@@ -17,11 +27,7 @@ import { UserModel } from '@/models/user';
 export const createActiveGame = async (
   payload: Partial<GameObject>
 ): Promise<Partial<GameObject> | null> => {
-  const user = await currentUser();
-
-  // @todo: Link the user data if there are two providers
-  const discordId = user?.externalAccounts?.[1].externalId;
-
+  const discordId = await getDiscordId();
   if (!discordId) return null;
 
   await GameModel.findOneAndDelete({
@@ -112,11 +118,7 @@ export const getActiveGames = async (
 export const updateActiveGame = async (
   payload: GameObject
 ): Promise<Partial<GameObject> | null> => {
-  const user = await currentUser();
-
-  // @todo: Link the user data if there are two providers
-  const discordId = user?.externalAccounts?.[1].externalId;
-
+  const discordId = await getDiscordId();
   if (!discordId) return null;
 
   const game = await GameModel.findOne({

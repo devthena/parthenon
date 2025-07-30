@@ -124,7 +124,7 @@ export const GameTable = ({
     };
 
     forceStand();
-  }, [status]);
+  }, [handleStand, status]);
 
   useEffect(() => {
     const dealerDelta = dealerHand.length !== dealerLastHand.length;

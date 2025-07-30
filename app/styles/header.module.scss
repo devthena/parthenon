@@ -52,6 +52,10 @@
 
   button {
     border: none;
+
+    svg path {
+      fill: var(--text-primary);
+    }
   }
 
   @media screen and (min-width: $tablet-width) {
@@ -71,7 +75,7 @@
 
 .modalContent {
   align-items: center;
-  background-color: var(--white);
+  background-color: var(--background-primary);
   display: flex;
   flex-direction: column;
   height: 100%;
