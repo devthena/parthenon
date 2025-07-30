@@ -4,18 +4,18 @@ import { redirect } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 
-import { Header, Modal } from '@/components';
 import { API_URLS } from '@/constants/api';
 import { INITIAL_BLACKJACK, INITIAL_WORDLE } from '@/constants/stats';
 import { GameCode } from '@/enums/games';
+
+import { Header, Modal } from '@/components';
 import { useFetch, useParthenon } from '@/hooks';
+import { getLinkedUser } from '@/lib/utils';
 
 import { GameObject } from '@/interfaces/games';
 import { StatObject } from '@/interfaces/stat';
-import { UserObject } from '@/interfaces/user';
 
 import styles from './layout.module.scss';
-import { getLinkedUser } from '@/lib/utils';
 
 const ProtectedLayout = ({
   children,
