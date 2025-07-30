@@ -104,13 +104,13 @@
 }
 
 .status {
-  border-top: 1px solid var(--black-lighter);
+  border-top: 1px solid var(--divider-light);
   margin-top: 20px;
   padding: 20px;
 
   @media screen and (min-width: $desktop-width) {
     border-top: none;
-    border-left: 1px solid var(--black-lighter);
+    border-left: 1px solid var(--divider-light);
     margin-top: 0;
     min-width: 450px;
     padding: 48px 45px;

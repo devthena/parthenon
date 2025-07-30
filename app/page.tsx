@@ -37,9 +37,9 @@ const Home = () => {
             <h1>Welcome to the Parthenon!</h1>
             <p>The official website of the AthenaUS community</p>
           </div>
-          <SignInButton>
-            <button className={styles.login}>Sign In</button>
-          </SignInButton>
+          <div className={styles.login}>
+            <SignInButton>LOGIN</SignInButton>
+          </div>
           <div className={styles.social}>
             <p>Connect with me!</p>
             <div className={styles.socialIcons}>
