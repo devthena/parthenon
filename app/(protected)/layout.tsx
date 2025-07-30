@@ -15,6 +15,7 @@ import { StatObject } from '@/interfaces/stat';
 import { UserObject } from '@/interfaces/user';
 
 import styles from './layout.module.scss';
+import { getLinkedUser } from '@/lib/utils';
 
 const ProtectedLayout = ({
   children,
@@ -22,7 +23,7 @@ const ProtectedLayout = ({
   children: React.ReactNode;
 }>) => {
   const { isLoaded, isSignedIn, user: userClerk } = useUser();
-  const { fetchGet, fetchGetArray } = useFetch();
+  const { fetchGet, fetchGetArray, fetchPost } = useFetch();
 
   const {
     activeGames,
@@ -70,14 +71,17 @@ const ProtectedLayout = ({
   const fetchUser = useCallback(async () => {
     if (!userClerk) return;
 
-    // @todo: Link the user data if there are two providers
-    const userAccount = userClerk.externalAccounts[1];
+    const attemptMerge = async () => {
+      const data = await getLinkedUser(
+        userClerk.externalAccounts,
+        fetchGet,
+        fetchPost
+      );
+      setStateUser(data);
+    };
 
-    const url = `${API_URLS.USERS}/${userAccount.providerUserId}?method=${userAccount.provider}`;
-    const data = await fetchGet<UserObject>(url);
-
-    setStateUser(data);
-  }, [fetchGet, setStateUser, userClerk]);
+    attemptMerge();
+  }, [fetchGet, fetchPost, setStateUser, userClerk]);
 
   useEffect(() => {
     if (isUserFetched || !isSignedIn) return;

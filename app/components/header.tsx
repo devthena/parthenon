@@ -39,8 +39,9 @@ export const Header = () => {
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
 
-  // @todo: Link the user data if there are two providers
-  const isDiscordUser = user?.externalAccounts[1].provider === 'discord';
+  const isDiscordUser = user?.externalAccounts.some(
+    account => account.provider === 'discord'
+  );
 
   return (
     <>
