@@ -39,7 +39,8 @@ export const Header = () => {
     ? `${styles.modal} ${styles.zIndexAdd}`
     : styles.modal;
 
-  const isDiscordUser = user?.externalAccounts[0].provider === 'discord';
+  // @todo: Link the user data if there are two providers
+  const isDiscordUser = user?.externalAccounts[1].provider === 'discord';
 
   return (
     <>
@@ -95,12 +96,12 @@ export const Header = () => {
           })}
           {isSignedIn ? (
             <SignOutButton>
-              <button className={styles.logButton}>Sign Out</button>
+              <button className={styles.logButton}>LOGOUT</button>
             </SignOutButton>
           ) : (
             <SignInButton>
               <button className={`${styles.logButton} ${styles.login}`}>
-                Sign In
+                LOGIN
               </button>
             </SignInButton>
           )}
@@ -133,7 +134,7 @@ export const Header = () => {
           </div>
           {isSignedIn && (
             <SignOutButton>
-              <button className={styles.logButton}>Sign Out</button>
+              <button className={styles.logButton}>LOGOUT</button>
             </SignOutButton>
           )}
         </div>

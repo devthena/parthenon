@@ -18,7 +18,9 @@ export const createActiveGame = async (
   payload: Partial<GameObject>
 ): Promise<Partial<GameObject> | null> => {
   const user = await currentUser();
-  const discordId = user?.externalAccounts?.[0].externalId;
+
+  // @todo: Link the user data if there are two providers
+  const discordId = user?.externalAccounts?.[1].externalId;
 
   if (!discordId) return null;
 
@@ -111,7 +113,9 @@ export const updateActiveGame = async (
   payload: GameObject
 ): Promise<Partial<GameObject> | null> => {
   const user = await currentUser();
-  const discordId = user?.externalAccounts?.[0].externalId;
+
+  // @todo: Link the user data if there are two providers
+  const discordId = user?.externalAccounts?.[1].externalId;
 
   if (!discordId) return null;
 

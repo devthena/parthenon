@@ -4,7 +4,7 @@ import { GameCode } from '@/enums/games';
 import { GameObject } from '@/interfaces/games';
 import { ModalState } from '@/interfaces/modal';
 import { UserObject } from '@/interfaces/user';
-import { ParthenonContext } from '@/lib/context';
+import { ParthenonContext } from '@/providers/context';
 import { StatObject } from '@/interfaces/stat';
 
 export const useParthenon = () => {

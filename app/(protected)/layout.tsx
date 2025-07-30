@@ -70,7 +70,8 @@ const ProtectedLayout = ({
   const fetchUser = useCallback(async () => {
     if (!userClerk) return;
 
-    const userAccount = userClerk.externalAccounts[0];
+    // @todo: Link the user data if there are two providers
+    const userAccount = userClerk.externalAccounts[1];
 
     const url = `${API_URLS.USERS}/${userAccount.providerUserId}?method=${userAccount.provider}`;
     const data = await fetchGet<UserObject>(url);

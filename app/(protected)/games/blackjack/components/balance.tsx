@@ -23,7 +23,7 @@ export const Balance = ({
   return (
     <div className={styles.balance}>
       <div className={styles.betBox}>
-        <span>BET:</span>
+        <span>{disableBet ? 'BET:' : 'ENTER BET:'}</span>
         <input
           disabled={disableBet}
           max={cash}

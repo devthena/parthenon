@@ -4,7 +4,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Analytics } from '@vercel/analytics/react';
 
 import { Footer } from '@/components';
-import { ParthenonProvider } from '@/lib/context';
+import { ParthenonProvider } from '@/providers/context';
+import { ThemeProvider } from '@/providers/theme';
 
 import './globals.scss';
 import styles from '@/styles/layout.module.scss';
@@ -46,6 +47,7 @@ const RootLayout = ({
           </head>
           <body
             className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
+            <ThemeProvider />
             <main className={styles.main}>
               <div className={styles.content}>{children}</div>
               <Footer />
