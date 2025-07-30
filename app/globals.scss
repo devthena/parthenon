@@ -44,10 +44,17 @@
   --divider: #1d1d21;
   --divider-light: rgba(29, 29, 33, 0.2);
   --game-tile-background: #fcfcff;
+  --game-tile-border: rgba(1, 49, 74, 0.2);
+  --game-wordle-grid-border: #cccccc;
+  --game-wordle-guess-border: #888888;
+  --game-wordle-key: #e9e9ec;
+  --game-wordle-key-absent: #787c7e;
+  --modal-background: rgba(248, 248, 255, 0.8);
   --text-bot-logo: #93c7ff;
   --text-headline: #01314a;
   --text-primary: #1d1d21;
   --text-secondary: #01314a;
+  --input-disabled-opacity: 0.8;
 }
 
 .dark {
@@ -63,10 +70,16 @@
   --divider-light: #01314a;
   --game-tile-background: #1d1d21;
   --game-tile-border: rgba(147, 199, 255, 0.25);
+  --game-wordle-grid-border: #888888;
+  --game-wordle-guess-border: #cccccc;
+  --game-wordle-key: #787c7e;
+  --game-wordle-key-absent: rgba(120, 124, 126, 0.5);
+  --modal-background: rgba(29, 29, 33, 0.8);
   --text-bot-logo: #f8f8ff;
   --text-headline: #d4e9ff;
   --text-primary: #f8f8ff;
   --text-secondary: #93c7ff;
+  --input-disabled-opacity: 0.5;
 }
 
 * {
@@ -112,4 +125,28 @@ code {
   @media screen and (min-width: $tablet-width) {
     font-size: 16px;
   }
+}
+
+input[type='text'],
+input[type='number'] {
+  background-color: var(--background-primary);
+  border: 1px solid var(--text-primary);
+  color: var(--text-primary);
+  outline: 0;
+
+  &:disabled {
+    opacity: var(--input-disabled-opacity);
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
 }

@@ -17,15 +17,39 @@
   }
 
   button {
-    background-color: var(--white);
-    border: 1px solid var(--black);
+    background-color: var(--background-primary);
+    border: 1px solid var(--text-primary);
     border-radius: 5px;
+    color: var(--text-primary);
+
+    & > svg {
+      height: 20px;
+      width: 20px;
+
+      path {
+        fill: var(--text-primary);
+      }
+    }
   }
 }
 
 .leftButtons,
 .rightButtons {
   width: 80px;
+
+  button {
+    color: var(--text-primary);
+
+    & > svg {
+      height: 20px;
+      width: 20px;
+
+      path,
+      polygon {
+        fill: var(--text-primary);
+      }
+    }
+  }
 }
 
 .leftButtons {
@@ -61,12 +85,6 @@ button.back {
   margin-right: 15px;
   padding: 2px 5px 0 2px;
 
-  & > svg {
-    fill: var(--black);
-    height: 20px;
-    width: 20px;
-  }
-
   @media screen and (min-width: $tablet-width) {
     display: none;
   }
@@ -79,12 +97,6 @@ button.backDesktop {
   display: none;
   padding: 3px 11px 3px 3px;
 
-  & > svg {
-    fill: var(--black);
-    height: 20px;
-    width: 20px;
-  }
-
   @media screen and (min-width: $tablet-width) {
     display: flex;
   }
@@ -94,11 +106,6 @@ button.rules,
 button.rulesOverview,
 button.stats {
   padding: 2px 5px 0;
-
-  & > svg {
-    height: 20px;
-    width: 20px;
-  }
 }
 
 button.rulesOverview {
