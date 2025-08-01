@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .copyText {
   font-size: 16px;
@@ -11,7 +11,7 @@
 }
 
 .userCode {
-  background-color: var(--owl-blue-lighter);
+  background-color: var(--code-background);
   display: inline-block;
   line-height: 18px;
   margin-top: 10px;

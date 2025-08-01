@@ -1,7 +1,7 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .grid {
-  color: var(--black);
+  color: var(--text-primary);
   display: grid;
   font-weight: 500;
   grid-template-rows: repeat(6, 1fr);
@@ -20,7 +20,7 @@
 
 .letter {
   align-items: center;
-  border: 1px solid var(--grey-light);
+  border: 1px solid var(--game-wordle-grid-border);
   display: inline-flex;
   font-size: 26px;
   justify-content: center;
@@ -44,7 +44,7 @@
 }
 
 .guessing {
-  border: 1px solid var(--grey-dark);
+  border: 1px solid var(--game-wordle-guess-border);
 }
 
 .absent {
@@ -58,8 +58,8 @@
 }
 
 .default {
-  background-color: var(--white);
-  color: var(--black);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
 }
 
 .present {

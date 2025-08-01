@@ -1,7 +1,6 @@
-@import 'variables';
+@use 'variables' as *;
 
 .header {
-  background-color: var(--white);
   display: flex;
   height: 50px;
   justify-content: center;
@@ -22,12 +21,12 @@
   }
 
   h1 {
-    color: var(--dark-blue);
+    color: var(--text-secondary);
     font-size: 16px;
     margin-left: 4px;
 
     & > span {
-      color: var(--owl-blue);
+      color: var(--text-bot-logo);
     }
 
     @media screen and (min-width: $tablet-width) {
@@ -53,7 +52,10 @@
 
   button {
     border: none;
-    cursor: pointer;
+
+    svg path {
+      fill: var(--text-primary);
+    }
   }
 
   @media screen and (min-width: $tablet-width) {
@@ -73,7 +75,7 @@
 
 .modalContent {
   align-items: center;
-  background-color: var(--white);
+  background-color: var(--background-primary);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -90,7 +92,7 @@
   justify-content: center;
 
   & > a {
-    color: var(--black);
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: 500;
     line-height: 24px;
@@ -114,7 +116,7 @@
     display: flex;
 
     & > a {
-      color: var(--black);
+      color: var(--text-primary);
       font-size: 16px;
       line-height: 24px;
       margin-left: 30px;
@@ -147,17 +149,30 @@
 }
 
 .logButton {
-  background-color: var(--owl-blue-light);
+  background-color: var(--button-background);
   border: 2px solid var(--dark-blue);
   border-radius: 19.5rem;
   color: var(--dark-blue);
+  font-size: 16px;
   font-weight: 700;
-  padding: 7px 28px 8px 29px;
+  padding: 7px 20px 8px;
   transition: all 0.1s ease;
 
   &:hover {
     background-color: var(--dark-blue);
     color: var(--white);
+  }
+
+  @media screen and (min-width: $tablet-width) {
+    margin-left: 30px;
+  }
+}
+
+.login {
+  padding: 5px 35px;
+
+  @media screen and (min-width: $tablet-width) {
+    padding: 7px 28px 8px;
   }
 }
 

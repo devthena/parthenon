@@ -1,6 +1,4 @@
 export * from './cards';
+export * from './delay';
 export * from './encryption';
-
-export const delay = (ms: number) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-};
+export * from './getLinkedUser';

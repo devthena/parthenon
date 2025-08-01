@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParthenonState } from '@/context';
+import { useParthenon } from '@/hooks';
 
 import { GAME_OVER_STATUS_BLK } from '@/constants/cards';
 import { BlackjackAnimation, BlackjackStatus, CardSize } from '@/enums/games';
 import { PlayCard } from '@/interfaces/games';
 
 import { delay } from '@/lib/utils';
-import { getBlackjackResult, getHandValue } from '@/lib/utils/cards';
+import { getHandValue } from '@/lib/utils/cards';
 
 import { Balance } from './balance';
 import { CardBox } from './card';
@@ -50,7 +50,7 @@ export const GameTable = ({
   onPlay: (bet: number) => void;
   onStand: () => void;
 }) => {
-  const { user, onSetUser } = useParthenonState();
+  const { setStateUser, user } = useParthenon();
 
   const [dealerTotal, setDealerTotal] = useState(0);
   const [playerTotal, setPlayerTotal] = useState(0);
@@ -60,17 +60,17 @@ export const GameTable = ({
   const handleDouble = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onDouble();
-  }, []);
+  }, [onDouble]);
 
   const handleHit = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onHit();
-  }, []);
+  }, [onHit]);
 
   const handleStand = useCallback(async () => {
     await setAnimation(BlackjackAnimation.Standby);
     onStand();
-  }, []);
+  }, [onStand]);
 
   const handleReset = useCallback(async () => {
     if (user && bet) {
@@ -81,7 +81,7 @@ export const GameTable = ({
       setPlayerLastHand([]);
       getGame();
       onPlay(bet);
-      onSetUser({
+      setStateUser({
         ...user,
         cash: user.cash - bet,
       });
@@ -90,7 +90,7 @@ export const GameTable = ({
     bet,
     getGame,
     onPlay,
-    onSetUser,
+    setStateUser,
     setAnimation,
     setDealerLastHand,
     setPlayerLastHand,
@@ -114,6 +114,17 @@ export const GameTable = ({
     },
     [dealerLastHand, playerLastHand]
   );
+
+  useEffect(() => {
+    if (status !== BlackjackStatus.WinPending) return;
+
+    const forceStand = async () => {
+      await delay(1000);
+      handleStand();
+    };
+
+    forceStand();
+  }, [handleStand, status]);
 
   useEffect(() => {
     const dealerDelta = dealerHand.length !== dealerLastHand.length;
@@ -213,18 +224,20 @@ export const GameTable = ({
           </div>
         </div>
         <div className={isGameOver ? styles.result : styles.actions}>
-          {!isGameOver && animation === BlackjackAnimation.Done && (
-            <>
-              <button disabled={!bet || bet > cash} onClick={handleDouble}>
-                DOUBLE
-              </button>
-              <button onClick={handleHit}>HIT</button>
-              <button onClick={handleStand}>STAND</button>
-            </>
-          )}
+          {!isGameOver &&
+            animation === BlackjackAnimation.Done &&
+            status !== BlackjackStatus.WinPending && (
+              <>
+                <button disabled={!bet || bet > cash} onClick={handleDouble}>
+                  DOUBLE
+                </button>
+                <button onClick={handleHit}>HIT</button>
+                <button onClick={handleStand}>STAND</button>
+              </>
+            )}
           {isGameOver && animation === BlackjackAnimation.Done && (
             <div>
-              <p className={styles.resultLabel}>{getBlackjackResult(status)}</p>
+              <p className={styles.resultLabel}>{status}</p>
               <button disabled={!bet || bet > cash} onClick={handleReset}>
                 PLAY AGAIN
               </button>

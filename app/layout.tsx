@@ -1,11 +1,11 @@
-import { UserProvider } from '@auth0/nextjs-auth0/client';
-import { Analytics } from '@vercel/analytics/react';
-
 import type { Metadata } from 'next';
 import { Figtree, Nunito, Source_Code_Pro } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
+import { Analytics } from '@vercel/analytics/react';
 
 import { Footer } from '@/components';
-import { ParthenonProvider } from '@/context';
+import { ParthenonProvider } from '@/providers/context';
+import { ThemeProvider } from '@/providers/theme';
 
 import './globals.scss';
 import styles from '@/styles/layout.module.scss';
@@ -39,23 +39,24 @@ const RootLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
-      <body
-        className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
-        <UserProvider>
-          <ParthenonProvider>
+    <ClerkProvider>
+      <ParthenonProvider>
+        <html lang="en">
+          <head>
+            <link rel="icon" href="/favicon.ico" sizes="any" />
+          </head>
+          <body
+            className={`${figtree.variable} ${nunito.variable} ${sourceCodePro.variable}`}>
+            <ThemeProvider />
             <main className={styles.main}>
               <div className={styles.content}>{children}</div>
               <Footer />
             </main>
-          </ParthenonProvider>
-        </UserProvider>
+          </body>
+        </html>
         <Analytics />
-      </body>
-    </html>
+      </ParthenonProvider>
+    </ClerkProvider>
   );
 };
 

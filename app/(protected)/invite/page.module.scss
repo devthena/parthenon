@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .invite > h1 span {
   color: var(--dark-blue);
@@ -22,7 +22,7 @@
   }
 
   a {
-    color: var(--dark-blue);
+    color: var(--text-secondary);
     text-decoration: underline;
   }
 }

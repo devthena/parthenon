@@ -10,7 +10,7 @@ const Privacy = () => {
     <div className={styles.privacy}>
       <div className={styles.headline}>
         <h1>PRIVACY POLICY</h1>
-        <p>Effective Date: July 10, 2024</p>
+        <p>Effective Date: August 1, 2025</p>
       </div>
       <ul className={styles.sections}>
         <li>
@@ -29,16 +29,24 @@ const Privacy = () => {
           <ul className={styles.list}>
             <li>
               <p>
-                <span>Personal Information</span>: When you log in via Auth0
-                using Discord or Twitch, we collect your username, user ID, and
-                other profile information provided by Discord or Twitch.
+                <span>Personal Information</span>: We collect limited user
+                information (such as user ID, name, and avatar) solely for
+                authentication purposes via{' '}
+                <a href="https://clerk.com/" target="_blank">
+                  Clerk
+                </a>
+                . We do not store personal information on our own servers,
+                except for the unique user ID provided by Discord and Twitch.
+                This ID is used exclusively to verify your identity during login
+                and is not used for tracking, profiling, or marketing purposes.
               </p>
             </li>
             <li>
               <p>
-                <span>Usage Information</span>: We collect information about
-                your interactions with the Site and Bot, such as messages sent,
-                commands used, and mini-games played.
+                <span>Usage Information</span>: We collect data about your
+                interactions with the Site and Bot, such as messages sent,
+                commands used, and mini-games played. This information helps us
+                improve functionality and user experience.
               </p>
             </li>
           </ul>
@@ -81,7 +89,7 @@ const Privacy = () => {
             <li>
               <p>
                 <span>Service Providers</span>: We may share information with
-                Auth0 for authentication purposes only. Auth0 handles user
+                Clerk for authentication purposes only. Clerk handles user
                 information as necessary to facilitate login and account
                 management for the Site.
               </p>

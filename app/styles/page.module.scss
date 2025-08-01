@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 .container {
   display: flex;
@@ -60,9 +60,17 @@
 }
 
 .login {
-  display: flex;
-  justify-content: center;
-  margin: 50px 0 14px;
+  margin-top: 60px;
+
+  button {
+    background-color: var(--button-background);
+    border: 2px solid var(--dark-blue);
+    border-radius: 19.5rem;
+    color: var(--dark-blue);
+    display: inline-block;
+    font-weight: 700;
+    padding: 5px 35px;
+  }
 
   @media screen and (min-width: $tablet-width) {
     display: none;
@@ -100,6 +108,10 @@
   svg {
     height: 20px;
     width: 20px;
+
+    path {
+      fill: var(--text-secondary);
+    }
 
     @media screen and (min-width: $tablet-width) {
       height: 32px;

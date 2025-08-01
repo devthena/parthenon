@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .toggle {
   align-items: center;
@@ -19,7 +19,7 @@
     width: 25px;
 
     path {
-      fill: var(--black);
+      fill: var(--text-primary);
     }
   }
 
@@ -33,7 +33,7 @@
     cursor: pointer;
     width: 40px;
     height: 25px;
-    background: var(--discord-light);
+    background: var(--discord-toggle);
     display: block;
     border-radius: 15px;
     position: relative;
@@ -46,13 +46,13 @@
     left: 4px;
     width: 18px;
     height: 18px;
-    background: var(--white);
+    background: var(--background-primary);
     border-radius: 100%;
     transition: 0.3s;
   }
 
   input:checked + label {
-    background: var(--twitch-light);
+    background: var(--twitch-toggle);
   }
 
   input:checked + label:after {
@@ -62,7 +62,6 @@
 }
 
 .boxes {
-  color: var(--dark-blue);
   display: flex;
   justify-content: center;
   margin: 20px 0;
@@ -73,7 +72,7 @@
 }
 
 .box {
-  background-color: var(--twitch-lighter);
+  background-color: var(--twitch-background);
   border-color: var(--owl-blue-lightest);
   border-width: 0 2px 2px 0;
   border-style: solid;
@@ -89,7 +88,7 @@
   }
 
   &:first-child {
-    background-color: var(--discord-lighter);
+    background-color: var(--discord-background);
     margin-right: 0;
 
     @media screen and (min-width: $tablet-width) {
@@ -103,6 +102,7 @@
 
   h2 {
     align-items: center;
+    color: var(--text-headline);
     display: flex;
     font-size: 20px;
     justify-content: center;
@@ -118,10 +118,18 @@
     svg {
       display: none;
 
+      path {
+        fill: var(--text-headline);
+      }
+
       @media screen and (min-width: $tablet-width) {
         display: block;
       }
     }
+  }
+
+  h3 {
+    color: var(--text-headline);
   }
 }
 

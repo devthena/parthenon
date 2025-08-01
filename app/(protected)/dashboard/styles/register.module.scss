@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .buttons {
   align-items: center;
@@ -14,7 +14,7 @@
 
 .button {
   align-items: center;
-  background-color: var(--discord-lighter);
+  background-color: var(--discord-background);
   border-radius: 16px;
   display: flex;
   width: 170px;
@@ -26,7 +26,7 @@
   }
 
   &:first-child {
-    background-color: var(--twitch-lighter);
+    background-color: var(--twitch-background);
     margin-bottom: 10px;
 
     @media screen and (min-width: $tablet-width) {
@@ -34,8 +34,12 @@
     }
   }
 
+  svg path {
+    fill: var(--text-headline);
+  }
+
   span {
-    color: var(--dark-blue);
+    color: var(--text-headline);
     font-size: 16px;
     font-weight: 600;
     margin-left: 5px;

@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 .footer {
   align-items: center;
@@ -19,7 +19,7 @@
   }
 
   a {
-    color: var(--dark-blue);
+    color: var(--text-secondary);
     font-size: 12px;
     font-weight: 500;
   }

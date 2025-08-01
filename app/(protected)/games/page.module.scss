@@ -1,4 +1,4 @@
-@import '@/styles/variables';
+@use '@/styles/variables' as *;
 
 .description {
   font-size: 16px;
@@ -28,8 +28,8 @@
 
 .gridItem {
   align-items: center;
-  background-color: var(--white-light);
-  border: 2px solid var(--dark-blue-light);
+  background-color: var(--game-tile-background);
+  border: 2px solid var(--game-tile-border);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -50,7 +50,7 @@
   }
 
   span {
-    color: var(--black);
+    color: var(--text-primary);
     font-family: var(--font-nunito);
     font-size: 12px;
     font-weight: 700;
