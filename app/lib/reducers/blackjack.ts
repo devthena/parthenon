@@ -77,7 +77,16 @@ export const blackjackReducer = (
         double: false,
         playerHand: playerHand,
         dealerHand: dealerHand,
-        status: checkStatus(playerHand, dealerHand),
+      };
+
+    case 'SET_STATUS':
+      return {
+        ...state,
+        status: checkStatus(
+          state.playerHand,
+          state.dealerHand,
+          state.status === BlackjackStatus.WinPending
+        ),
       };
 
     case 'DOUBLE':
@@ -99,7 +108,6 @@ export const blackjackReducer = (
         double: true,
         dealerHand: newDealerHand,
         playerHand: newPlayerHand,
-        status: checkStatus(newPlayerHand, newDealerHand),
       };
 
     case 'HIT':
@@ -112,7 +120,6 @@ export const blackjackReducer = (
         ...state,
         deck: updatedDeck,
         playerHand: updatedPlayerHand,
-        status: checkStatus(updatedPlayerHand, [...state.dealerHand]),
       };
 
     case 'STAND':
@@ -123,11 +130,6 @@ export const blackjackReducer = (
         ...state,
         deck: currentDeck,
         dealerHand: updatedDealerHand,
-        status: checkStatus(
-          [...state.playerHand],
-          updatedDealerHand,
-          state.status === BlackjackStatus.WinPending
-        ),
       };
 
     case 'GAME_RESET':

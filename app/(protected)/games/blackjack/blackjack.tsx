@@ -46,17 +46,18 @@ const Blackjack = () => {
     onHit,
     onPlay,
     onReset,
+    onSetStatus,
     onStand,
   } = useBlackjack();
 
   const [page, setPage] = useState(GamePage.Overview);
-  const [isDataUpdated, setIsDataUpdated] = useState(true);
 
   const [dealerLastHand, setDealerLastHand] = useState([]);
   const [playerLastHand, setPlayerLastHand] = useState([]);
 
   const betRef = useRef(bet);
   const gameKeyRef = useRef<string | undefined>(null);
+  const gameSavedRef = useRef(false);
 
   const getGame = useCallback(async () => {
     const game = await fetchPost<GameObject>(API_URLS.GAMES, {
@@ -112,78 +113,67 @@ const Blackjack = () => {
   }, [bet]);
 
   useEffect(() => {
-    if (!user || !user.discord_username || !bet || isDataUpdated) return;
+    if (!user || !bet) return;
+    if (!GAME_OVER_STATUS_BLK.includes(status) || gameSavedRef.current) return;
 
-    if (GAME_OVER_STATUS_BLK.includes(status)) {
-      setIsDataUpdated(true);
-      updateGame();
+    gameSavedRef.current = true;
+    updateGame();
 
-      const newStats =
-        stats && stats[GameCode.Blackjack]
-          ? stats[GameCode.Blackjack]
-          : INITIAL_BLACKJACK;
+    const newStats =
+      stats && stats[GameCode.Blackjack]
+        ? stats[GameCode.Blackjack]
+        : INITIAL_BLACKJACK;
 
-      newStats.totalPlayed += 1;
+    newStats.totalPlayed += 1;
 
-      if (status === BlackjackStatus.Blackjack) {
-        updateStats({
-          ...newStats,
-          totalBlackjack: newStats.totalBlackjack + 1,
-          totalWon: newStats.totalWon + 1,
-        });
+    if (status === BlackjackStatus.Blackjack) {
+      updateStats({
+        ...newStats,
+        totalBlackjack: newStats.totalBlackjack + 1,
+        totalWon: newStats.totalWon + 1,
+      });
 
-        const reward = double ? bet + bet * 2 : bet + Math.round(bet * 1.5);
+      const reward = double ? bet + bet * 2 : bet + Math.round(bet * 1.5);
 
+      updateUser({
+        ...user,
+        cash: user.cash + reward,
+      });
+    } else if (
+      status === BlackjackStatus.Win ||
+      status === BlackjackStatus.DealerBust
+    ) {
+      updateStats({
+        ...newStats,
+        totalWon: newStats.totalWon + 1,
+      });
+
+      const reward = double ? bet + bet * 2 : bet * 2;
+
+      updateUser({
+        ...user,
+        cash: user.cash + reward,
+      });
+    } else if (status === BlackjackStatus.Push) {
+      updateUser({
+        ...user,
+        cash: user.cash + bet,
+      });
+    } else {
+      if (double) {
         updateUser({
           ...user,
-          cash: user.cash + reward,
+          cash: user.cash - bet,
         });
-      } else if (
-        status === BlackjackStatus.Win ||
-        status === BlackjackStatus.DealerBust
-      ) {
-        updateStats({
-          ...newStats,
-          totalWon: newStats.totalWon + 1,
-        });
-
-        const reward = double ? bet + bet * 2 : bet * 2;
-
-        updateUser({
-          ...user,
-          cash: user.cash + reward,
-        });
-      } else if (status === BlackjackStatus.Push) {
-        updateUser({
-          ...user,
-          cash: user.cash + bet,
-        });
-      } else {
-        if (double) {
-          updateUser({
-            ...user,
-            cash: user.cash - bet,
-          });
-        }
       }
     }
-  }, [
-    bet,
-    double,
-    isDataUpdated,
-    stats,
-    status,
-    updateGame,
-    updateStats,
-    updateUser,
-    user,
-  ]);
+  }, [bet, double, stats, status, updateGame, updateStats, updateUser, user]);
 
   useEffect(() => {
-    if (status === BlackjackStatus.Playing && isDataUpdated) {
-      setIsDataUpdated(false);
-    }
-  }, [status, isDataUpdated]);
+    if (!playerHand.length || !dealerHand.length) return;
+    if (playerHand.length === 2) gameSavedRef.current = false;
+    onSetStatus();
+  }, [dealerHand, playerHand]);
 
   if (isUserFetched && (!user || !user?.discord_username))
     redirect('/dashboard');

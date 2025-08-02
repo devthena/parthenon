@@ -19,6 +19,7 @@ export interface BlackjackState {
 export type BlackjackAction =
   | { type: 'BET_UPDATE'; payload: number | null }
   | { type: 'GAME_START'; payload: { bet: number; deck: PlayCard[] } }
+  | { type: 'SET_STATUS' }
   | { type: 'DOUBLE' }
   | { type: 'HIT' }
   | { type: 'STAND' }
