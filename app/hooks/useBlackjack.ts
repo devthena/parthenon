@@ -30,6 +30,10 @@ export const useBlackjack = () => {
     [dispatch]
   );
 
+  const onSetStatus = useCallback(() => {
+    dispatch({ type: 'SET_STATUS' });
+  }, []);
+
   const onDouble = useCallback(() => {
     dispatch({ type: 'DOUBLE' });
   }, [dispatch]);
@@ -48,6 +52,7 @@ export const useBlackjack = () => {
     onDouble,
     onHit,
     onReset,
+    onSetStatus,
     onStand,
     onPlay,
   };
