@@ -12,7 +12,7 @@ import styles from '@/styles/layout.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon',
-  description: 'Official website of AthenaUS',
+  description: 'Official Website of the AthenaUS community',
 };
 
 const figtree = Figtree({

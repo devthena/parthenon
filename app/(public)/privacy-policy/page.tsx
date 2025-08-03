@@ -3,6 +3,8 @@ import styles from './page.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon | Privacy Policy',
+  description:
+    'Learn how we collect, use, and protect your personal information when using our platform.',
 };
 
 const Privacy = () => {
