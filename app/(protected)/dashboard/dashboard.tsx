@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import { Loading } from '@/components';
 import { useParthenon } from '@/hooks';
-import { CoinIcon, StarIcon } from '@/images/icons';
+import { SilverIcon, StarIcon } from '@/images/icons';
 
 import { AccountLinked, Instructions, Register } from './components';
 import styles from './page.module.scss';
@@ -65,7 +65,7 @@ const Dashboard = () => {
                 <span>POINTS</span>
                 <span>{user ? user.cash : 0}</span>
               </p>
-              <CoinIcon />
+              <SilverIcon />
             </div>
             <div className={styles.item}>
               <p className={styles.label}>
