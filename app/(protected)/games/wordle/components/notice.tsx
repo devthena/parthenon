@@ -1,5 +1,5 @@
 import { WordleStatus } from '@/enums/games';
-import { CoinIcon } from '@/images/icons';
+import { SilverIcon } from '@/images/icons';
 
 import styles from '../styles/notice.module.scss';
 
@@ -34,7 +34,7 @@ export const Notice = ({
             <>
               Reward: <span className={styles.reward}>{reward}</span>
               <span className={styles.coin}>
-                <CoinIcon />
+                <SilverIcon />
               </span>
             </>
           )}{' '}
