@@ -1,7 +1,7 @@
 @use '@/styles/variables' as *;
 
 .invite > h1 span {
-  color: var(--dark-blue);
+  color: var(--text-secondary);
 }
 
 .invite > figure {
@@ -28,7 +28,7 @@
 }
 
 .inviteButton {
-  background-color: var(--owl-blue-light);
+  background-color: var(--button-background);
   border: 2px solid var(--dark-blue);
   border-radius: 19.5rem;
   color: var(--dark-blue);
