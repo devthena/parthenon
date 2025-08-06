@@ -3,6 +3,8 @@ import styles from './page.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon | Terms of Service',
+  description:
+    'A detailed overview of our terms and conditions, including user responsibilities and legal disclaimers.',
 };
 
 const Terms = () => {

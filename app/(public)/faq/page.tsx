@@ -3,6 +3,8 @@ import styles from './page.module.scss';
 
 export const metadata: Metadata = {
   title: 'Parthenon | FAQ',
+  description:
+    'Find quick answers to common questions about accounts, features, and troubleshooting.',
 };
 
 const FAQ = () => {

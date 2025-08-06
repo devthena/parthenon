@@ -86,7 +86,7 @@ const Blackjack = () => {
 
     if (game) gameKeyRef.current = game.key;
     setStateActiveGame(GameCode.Blackjack, game);
-  }, [double, fetchPatch, setStateActiveGame, status]);
+  }, [double, status, fetchPatch, setStateActiveGame]);
 
   const updateStats = useCallback(
     async (payload: BlackjackStats) => {
@@ -97,7 +97,7 @@ const Blackjack = () => {
         [GameCode.Blackjack]: { ...payload },
       });
     },
-    [setStateStats, stats]
+    [stats, setStateStats]
   );
 
   const updateUser = useCallback(
@@ -105,7 +105,7 @@ const Blackjack = () => {
       if (!user) return;
       setStateUser({ ...user, ...payload });
     },
-    [setStateUser, user]
+    [user, setStateUser]
   );
 
   useEffect(() => {
@@ -173,7 +173,7 @@ const Blackjack = () => {
     if (!playerHand.length || !dealerHand.length) return;
     if (playerHand.length === 2) gameSavedRef.current = false;
     onSetStatus();
-  }, [dealerHand, playerHand]);
+  }, [dealerHand, playerHand, onSetStatus]);
 
   if (isUserFetched && (!user || !user?.discord_username))
     redirect('/dashboard');

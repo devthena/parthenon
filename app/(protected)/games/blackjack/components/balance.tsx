@@ -1,4 +1,4 @@
-import { CoinIcon } from '@/images/icons';
+import { SilverIcon } from '@/images/icons';
 import styles from '../styles/balance.module.scss';
 
 export const Balance = ({
@@ -44,7 +44,7 @@ export const Balance = ({
       <div className={balanceClass}>
         <span>CASH BALANCE:</span>
         <span className={styles.cash}>{cash}</span>
-        <CoinIcon />
+        <SilverIcon />
       </div>
     </div>
   );
